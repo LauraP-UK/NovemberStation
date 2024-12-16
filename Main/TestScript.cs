@@ -6,6 +6,7 @@ namespace NovemberStation.Main;
 public partial class TestScript : Node {
 
     private static TestScript instance;
+    private static readonly Scheduler scheduler = new();
 
     public TestScript() {
         instance = this;

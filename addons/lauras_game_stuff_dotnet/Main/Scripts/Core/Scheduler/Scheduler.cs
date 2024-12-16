@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using Godot;
 using Timer = System.Timers.Timer;
 
 public class Scheduler {
