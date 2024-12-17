@@ -1,12 +1,14 @@
 
-public class KeyPressEvent : EventBase<string> {
-    private string _key;
+using Godot;
 
-    public KeyPressEvent(string key) {
+public class KeyPressEvent : EventBase<Key> {
+    private Key _key;
+
+    public KeyPressEvent(Key key) {
         _key = key;
     }
 
-    public override string GetAdditionalContext() {
+    public override Key GetAdditionalContext() {
         return _key;
     }
 }

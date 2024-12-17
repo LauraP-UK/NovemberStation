@@ -1,13 +1,15 @@
 
-public class KeyReleaseEvent : EventBase<string> {
+using Godot;
+
+public class KeyReleaseEvent : EventBase<Key> {
     
-    private string _key;
+    private Key _key;
     
-    public KeyReleaseEvent(string key) {
+    public KeyReleaseEvent(Key key) {
         _key = key;
     }
     
-    public override string GetAdditionalContext() {
+    public override Key GetAdditionalContext() {
         return _key;
     }
 }

@@ -1,18 +1,19 @@
 using System.Collections.Generic;
+using Godot;
 
 public class KeyBinding {
-    private readonly AutoDictionary<string, GameAction> _keyToAction = new();
+    private readonly AutoDictionary<Key, GameAction.Action> _keyToAction = new();
 
-    public void BindKey(string key, GameAction action) {
+    public void BindKey(Key key, GameAction.Action action) {
         _keyToAction.Add(key, action);
     }
 
-    public GameAction? GetAction(string key) {
-        return _keyToAction.TryGetValue(key, out GameAction action) ? action : null;
+    public GameAction.Action? GetAction(Key key) {
+        return _keyToAction.TryGetValue(key, out GameAction.Action action) ? action : null;
     }
 
-    public IEnumerable<string> GetKeysForAction(GameAction action) {
-        foreach (KeyValuePair<string,GameAction> pair in _keyToAction)
+    public IEnumerable<Key> GetKeysForAction(GameAction.Action action) {
+        foreach (KeyValuePair<Key, GameAction.Action> pair in _keyToAction)
             if (pair.Value == action) yield return pair.Key;
     }
 }

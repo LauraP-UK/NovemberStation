@@ -64,6 +64,7 @@ public class EventManager {
     }
 
     private void CleanupListeners() {
+        Console.WriteLine("INFO: EventManager.CleanupListeners() : Cleaning up listeners.");
         foreach (Type key in _listeners.Keys)
             _listeners[key].RemoveWhere(listener => listener.Owner == null);
     }
