@@ -1,20 +1,16 @@
 using System;
 using Godot;
 
-public partial class InputController : Node {
+public class InputController {
     private static InputController _instance;
 
     private readonly KeyBinding _keyBinding;
-    private readonly Func<Key, bool> _isKeyPressed;
-    private readonly Func<Key, bool> _isKeyReleased;
 
-    public InputController(KeyBinding keyBinding, Func<Key, bool> isKeyPressed, Func<Key, bool> isKeyReleased) {
+    public InputController(KeyBinding keyBinding) {
         if (_instance != null) throw new InvalidOperationException("ERROR: InputController.<init> : InputController is a singleton and cannot be instantiated more than once.");
         _instance = this;
-
         _keyBinding = keyBinding;
-        _isKeyPressed = isKeyPressed;
-        _isKeyReleased = isKeyReleased;
+        GD.Print("INFO: InputController.<init> : InputController has been instantiated.");
     }
 
     public static InputController I() {
@@ -26,23 +22,19 @@ public partial class InputController : Node {
         return _keyBinding;
     }
 
-    public override void _Input(InputEvent @event) {
+    public void ProcessInput(InputEvent @event) {
+        GD.Print("INFO: InputController._Input() : Input event detected.");
+        if (@event is not InputEventKey eventKey) return;
         
-    }
-
-    public void Update() {
-        foreach (GameActionSpecific action in GameAction.GetAll()) {
-            action.CheckAction(
-                key => _isKeyPressed(key) || _isKeyReleased(key),
-                key => {
-                    if (_isKeyPressed(key)) {
-                        new KeyPressEvent(key).Fire();
-                        FireGameAction(action.GetAction());
-                    }
-
-                    if (_isKeyReleased(key)) new KeyReleaseEvent(key).Fire();
-                });
-        }
+        bool isPress = eventKey.Pressed;
+        Key key = eventKey.Keycode;
+        GD.Print($"INFO: InputController._Input() : Key is {OS.GetKeycodeString(key)}  |  Pressed: {isPress}");
+        if (isPress) {
+            GameAction.Action? action = _keyBinding.GetAction(key);
+            new KeyPressEvent(key).Fire();
+            if (action.HasValue) FireGameAction(action.Value);
+        } else
+            new KeyReleaseEvent(key).Fire();
     }
 
     private void FireGameAction(GameAction.Action action) {

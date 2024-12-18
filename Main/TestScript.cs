@@ -19,7 +19,7 @@ public partial class TestScript : Node {
         keyBinding.BindKey(Key.A, GameAction.Action.MOVE_LEFT);
         keyBinding.BindKey(Key.D, GameAction.Action.MOVE_RIGHT);
         
-        inputController = new InputController(keyBinding, Input.IsKeyPressed, _ => false);
+        inputController = new InputController(keyBinding);
     }
 
     public static TestScript I() {
@@ -29,7 +29,11 @@ public partial class TestScript : Node {
     public void PrintSomethingStupid() {
         GD.Print("Start");
     }
-    
+
+    public override void _Input(InputEvent @event) {
+        inputController.ProcessInput(@event);
+    }
+
     // Called when the node enters the scene tree for the first time.
     public override void _Ready() {
         I().PrintSomethingStupid();
@@ -37,6 +41,6 @@ public partial class TestScript : Node {
 
     // Called every frame. 'delta' is the elapsed time since the previous frame.
     public override void _Process(double delta) {
-        InputController.I().Update();
+        
     }
 }
