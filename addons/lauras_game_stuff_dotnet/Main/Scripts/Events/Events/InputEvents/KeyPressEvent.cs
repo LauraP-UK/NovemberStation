@@ -2,7 +2,7 @@
 using Godot;
 
 public class KeyPressEvent : EventBase<Key> {
-    private Key _key;
+    private readonly Key _key;
 
     public KeyPressEvent(Key key) {
         _key = key;

@@ -1,12 +1,16 @@
 public abstract class ActorEventBase : EventBase<string> {
 
-    private string ActorName { get; }
+    private string _actorName { get; set; }
 
-    protected ActorEventBase(string actorName) {
-        ActorName = actorName;
+    protected ActorEventBase() {
+    }
+    
+    public ActorEventBase SetActorName(string actorName) {
+        _actorName = actorName;
+        return this;
     }
     
     public override string GetAdditionalContext() {
-        return ActorName;
+        return _actorName;
     }
 }

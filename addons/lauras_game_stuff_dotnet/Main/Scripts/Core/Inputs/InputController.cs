@@ -10,7 +10,6 @@ public class InputController {
         if (_instance != null) throw new InvalidOperationException("ERROR: InputController.<init> : InputController is a singleton and cannot be instantiated more than once.");
         _instance = this;
         _keyBinding = keyBinding;
-        GD.Print("INFO: InputController.<init> : InputController has been instantiated.");
     }
 
     public static InputController I() {
@@ -23,12 +22,10 @@ public class InputController {
     }
 
     public void ProcessInput(InputEvent @event) {
-        GD.Print("INFO: InputController._Input() : Input event detected.");
         if (@event is not InputEventKey eventKey) return;
         
         bool isPress = eventKey.Pressed;
         Key key = eventKey.Keycode;
-        GD.Print($"INFO: InputController._Input() : Key is {OS.GetKeycodeString(key)}  |  Pressed: {isPress}");
         if (isPress) {
             GameAction.Action? action = _keyBinding.GetAction(key);
             new KeyPressEvent(key).Fire();
