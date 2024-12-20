@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.Reflection;
+using Godot;
 
 public class EventManager {
     private static EventManager instance;
@@ -17,22 +19,45 @@ public class EventManager {
         return instance;
     }
 
-    public void RegisterListener<TEvent, TContext>(Action<TEvent, TContext> callback, object owner = null) where TEvent : EventBase<TContext> {
-        Type eventID = typeof(TEvent);
+    public static void RegisterListeners(object target) {
+        // Get all methods in the target object
+        MethodInfo[] methods = target.GetType().GetMethods(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
 
-        if (!_listeners.ContainsKey(eventID)) _listeners[eventID] = new HashSet<Listener>();
+        foreach (MethodInfo method in methods) {
+            // Check if the method has the EventListener attribute
+            if (method.GetCustomAttribute<EventListenerAttribute>() == null) continue;
+
+            // Ensure the method signature matches (e.g., parameters)
+            ParameterInfo[] parameters = method.GetParameters();
+            if (parameters.Length != 2) continue; // Expecting 2 parameters: event and context
+
+            Type eventType = parameters[0].ParameterType;
+            Type contextType = parameters[1].ParameterType;
+
+            // Register the method as a listener with the EventManager
+            Delegate callback = method.CreateDelegate(typeof(Action<,>).MakeGenericType(eventType, contextType), target);
+            I().RegisterListener(eventType, callback, target);
+        }
+    }
+
+    public void RegisterListener(Type eventType, Delegate callback, object owner = null) {
+        if (!_listeners.ContainsKey(eventType)) _listeners[eventType] = new HashSet<Listener>();
 
         object actualOwner = owner ?? callback.Target;
-        if (actualOwner == null) throw new ArgumentException("ERROR: EventManager.RegisterListener() : Owner cannot be null if callback has no target.");
+        if (actualOwner == null) throw new ArgumentException("Owner cannot be null if callback has no target.");
 
         Listener toAdd = new(callback, actualOwner);
 
-        if (_listeners[eventID].Contains(toAdd)) {
-            Console.WriteLine($"WARN: EventManager.RegisterListener() : Listener of type {eventID.FullName} already registered with Owner {actualOwner}!");
+        if (_listeners[eventType].Contains(toAdd)) {
+            GD.Print($"WARN: Listener of type {eventType.FullName} already registered with Owner {actualOwner}!");
             return;
         }
 
-        _listeners[eventID].Add(toAdd);
+        _listeners[eventType].Add(toAdd);
+    }
+    
+    public void RegisterListener<TEvent, TContext>(Action<TEvent, TContext> callback, object owner = null) where TEvent : EventBase<TContext> {
+        RegisterListener(typeof(TEvent), callback, owner);
     }
 
     public void UnregisterListener<TEvent, TContext>(Action<TEvent, object> callback) where TEvent : EventBase<TContext> {
@@ -42,18 +67,17 @@ public class EventManager {
             list.RemoveWhere(listener => ReferenceEquals(listener.Callback, callback));
     }
 
-    public void FireEvent<TEvent, TContext>(TEvent ev) where TEvent : EventBase<TContext> {
-        Type eventID = typeof(TEvent);
-        if (!_listeners.TryGetValue(eventID, out HashSet<Listener> listenerList)) return;
+    public void FireEvent<TContext>(EventBase<TContext> ev) {
+        Type eventID = ev.GetType();
+        if (!_listeners.TryGetValue(eventID, out HashSet<Listener> listenerList))
+            return;
 
         TContext additionalContext = ev.GetAdditionalContext();
 
         HashSet<Listener> toRemove = new();
         foreach (Listener listener in new HashSet<Listener>(listenerList)) {
-            if (listener.Owner != null && listener.Callback is Action<TEvent, TContext> action) {
-                Console.WriteLine($"INFO: EventManager.FireEvent() :  Firing event of type {eventID} with {listenerList.Count} listeners.");
-                action(ev, additionalContext);
-            }
+            if (listener.Owner != null && listener.Callback is Delegate callback)
+                callback.DynamicInvoke(ev, additionalContext);
             else
                 toRemove.Add(listener);
         }
@@ -64,7 +88,6 @@ public class EventManager {
     }
 
     private void CleanupListeners() {
-        Console.WriteLine("INFO: EventManager.CleanupListeners() : Cleaning up listeners.");
         foreach (Type key in _listeners.Keys)
             _listeners[key].RemoveWhere(listener => listener.Owner == null);
     }

@@ -12,6 +12,8 @@ public class GameAction {
         NONE
     }
     
+    private static GameAction _instance;
+    
     public static readonly GameActionBase MOVE_FORWARD = new MovementGameAction(Action.MOVE_FORWARD);
     public static readonly GameActionBase MOVE_BACKWARD = new MovementGameAction(Action.MOVE_BACKWARD);
     public static readonly GameActionBase MOVE_LEFT = new MovementGameAction(Action.MOVE_LEFT);
@@ -28,6 +30,19 @@ public class GameAction {
         JUMP,
         USE
     };
+    
+    public GameAction() {
+        if (_instance != null) throw new InvalidOperationException("ERROR: GameAction.<init> : GameAction is a singleton and cannot be instantiated more than once.");
+        _instance = this;
+        foreach (GameActionBase action in GetAll()) {
+            action.RegisterAllListeners();
+        }
+    }
+    
+    public static GameAction I() {
+        if (_instance == null) throw new InvalidOperationException("ERROR: GameAction.GetInstance : GameAction has not been instantiated yet.");
+        return _instance;
+    }
 
     public static List<GameActionBase> GetAll() {
         return new List<GameActionBase>(_all);

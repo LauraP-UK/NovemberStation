@@ -1,5 +1,11 @@
+using Godot;
 
 public class JumpGameAction : GameActionBase {
     public JumpGameAction(GameAction.Action action) : base(action) { }
-    public override void RegisterListeners() { }
+    
+    [EventListener]
+    private void OnJumpKeyPress(KeyPressEvent ev, Key key) {
+        if (!IsValidKey(key)) return;
+        GD.Print($"RESULT: Jump : {key}");
+    }
 }
