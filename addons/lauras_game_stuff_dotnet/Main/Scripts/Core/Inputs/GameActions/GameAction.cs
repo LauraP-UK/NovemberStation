@@ -34,9 +34,7 @@ public class GameAction {
     public GameAction() {
         if (_instance != null) throw new InvalidOperationException("ERROR: GameAction.<init> : GameAction is a singleton and cannot be instantiated more than once.");
         _instance = this;
-        foreach (GameActionBase action in GetAll()) {
-            action.RegisterAllListeners();
-        }
+        foreach (GameActionBase action in GetAll()) action.RegisterAllListeners();
     }
     
     public static GameAction I() {

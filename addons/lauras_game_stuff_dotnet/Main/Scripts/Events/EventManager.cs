@@ -6,7 +6,7 @@ using Godot;
 public class EventManager {
     private static EventManager instance;
 
-    private readonly Dictionary<Type, HashSet<Listener>> _listeners = new();
+    private readonly Dictionary<Type, HashSet<EventActionHolder>> _listeners = new();
 
     public EventManager() {
         if (instance == null) instance = this;
@@ -20,33 +20,29 @@ public class EventManager {
     }
 
     public static void RegisterListeners(object target) {
-        // Get all methods in the target object
         MethodInfo[] methods = target.GetType().GetMethods(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
 
         foreach (MethodInfo method in methods) {
-            // Check if the method has the EventListener attribute
             if (method.GetCustomAttribute<EventListenerAttribute>() == null) continue;
 
-            // Ensure the method signature matches (e.g., parameters)
             ParameterInfo[] parameters = method.GetParameters();
-            if (parameters.Length != 2) continue; // Expecting 2 parameters: event and context
+            if (parameters.Length != 2) continue; // Expecting 2 parameters: event instance and optional context
 
             Type eventType = parameters[0].ParameterType;
             Type contextType = parameters[1].ParameterType;
 
-            // Register the method as a listener with the EventManager
             Delegate callback = method.CreateDelegate(typeof(Action<,>).MakeGenericType(eventType, contextType), target);
             I().RegisterListener(eventType, callback, target);
         }
     }
 
     public void RegisterListener(Type eventType, Delegate callback, object owner = null) {
-        if (!_listeners.ContainsKey(eventType)) _listeners[eventType] = new HashSet<Listener>();
+        if (!_listeners.ContainsKey(eventType)) _listeners[eventType] = new HashSet<EventActionHolder>();
 
         object actualOwner = owner ?? callback.Target;
         if (actualOwner == null) throw new ArgumentException("Owner cannot be null if callback has no target.");
 
-        Listener toAdd = new(callback, actualOwner);
+        EventActionHolder toAdd = new(callback, actualOwner);
 
         if (_listeners[eventType].Contains(toAdd)) {
             GD.Print($"WARN: Listener of type {eventType.FullName} already registered with Owner {actualOwner}!");
@@ -60,22 +56,26 @@ public class EventManager {
         RegisterListener(typeof(TEvent), callback, owner);
     }
 
+    public void UnregisterByOwner(object owner) {
+        foreach (Type key in _listeners.Keys)
+            _listeners[key].RemoveWhere(listener => ReferenceEquals(listener.Owner, owner));
+    }
     public void UnregisterListener<TEvent, TContext>(Action<TEvent, object> callback) where TEvent : EventBase<TContext> {
         Type eventID = typeof(TEvent);
 
-        if (_listeners.TryGetValue(eventID, out HashSet<Listener> list))
+        if (_listeners.TryGetValue(eventID, out HashSet<EventActionHolder> list))
             list.RemoveWhere(listener => ReferenceEquals(listener.Callback, callback));
     }
 
     public void FireEvent<TContext>(EventBase<TContext> ev) {
         Type eventID = ev.GetType();
-        if (!_listeners.TryGetValue(eventID, out HashSet<Listener> listenerList))
+        if (!_listeners.TryGetValue(eventID, out HashSet<EventActionHolder> listenerList))
             return;
 
         TContext additionalContext = ev.GetAdditionalContext();
 
-        HashSet<Listener> toRemove = new();
-        foreach (Listener listener in new HashSet<Listener>(listenerList)) {
+        HashSet<EventActionHolder> toRemove = new();
+        foreach (EventActionHolder listener in new HashSet<EventActionHolder>(listenerList)) {
             if (listener.Owner != null && listener.Callback is Delegate callback)
                 callback.DynamicInvoke(ev, additionalContext);
             else
@@ -83,7 +83,7 @@ public class EventManager {
         }
 
         if (toRemove.Count != 0)
-            foreach (Listener listener in toRemove)
+            foreach (EventActionHolder listener in toRemove)
                 listenerList.Remove(listener);
     }
 

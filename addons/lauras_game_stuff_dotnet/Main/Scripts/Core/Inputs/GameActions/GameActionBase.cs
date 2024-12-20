@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Godot;
 
-public abstract class GameActionBase {
+public abstract class GameActionBase : Listener {
     private readonly GameAction.Action _action;
     
     protected GameActionBase(GameAction.Action action) {
@@ -16,7 +16,7 @@ public abstract class GameActionBase {
     }
 
     public void RegisterAllListeners() {
-        EventManager.RegisterListeners(this);
+        //EventManager.RegisterListeners(this);
     }
     
     protected static TEvent GetEvent<TEvent, TContext>(params object[] args) where TEvent : EventBase<TContext> {

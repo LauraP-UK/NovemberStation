@@ -23,40 +23,9 @@ public class InputController {
 
     public void ProcessInput(InputEvent @event) {
         if (@event is not InputEventKey eventKey) return;
-        
-        bool isPress = eventKey.Pressed;
-        Key key = eventKey.Keycode;
-        if (isPress) {
-            GameAction.Action? action = _keyBinding.GetAction(key);
-            new KeyPressEvent(key).Fire();
-            if (action.HasValue) FireGameAction(action.Value);
-        } else
-            new KeyReleaseEvent(key).Fire();
-    }
-
-    private void FireGameAction(GameAction.Action action) {
-        switch (action) {
-            case GameAction.Action.NONE: return;
-            case GameAction.Action.MOVE_FORWARD:
-                // Move forward
-                break;
-            case GameAction.Action.MOVE_BACKWARD:
-                // Move backward
-                break;
-            case GameAction.Action.MOVE_LEFT:
-                // Move left
-                break;
-            case GameAction.Action.MOVE_RIGHT:
-                // Move right
-                break;
-            case GameAction.Action.JUMP:
-                // Jump
-                break;
-            case GameAction.Action.USE:
-                // Use
-                break;
-            default:
-                throw new ArgumentOutOfRangeException(nameof(action), action, null);
-        }
+        if (eventKey.Pressed)
+            new KeyPressEvent(eventKey.Keycode).Fire();
+        else
+            new KeyReleaseEvent(eventKey.Keycode).Fire();
     }
 }
