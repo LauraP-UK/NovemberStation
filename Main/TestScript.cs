@@ -9,6 +9,8 @@ public partial class TestScript : Node {
     private static TestScript instance;
     private static readonly Scheduler scheduler = new();
     private static InputController inputController;
+    
+    private Player player;
 
     public TestScript() {
         instance = this;
@@ -25,11 +27,16 @@ public partial class TestScript : Node {
         
         inputController = new InputController(keyBinding);
         GameAction gameAction = new();
-        GD.Print("TestScript constructor");
+
+        player = new Player();
     }
 
     public static TestScript I() {
         return instance;
+    }
+    
+    public Player GetPlayer() {
+        return player;
     }
 
     public void PrintSomethingStupid() {

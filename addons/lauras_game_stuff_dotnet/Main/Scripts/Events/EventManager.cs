@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using Godot;
 
@@ -23,8 +24,11 @@ public class EventManager {
         MethodInfo[] methods = target.GetType().GetMethods(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
 
         foreach (MethodInfo method in methods) {
-            if (method.GetCustomAttribute<EventListenerAttribute>() == null) continue;
+            EventListenerAttribute attribute = method.GetCustomAttribute<EventListenerAttribute>();
+            if (attribute == null) continue;
 
+            int priority = attribute.Priority;
+            
             ParameterInfo[] parameters = method.GetParameters();
             if (parameters.Length != 2) continue; // Expecting 2 parameters: event instance and optional context
 
@@ -32,17 +36,17 @@ public class EventManager {
             Type contextType = parameters[1].ParameterType;
 
             Delegate callback = method.CreateDelegate(typeof(Action<,>).MakeGenericType(eventType, contextType), target);
-            I().RegisterListener(eventType, callback, target);
+            I().RegisterListener(eventType, callback, priority, target);
         }
     }
 
-    public void RegisterListener(Type eventType, Delegate callback, object owner = null) {
+    public void RegisterListener(Type eventType, Delegate callback, int priority, object owner = null) {
         if (!_listeners.ContainsKey(eventType)) _listeners[eventType] = new HashSet<EventActionHolder>();
 
         object actualOwner = owner ?? callback.Target;
         if (actualOwner == null) throw new ArgumentException("Owner cannot be null if callback has no target.");
 
-        EventActionHolder toAdd = new(callback, actualOwner);
+        EventActionHolder toAdd = new(callback, actualOwner, priority);
 
         if (_listeners[eventType].Contains(toAdd)) {
             GD.Print($"WARN: Listener of type {eventType.FullName} already registered with Owner {actualOwner}!");
@@ -52,8 +56,8 @@ public class EventManager {
         _listeners[eventType].Add(toAdd);
     }
     
-    public void RegisterListener<TEvent, TContext>(Action<TEvent, TContext> callback, object owner = null) where TEvent : EventBase<TContext> {
-        RegisterListener(typeof(TEvent), callback, owner);
+    public void RegisterListener<TEvent, TContext>(Action<TEvent, TContext> callback, int priority, object owner = null) where TEvent : EventBase<TContext> {
+        RegisterListener(typeof(TEvent), callback, priority, owner);
     }
 
     public void UnregisterByOwner(object owner) {
@@ -73,13 +77,18 @@ public class EventManager {
             return;
 
         TContext additionalContext = ev.GetAdditionalContext();
+        
+        List<EventActionHolder> sortedListeners = listenerList
+            .OrderByDescending(l => l.Priority)
+            .ThenBy(l => l.RegisteredAt)
+            .ToList();
 
         HashSet<EventActionHolder> toRemove = new();
-        foreach (EventActionHolder listener in new HashSet<EventActionHolder>(listenerList)) {
-            if (listener.Owner != null && listener.Callback is Delegate callback)
+        foreach (EventActionHolder listener in sortedListeners) {
+            if (listener.Owner != null && listener.Callback is Delegate callback) {
                 callback.DynamicInvoke(ev, additionalContext);
-            else
-                toRemove.Add(listener);
+                if (ev is ICancellable cancelable && cancelable.IsCanceled()) break;
+            } else toRemove.Add(listener);
         }
 
         if (toRemove.Count != 0)
