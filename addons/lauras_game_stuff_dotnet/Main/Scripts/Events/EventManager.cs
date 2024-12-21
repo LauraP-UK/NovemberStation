@@ -86,8 +86,17 @@ public class EventManager {
         HashSet<EventActionHolder> toRemove = new();
         foreach (EventActionHolder listener in sortedListeners) {
             if (listener.Owner != null && listener.Callback is Delegate callback) {
-                callback.DynamicInvoke(ev, additionalContext);
-                if (ev is ICancellable cancelable && cancelable.IsCanceled()) break;
+                try {
+                    callback.DynamicInvoke(ev, additionalContext);
+                    if (ev is ICancellable cancelable && cancelable.IsCanceled()) {
+                        ev.PrintLog();
+                        break;
+                    }
+                } catch (Exception e) {
+                    GD.PrintErr($"ERROR: EventManager.FireEvent : Exception thrown while invoking listener for event {eventID.FullName} : {e}");
+                    GD.PrintErr($"Listener: {listener.Owner?.GetType().Name ?? "Unknown"} | Callback: {callback.Method.Name}");
+                    GD.PrintErr($"Exception: {e.Message}\n{e.StackTrace}");
+                }
             } else toRemove.Add(listener);
         }
 

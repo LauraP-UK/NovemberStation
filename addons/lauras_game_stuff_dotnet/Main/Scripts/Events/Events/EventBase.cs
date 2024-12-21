@@ -8,11 +8,17 @@ public abstract class EventBase<TContext> {
     private readonly List<LogItem> _log = new();
     public abstract TContext GetAdditionalContext();
     
-    public void Fire() => EventManager.I().FireEvent(this);
-    
+    public void Fire() {
+        if (_log.Count != 0) Log("EventBase.Fire", "Firing event", 100);
+        EventManager.I().FireEvent(this);
+    }
+
     public string GetLog() => _log.Aggregate("", (current, item) => current + $"{item._timestamp} - {item._from} ({item._priority}): {item._message}\n");
-    public void PrintLog() => GD.Print(GetLog());
-    
+    public void PrintLog() {
+        if (_log.Count == 0) return;
+        GD.Print(GetLog());
+    }
+
     public void Log(string from, string message, int priority) {
         _log.Add(new LogItem {_from = from,_message = message,_priority = priority,_timestamp = DateTimeOffset.Now.ToUnixTimeMilliseconds()});
     }
