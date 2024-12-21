@@ -27,8 +27,6 @@ public partial class TestScript : Node {
         
         inputController = new InputController(keyBinding);
         GameAction gameAction = new();
-
-        player = new Player();
     }
 
     public static TestScript I() {
@@ -50,6 +48,9 @@ public partial class TestScript : Node {
     // Called when the node enters the scene tree for the first time.
     public override void _Ready() {
         I().PrintSomethingStupid();
+        player = (Player) Characters.PLAYER.CreateActor();
+        GetTree().Root.GetNode<Node>("Main").AddChild(player.GetModel());
+        player.SetPosition(new Vector3(5f, 0.2f, 0f));
     }
 
     // Called every frame. 'delta' is the elapsed time since the previous frame.

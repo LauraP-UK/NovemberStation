@@ -1,0 +1,40 @@
+[gd_scene load_steps=5 format=3 uid="uid://bea3c2ji0la15"]
+
+[ext_resource type="Script" path="res://Main/TestScript.cs" id="1_htyov"]
+[ext_resource type="PackedScene" uid="uid://cqvhghgw72hrv" path="res://Main/Prefabs/Sandbox/Geometry/PhysicsCube.tscn" id="2_y3p7f"]
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_ffmi0"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_cfnm2"]
+size = Vector3(16, 1, 16)
+
+[node name="Main" type="Node3D"]
+script = ExtResource("1_htyov")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(-0.617664, 0.566081, -0.545934, -0.00617194, 0.690671, 0.723143, 0.786418, 0.450028, -0.423109, -10.638, 13.9349, -7.70286)
+shadow_enabled = true
+
+[node name="DirectionalLight3D2" type="DirectionalLight3D" parent="."]
+transform = Transform3D(0.887994, 0.336308, -0.313628, -0.00617194, 0.690671, 0.723142, 0.459813, -0.640211, 0.615388, -10.638, 13.9349, 12.6165)
+shadow_enabled = true
+
+[node name="SceneObjects" type="Node3D" parent="."]
+
+[node name="Cube 1" parent="SceneObjects" instance=ExtResource("2_y3p7f")]
+
+[node name="Cube 2" parent="SceneObjects" instance=ExtResource("2_y3p7f")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.399514, 3.08708, -1.10743)
+
+[node name="Cube 3" parent="SceneObjects" instance=ExtResource("2_y3p7f")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.356814, 1.83714, -0.536743)
+
+[node name="StaticBody3D" type="StaticBody3D" parent="SceneObjects"]
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="SceneObjects/StaticBody3D"]
+transform = Transform3D(8, 0, 0, 0, 8, 0, 0, 0, 8, 0, 0, 0)
+mesh = SubResource("PlaneMesh_ffmi0")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="SceneObjects/StaticBody3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
+shape = SubResource("BoxShape3D_cfnm2")
