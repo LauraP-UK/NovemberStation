@@ -1,8 +1,11 @@
-[gd_scene load_steps=3 format=3 uid="uid://dvka8kvdljqew"]
+[gd_scene load_steps=4 format=3 uid="uid://dvka8kvdljqew"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_f8i3f"]
 
 [sub_resource type="CapsuleMesh" id="CapsuleMesh_5d363"]
+
+[sub_resource type="BoxMesh" id="BoxMesh_abprh"]
+size = Vector3(0.2, 0.2, 0.2)
 
 [node name="PlayerRoot" type="CharacterBody3D"]
 
@@ -15,6 +18,11 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
 mesh = SubResource("CapsuleMesh_5d363")
 skeleton = NodePath("")
 
-[node name="Camera3D" type="Camera3D" parent="."]
+[node name="MeshInstance3D2" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5414, -1.22652)
+mesh = SubResource("BoxMesh_abprh")
+skeleton = NodePath("")
+
+[node name="Camera" type="Camera3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 0.984808, 0.173648, 0, -0.173648, 0.984808, 0, 1.5, 0)
 current = true

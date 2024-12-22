@@ -8,6 +8,7 @@ public class GameAction {
         MOVE_BACKWARD,
         MOVE_LEFT,
         MOVE_RIGHT,
+        TURN_CAMERA,
         JUMP,
         USE,
         NONE
@@ -19,6 +20,7 @@ public class GameAction {
     public static readonly GameActionBase MOVE_BACKWARD = new MovementGameAction(Action.MOVE_BACKWARD, Vector3.Back);
     public static readonly GameActionBase MOVE_LEFT = new MovementGameAction(Action.MOVE_LEFT, Vector3.Left);
     public static readonly GameActionBase MOVE_RIGHT = new MovementGameAction(Action.MOVE_RIGHT, Vector3.Right);
+    public static readonly GameActionBase TURN_CAMERA = new TurnCameraGameAction(Action.TURN_CAMERA);
     public static readonly GameActionBase JUMP = new JumpGameAction(Action.JUMP);
     public static readonly GameActionBase USE = new UseGameAction(Action.USE);
     public static readonly GameActionBase NONE =new NoOpGameAction(Action.NONE);
@@ -43,12 +45,7 @@ public class GameAction {
         return _instance;
     }
 
-    public static List<GameActionBase> GetAll() {
-        return new List<GameActionBase>(_all);
-    }
-    
-    public static GameActionBase GetDefault() {
-        return NONE;
-    }
-    
+    public static List<GameActionBase> GetAll() => new(_all);
+
+    public static GameActionBase GetDefault() => NONE;
 }

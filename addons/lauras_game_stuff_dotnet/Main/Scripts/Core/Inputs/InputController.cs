@@ -17,9 +17,7 @@ public class InputController {
         return _instance;
     }
 
-    public KeyBinding GetKeyBinding() {
-        return _keyBinding;
-    }
+    public KeyBinding GetKeyBinding() => _keyBinding;
 
     public void ProcessInput(InputEvent @event) {
         if (@event is InputEventKey eventKey) {

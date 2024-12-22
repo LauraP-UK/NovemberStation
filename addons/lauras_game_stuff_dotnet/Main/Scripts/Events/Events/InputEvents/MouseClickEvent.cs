@@ -14,8 +14,5 @@ public class MouseClickEvent : EventBase<Vector2> {
 
     public MouseButton GetMouseButton() => _mouseButton;
     public bool IsPressed() => _pressed;
-
-    public override Vector2 GetAdditionalContext() {
-        return _position;
-    }
+    public override Vector2 GetAdditionalContext() => _position;
 }

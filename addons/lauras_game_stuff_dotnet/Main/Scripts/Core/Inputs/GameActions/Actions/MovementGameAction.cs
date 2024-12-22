@@ -12,8 +12,7 @@ public class MovementGameAction : GameActionBase {
     [EventListener]
     private void OnMoveKeyPress(KeyPressEvent ev, Key context) {
         if (!IsValidKey(context)) return;
-        GD.Print($"RESULT: MovementGameAction : {context}");
-        ActorMoveEvent moveEvent = new();
+        PlayerMoveEvent moveEvent = new();
         moveEvent.SetDirection(_offset);
         moveEvent.SetActor(TestScript.I().GetPlayer());
         moveEvent.Fire();

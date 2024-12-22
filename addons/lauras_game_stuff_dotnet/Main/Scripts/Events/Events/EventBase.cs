@@ -19,9 +19,7 @@ public abstract class EventBase<TContext> {
         GD.Print(GetLog());
     }
 
-    public void Log(string from, string message, int priority) {
-        _log.Add(new LogItem {_from = from,_message = message,_priority = priority,_timestamp = DateTimeOffset.Now.ToUnixTimeMilliseconds()});
-    }
-    
+    public void Log(string from, string message, int priority) => _log.Add(new LogItem {_from = from,_message = message,_priority = priority,_timestamp = DateTimeOffset.Now.ToUnixTimeMilliseconds()});
+
     private class LogItem {public string _from; public string _message; public int _priority; public long _timestamp;}
 }

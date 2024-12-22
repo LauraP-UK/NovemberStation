@@ -7,7 +7,5 @@ public abstract class ActorEventBase : CancellableEventBase<ActorBase> {
         return this;
     }
     
-    public override ActorBase GetAdditionalContext() {
-        return _actor;
-    }
+    public override ActorBase GetAdditionalContext() => _actor;
 }

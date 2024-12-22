@@ -11,8 +11,5 @@ public class MouseMoveEvent : EventBase<Vector2> {
     
     public Vector2 GetPosition() => _position;
     public Vector2 GetDelta() => _delta;
-
-    public override Vector2 GetAdditionalContext() {
-        return GetDelta();
-    }
+    public override Vector2 GetAdditionalContext() => GetDelta();
 }
