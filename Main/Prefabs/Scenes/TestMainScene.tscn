@@ -22,14 +22,18 @@ shadow_enabled = true
 [node name="SceneObjects" type="Node3D" parent="."]
 
 [node name="Cube 1" parent="SceneObjects" instance=ExtResource("2_y3p7f")]
+mass = 20.0
 
 [node name="Cube 2" parent="SceneObjects" instance=ExtResource("2_y3p7f")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.399514, 3.08708, -1.10743)
 
 [node name="Cube 3" parent="SceneObjects" instance=ExtResource("2_y3p7f")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.356814, 1.83714, -0.536743)
+mass = 10.0
 
 [node name="StaticBody3D" type="StaticBody3D" parent="SceneObjects"]
+collision_layer = 2
+collision_mask = 7
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="SceneObjects/StaticBody3D"]
 transform = Transform3D(8, 0, 0, 0, 8, 0, 0, 0, 8, 0, 0, 0)

@@ -30,6 +30,7 @@ public class GameAction {
         MOVE_BACKWARD,
         MOVE_LEFT,
         MOVE_RIGHT,
+        TURN_CAMERA,
         JUMP,
         USE
     };
@@ -37,7 +38,6 @@ public class GameAction {
     public GameAction() {
         if (_instance != null) throw new InvalidOperationException("ERROR: GameAction.<init> : GameAction is a singleton and cannot be instantiated more than once.");
         _instance = this;
-        foreach (GameActionBase action in GetAll()) action.RegisterAllListeners();
     }
     
     public static GameAction I() {
@@ -48,4 +48,10 @@ public class GameAction {
     public static List<GameActionBase> GetAll() => new(_all);
 
     public static GameActionBase GetDefault() => NONE;
+
+    public static void UpdateMovement() {
+        foreach (GameActionBase gameActionBase in GetAll())
+            if (gameActionBase is MovementGameAction movementGameAction)
+                movementGameAction.Update();
+    }
 }
