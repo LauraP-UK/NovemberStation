@@ -2,19 +2,8 @@
 using Godot;
 
 public class PlayerController : ControllerBase {
-
-    private const int MOVE_RANGE = 5;
     
     public PlayerController(Player player) : base(player) {}
-
-    /*[EventListener(PriorityLevels.NORMAL)]
-    private void OnPlayerMoveCatcher(PlayerMoveEvent ev, Player player) {
-        Vector3 direction = ev.GetDirection();
-        Vector3 newPosition = GetPredictedMovement(direction * 0.1f);
-        if (!direction.Equals(Vector3.Zero))
-            if (newPosition.X < -MOVE_RANGE || newPosition.X > MOVE_RANGE || newPosition.Z < -MOVE_RANGE || newPosition.Z > MOVE_RANGE)
-                ev.SetCanceled(true);
-    }*/
 
     [EventListener(PriorityLevels.TERMINUS)]
     private void OnPlayerMove(PlayerMoveEvent ev, Player player) {

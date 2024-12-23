@@ -29,34 +29,22 @@ public partial class TestScript : Node {
         GameAction gameAction = new();
     }
 
-    public static TestScript I() {
-        return instance;
-    }
-    
-    public Player GetPlayer() {
-        return player;
-    }
+    public static TestScript I() => instance;
 
-    public void PrintSomethingStupid() {
-        GD.Print("Start");
-    }
+    public Player GetPlayer() => player;
 
-    public override void _Input(InputEvent @event) {
-        inputController.ProcessInput(@event);
-    }
+    public override void _Input(InputEvent @event) => inputController.ProcessInput(@event);
 
     // Called when the node enters the scene tree for the first time.
     public override void _Ready() {
-        I().PrintSomethingStupid();
+        GD.Print("Start");
         player = (Player) Characters.PLAYER.CreateActor();
         GetTree().Root.GetNode<Node>("Main").AddChild(player.GetModel());
         player.SetPosition(new Vector3(5f, 0.2f, 0f));
     }
 
     // Called every frame. 'delta' is the elapsed time since the previous frame.
-    public override void _Process(double delta) {
-        GameAction.UpdateMovement();
-    }
+    public override void _Process(double delta) => GameAction.UpdateMovement();
 
     public override void _PhysicsProcess(double delta) {
         base._PhysicsProcess(delta);
