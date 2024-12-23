@@ -39,9 +39,12 @@ public partial class TestScript : Node {
     // Called when the node enters the scene tree for the first time.
     public override void _Ready() {
         GD.Print("Start");
+
+        Input.MouseMode = Input.MouseModeEnum.Captured;
+        
         player = (Player) Characters.PLAYER.CreateActor();
         GetTree().Root.GetNode<Node>("Main").AddChild(player.GetModel());
-        player.SetPosition(new Vector3(5f, 0.2f, 0f));
+        player.SetPosition(new Vector3(5f, 0.2f, 0f), new Vector3(0.0f, 90.0f, 0.0f));
     }
 
     // Called every frame. 'delta' is the elapsed time since the previous frame.

@@ -5,6 +5,9 @@ using Godot;
 public abstract class ControllerBase : Listener {
     
     private ActorBase _actor { get; }
+    protected Vector3 _velocityInfluence = Vector3.Zero;
+
+    private const float MAX_SPEED = 2.0f;
 
     protected ControllerBase(ActorBase actor) {
         _actor = actor;
@@ -13,13 +16,21 @@ public abstract class ControllerBase : Listener {
 
     public void Update(float delta) {
         CharacterBody3D model = GetActor().GetModel();
-        Vector3 velocity = model.Velocity;
+
+        if (!_velocityInfluence.Equals(Vector3.Zero)) GD.Print($"INFO: ControllerBase.Update() : _velocityInfluence = {_velocityInfluence}");
         
-        velocity.X *= 0.85f;
-        velocity.Z *= 0.85f;
+        Vector3 vel = model.Velocity + _velocityInfluence;
         
-        velocity.Y += -9.8f * delta;
-        model.Velocity = velocity;
+        if (!model.IsOnFloor()) vel.Y += -9.8f * delta;
+        
+        vel.X *= 0.85f;
+        vel.Z *= 0.85f;
+
+        vel.X = Math.Clamp(vel.X, -MAX_SPEED, MAX_SPEED);
+        vel.Z = Math.Clamp(vel.Z, -MAX_SPEED, MAX_SPEED);
+        
+        model.Velocity = vel;
+        _velocityInfluence = Vector3.Zero;
         
         PushAwayRigidBodies();
         

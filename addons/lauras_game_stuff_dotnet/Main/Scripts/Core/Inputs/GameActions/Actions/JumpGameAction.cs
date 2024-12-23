@@ -6,6 +6,6 @@ public class JumpGameAction : GameActionBase {
     [EventListener]
     private void OnJumpKeyPress(KeyPressEvent ev, Key key) {
         if (!IsValidKey(key)) return;
-        GD.Print($"RESULT: Jump : {key}");
+        new PlayerJumpEvent().Fire();
     }
 }

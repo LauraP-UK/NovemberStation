@@ -19,16 +19,21 @@ shadow_enabled = true
 transform = Transform3D(0.887994, 0.336308, -0.313628, -0.00617194, 0.690671, 0.723142, 0.459813, -0.640211, 0.615388, -10.638, 13.9349, 12.6165)
 shadow_enabled = true
 
+[node name="DirectionalLight3D3" type="DirectionalLight3D" parent="."]
+transform = Transform3D(0.0964253, -0.827615, 0.552952, 0.0106048, 0.556363, 0.830872, -0.995284, -0.0742531, 0.0624242, 18.5745, 5.96518, 0.477017)
+shadow_enabled = true
+
 [node name="SceneObjects" type="Node3D" parent="."]
 
 [node name="Cube 1" parent="SceneObjects" instance=ExtResource("2_y3p7f")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.613722, 0.925949)
 mass = 20.0
 
 [node name="Cube 2" parent="SceneObjects" instance=ExtResource("2_y3p7f")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.399514, 3.08708, -1.10743)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.38113, 0.616827, -1.34049)
 
 [node name="Cube 3" parent="SceneObjects" instance=ExtResource("2_y3p7f")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.356814, 1.83714, -0.536743)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.116946, 0.944416, -0.197491)
 mass = 10.0
 
 [node name="StaticBody3D" type="StaticBody3D" parent="SceneObjects"]

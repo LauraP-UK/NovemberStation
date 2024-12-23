@@ -52,8 +52,4 @@ public class GameAction {
     public static List<GameActionBase> GetAll() => new(_all);
 
     public static GameActionBase GetDefault() => NONE;
-
-    public static void UpdateMovement() {
-        MovementActionTracker.Update();
-    }
 }

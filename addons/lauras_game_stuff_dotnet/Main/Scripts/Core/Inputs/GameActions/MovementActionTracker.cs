@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using Godot;
-using NovemberStation.Main;
 
 public class MovementActionTracker {
 
@@ -17,7 +16,6 @@ public class MovementActionTracker {
         movement = movement.Normalized();
         PlayerMoveEvent moveEvent = new();
         moveEvent.SetDirection(movement);
-        moveEvent.SetActor(TestScript.I().GetPlayer());
         moveEvent.Fire();
     }
 }
