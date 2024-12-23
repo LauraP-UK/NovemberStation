@@ -38,7 +38,7 @@ public abstract class ControllerBase : Listener {
                 velocityDiff = Math.Max(0.0f, velocityDiff);
                 float massRatio = Math.Min(1.0f, APPROX_ACTOR_MASS / rigidBody.Mass);
 
-                //pushDirection.Y = 0;
+                pushDirection.Y *= 0.25f;
                 float pushForce = massRatio * 1.0f; // Magic adjustment factor
                 rigidBody.ApplyImpulse(pushDirection * velocityDiff * pushForce, collision.GetPosition() - rigidBody.GetGlobalPosition());
             }

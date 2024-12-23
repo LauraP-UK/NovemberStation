@@ -24,6 +24,7 @@ public partial class TestScript : Node {
         keyBinding.BindKey(Key.D, GameAction.Action.MOVE_RIGHT);
         keyBinding.BindKey(Key.Space, GameAction.Action.JUMP);
         keyBinding.BindKey(Key.E, GameAction.Action.USE);
+        keyBinding.BindKey(Key.Escape, GameAction.Action.QUIT);
         
         inputController = new InputController(keyBinding);
         GameAction gameAction = new();
@@ -50,4 +51,6 @@ public partial class TestScript : Node {
         base._PhysicsProcess(delta);
         player.GetController().Update((float) delta);
     }
+    
+    public void Quit() => GetTree().Quit();
 }

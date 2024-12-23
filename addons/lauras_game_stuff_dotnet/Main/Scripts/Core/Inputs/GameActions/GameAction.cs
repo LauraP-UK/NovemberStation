@@ -11,6 +11,7 @@ public class GameAction {
         TURN_CAMERA,
         JUMP,
         USE,
+        QUIT,
         NONE
     }
     
@@ -24,6 +25,7 @@ public class GameAction {
     public static readonly GameActionBase TURN_CAMERA = new TurnCameraGameAction(Action.TURN_CAMERA);
     public static readonly GameActionBase JUMP = new JumpGameAction(Action.JUMP);
     public static readonly GameActionBase USE = new UseGameAction(Action.USE);
+    public static readonly GameActionBase QUIT = new QuitGameAction(Action.QUIT);
     public static readonly GameActionBase NONE =new NoOpGameAction(Action.NONE);
 
     private static readonly List<GameActionBase> _all = new() {
@@ -33,7 +35,8 @@ public class GameAction {
         MOVE_RIGHT,
         TURN_CAMERA,
         JUMP,
-        USE
+        USE,
+        QUIT
     };
     
     public GameAction() {
