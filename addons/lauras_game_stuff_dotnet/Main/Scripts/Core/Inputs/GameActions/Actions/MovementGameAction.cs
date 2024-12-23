@@ -8,6 +8,7 @@ public class MovementGameAction : GameActionBase {
     
     public MovementGameAction(GameAction.Action action, Vector3 offset) : base(action) {
         _offset = offset;
+        MovementActionTracker.RegisterMovementAction(this);
     }
 
     [EventListener]
@@ -21,12 +22,7 @@ public class MovementGameAction : GameActionBase {
         if (!IsValidKey(context)) return;
         _isKeyPressed = false;
     }
-
-    public void Update() {
-        if (!_isKeyPressed) return;
-        PlayerMoveEvent moveEvent = new();
-        moveEvent.SetDirection(_offset);
-        moveEvent.SetActor(TestScript.I().GetPlayer());
-        moveEvent.Fire();
-    }
+    
+    public Vector3 GetOffset() => _offset;
+    public bool IsKeyPressed() => _isKeyPressed;
 }

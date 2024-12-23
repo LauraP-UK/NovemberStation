@@ -44,7 +44,7 @@ public partial class TestScript : Node {
     }
 
     // Called every frame. 'delta' is the elapsed time since the previous frame.
-    public override void _Process(double delta) => GameAction.UpdateMovement();
+    public override void _Process(double delta) => MovementActionTracker.Update();
 
     public override void _PhysicsProcess(double delta) {
         base._PhysicsProcess(delta);

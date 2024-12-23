@@ -15,6 +15,7 @@ public class GameAction {
     }
     
     private static GameAction _instance;
+    private static MovementActionTracker _movementActionTracker = new();
     
     public static readonly GameActionBase MOVE_FORWARD = new MovementGameAction(Action.MOVE_FORWARD, Vector3.Forward);
     public static readonly GameActionBase MOVE_BACKWARD = new MovementGameAction(Action.MOVE_BACKWARD, Vector3.Back);
@@ -50,8 +51,6 @@ public class GameAction {
     public static GameActionBase GetDefault() => NONE;
 
     public static void UpdateMovement() {
-        foreach (GameActionBase gameActionBase in GetAll())
-            if (gameActionBase is MovementGameAction movementGameAction)
-                movementGameAction.Update();
+        MovementActionTracker.Update();
     }
 }

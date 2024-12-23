@@ -15,8 +15,8 @@ public abstract class ControllerBase : Listener {
         CharacterBody3D model = GetActor().GetModel();
         Vector3 velocity = model.Velocity;
         
-        velocity.X *= 0.9f;
-        velocity.Z *= 0.9f;
+        velocity.X *= 0.85f;
+        velocity.Z *= 0.85f;
         
         velocity.Y += -9.8f * delta;
         model.Velocity = velocity;
