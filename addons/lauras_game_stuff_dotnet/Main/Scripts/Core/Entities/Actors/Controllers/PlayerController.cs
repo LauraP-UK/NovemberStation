@@ -9,8 +9,8 @@ public class PlayerController : ControllerBase {
     private void OnPlayerJump(PlayerJumpEvent ev, Player player) {
         CharacterBody3D model = player.GetModel();
         if (!model.IsOnFloor()) return;
-        GD.Print("INFO: PlayerController.OnPlayerJump() : Player is not on the floor and has Jumped!");
-        _velocityInfluence += new Vector3(0.0f, 5.5f, 0.0f);
+        //GD.Print("INFO: PlayerController.OnPlayerJump() : Player is not on the floor and has Jumped!");
+        _velocityInfluence = new Vector3(0.0f, 5.5f, 0.0f);
     }
 
     [EventListener(PriorityLevels.TERMINUS)]
@@ -19,16 +19,15 @@ public class PlayerController : ControllerBase {
         CharacterBody3D model = player.GetModel();
 
         if (!direction.Equals(Vector3.Zero)) {
-            float speed = 5f;
-            Vector3 forward = model.GlobalTransform.Basis.Z;
-            Vector3 right = model.GlobalTransform.Basis.X;
+            float speed = 5.0f;
             
-            Vector3 targetVelocity = (forward * direction.Z + right * direction.X);
-            
-            if (!targetVelocity.Equals(Vector3.Zero)) targetVelocity = targetVelocity.Normalized() * speed;
-            
-            _velocityInfluence = new Vector3(0.0f, _velocityInfluence.Y, 0.0f);
-            _velocityInfluence += targetVelocity;
+            //GD.Print($"Forward: {model.GlobalTransform.Basis.Z}, Right: {model.GlobalTransform.Basis.X}");
+
+            Vector3 forward = model.GlobalTransform.Basis.Z.Normalized();
+            Vector3 right = model.GlobalTransform.Basis.X.Normalized();
+            Vector3 velocity = (forward * direction.Z + right * direction.X) * speed;
+            _velocityInfluence = new Vector3(velocity.X, 0, velocity.Z);
+
         }
 
         Vector2 turnDelta = ev.GetTurnDelta();

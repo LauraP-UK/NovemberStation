@@ -33,7 +33,7 @@ mass = 20.0
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.38113, 0.616827, -1.34049)
 
 [node name="Cube 3" parent="SceneObjects" instance=ExtResource("2_y3p7f")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.116946, 0.944416, -0.197491)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.37806, 0.944416, -0.197491)
 mass = 10.0
 
 [node name="StaticBody3D" type="StaticBody3D" parent="SceneObjects"]

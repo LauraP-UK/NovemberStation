@@ -7,7 +7,7 @@ public abstract class ControllerBase : Listener {
     private ActorBase _actor { get; }
     protected Vector3 _velocityInfluence = Vector3.Zero;
 
-    private const float MAX_SPEED = 2.0f;
+    private const float MAX_SPEED = 4.0f;
 
     protected ControllerBase(ActorBase actor) {
         _actor = actor;
@@ -16,25 +16,27 @@ public abstract class ControllerBase : Listener {
 
     public void Update(float delta) {
         CharacterBody3D model = GetActor().GetModel();
-
-        if (!_velocityInfluence.Equals(Vector3.Zero)) GD.Print($"INFO: ControllerBase.Update() : _velocityInfluence = {_velocityInfluence}");
         
         Vector3 vel = model.Velocity + _velocityInfluence;
+        Vector3 velCopy = vel;
         
         if (!model.IsOnFloor()) vel.Y += -9.8f * delta;
+        
+        Vector3 horizontalVelocity = new(vel.X, 0, vel.Z);
+        if (horizontalVelocity.Length() > MAX_SPEED) horizontalVelocity = horizontalVelocity.Normalized() * MAX_SPEED;
+        vel = new Vector3(horizontalVelocity.X, vel.Y, horizontalVelocity.Z);
         
         vel.X *= 0.85f;
         vel.Z *= 0.85f;
 
-        vel.X = Math.Clamp(vel.X, -MAX_SPEED, MAX_SPEED);
-        vel.Z = Math.Clamp(vel.Z, -MAX_SPEED, MAX_SPEED);
+        vel = VectorUtils.RoundTo(vel, 4);
         
         model.Velocity = vel;
-        _velocityInfluence = Vector3.Zero;
-        
+
         PushAwayRigidBodies();
-        
         model.MoveAndSlide();
+        
+        _velocityInfluence = Vector3.Zero;
     }
 
     private const float APPROX_ACTOR_MASS = 80.0f;
