@@ -17,20 +17,21 @@ public abstract class ControllerBase : Listener {
     public void Update(float delta) {
         CharacterBody3D model = GetActor().GetModel();
         
-        Vector3 vel = model.Velocity + _velocityInfluence;
-        Vector3 velCopy = vel;
+        Vector3 vel = model.Velocity + _velocityInfluence * (model.IsOnFloor() ? 1f : 0.015f);
         
         if (!model.IsOnFloor()) vel.Y += -9.8f * delta;
         
         Vector3 horizontalVelocity = new(vel.X, 0, vel.Z);
         if (horizontalVelocity.Length() > MAX_SPEED) horizontalVelocity = horizontalVelocity.Normalized() * MAX_SPEED;
         vel = new Vector3(horizontalVelocity.X, vel.Y, horizontalVelocity.Z);
-        
-        vel.X *= 0.85f;
-        vel.Z *= 0.85f;
+
+        if (model.IsOnFloor()) {
+            vel.X *= 0.85f;
+            vel.Z *= 0.85f;
+        }
 
         vel = VectorUtils.RoundTo(vel, 4);
-        
+
         model.Velocity = vel;
 
         PushAwayRigidBodies();

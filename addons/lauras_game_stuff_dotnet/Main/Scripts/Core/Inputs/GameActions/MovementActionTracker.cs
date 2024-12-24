@@ -12,6 +12,8 @@ public class MovementActionTracker {
 
     public static void Update() {
         Vector3 movement = _movementActions.Where(action => action.IsKeyPressed()).Aggregate(Vector3.Zero, (current, action) => current + action.GetOffset());
+        //movement += ((JumpGameAction) GameAction.JUMP).IsKeyPressed() ? new Vector3(0.0f, 10.0f, 0.0f) : Vector3.Zero;
+        
         if (movement.Equals(Vector3.Zero)) return;
         movement = movement.Normalized();
         PlayerMoveEvent moveEvent = new();

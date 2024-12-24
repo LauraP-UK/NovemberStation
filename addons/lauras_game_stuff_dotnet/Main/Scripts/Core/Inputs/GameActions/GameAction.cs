@@ -8,8 +8,8 @@ public class GameAction {
         MOVE_BACKWARD,
         MOVE_LEFT,
         MOVE_RIGHT,
-        TURN_CAMERA,
         JUMP,
+        TURN_CAMERA,
         USE,
         QUIT,
         NONE
@@ -22,8 +22,8 @@ public class GameAction {
     public static readonly GameActionBase MOVE_BACKWARD = new MovementGameAction(Action.MOVE_BACKWARD, Vector3.Back);
     public static readonly GameActionBase MOVE_LEFT = new MovementGameAction(Action.MOVE_LEFT, Vector3.Left);
     public static readonly GameActionBase MOVE_RIGHT = new MovementGameAction(Action.MOVE_RIGHT, Vector3.Right);
+    public static readonly GameActionBase JUMP = new MovementGameAction(Action.JUMP, new Vector3(0.0f, 10.0f, 0.0f));
     public static readonly GameActionBase TURN_CAMERA = new TurnCameraGameAction(Action.TURN_CAMERA);
-    public static readonly GameActionBase JUMP = new JumpGameAction(Action.JUMP);
     public static readonly GameActionBase USE = new UseGameAction(Action.USE);
     public static readonly GameActionBase QUIT = new QuitGameAction(Action.QUIT);
     public static readonly GameActionBase NONE =new NoOpGameAction(Action.NONE);
