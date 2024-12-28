@@ -15,10 +15,14 @@ run/main_scene="res://Main/Prefabs/Scenes/TestMainScene.tscn"
 config/features=PackedStringArray("4.3", "C#", "Forward Plus")
 config/icon="res://icon.svg"
 
+[autoload]
+
+DebugDraw="*res://addons/debug_drawing/DebugDraw.cs"
+
 [dotnet]
 
 project/assembly_name="NovemberStation"
 
 [editor_plugins]
 
-enabled=PackedStringArray("res://addons/lauras_game_stuff/plugin.cfg")
+enabled=PackedStringArray("res://addons/debug_drawing/plugin.cfg")

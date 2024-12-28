@@ -9,4 +9,6 @@ public class Player : ActorBase {
     }
 
     public Camera3D GetCamera() => _camera ??= GetModel().GetNode<Camera3D>("Camera");
+    
+    public RaycastResult GetLookingAt(float distance) => Raycast.Trace(this, distance);
 }

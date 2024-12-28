@@ -1,5 +1,6 @@
 
 
+using System;
 using Godot;
 
 namespace NovemberStation.Main;
@@ -56,4 +57,5 @@ public partial class TestScript : Node {
     }
     
     public void Quit() => GetTree().Quit();
+    public Rid GetRid() => GetTree().Root.GetWorld3D().Space;
 }

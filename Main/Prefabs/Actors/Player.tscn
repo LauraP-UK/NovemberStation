@@ -22,10 +22,11 @@ mesh = SubResource("CapsuleMesh_5d363")
 skeleton = NodePath("")
 
 [node name="MeshInstance3D2" type="MeshInstance3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5414, -1.22652)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5414, -0.218916)
+visible = false
 mesh = SubResource("BoxMesh_abprh")
 skeleton = NodePath("")
 
 [node name="Camera" type="Camera3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.7, 0)
 current = true

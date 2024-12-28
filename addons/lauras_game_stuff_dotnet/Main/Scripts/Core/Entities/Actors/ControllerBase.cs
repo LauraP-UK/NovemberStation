@@ -14,7 +14,11 @@ public abstract class ControllerBase : Listener {
         _actor.SetController(this);
     }
 
+    protected abstract void OnUpdate(float delta);
+
     public void Update(float delta) {
+        OnUpdate(delta);
+        
         CharacterBody3D model = GetActor().GetModel();
         
         Vector3 vel = model.Velocity + _velocityInfluence * (model.IsOnFloor() ? 1f : 0.015f);
@@ -41,20 +45,31 @@ public abstract class ControllerBase : Listener {
     }
 
     private const float APPROX_ACTOR_MASS = 80.0f;
+    private const float MIN_IMPULSE_THRESHOLD = 1.25f;
     
     private void PushAwayRigidBodies() {
         CharacterBody3D model = GetActor().GetModel();
         for (int i = 0; i < model.GetSlideCollisionCount(); i++) {
             KinematicCollision3D collision = model.GetSlideCollision(i);
             if (collision.GetCollider() is RigidBody3D rigidBody) {
-                Vector3 pushDirection = -collision.GetNormal();
-                float velocityDiff = model.GetVelocity().Dot(pushDirection) - rigidBody.LinearVelocity.Dot(pushDirection);
-                velocityDiff = Math.Max(0.0f, velocityDiff);
                 float massRatio = Math.Min(1.0f, APPROX_ACTOR_MASS / rigidBody.Mass);
 
-                pushDirection.Y *= 0.25f;
+                Vector3 pushDirection = -collision.GetNormal();
+                pushDirection.Y = 0.0f;
+                pushDirection = pushDirection.Normalized();
+                
+                float velocityDiff = model.GetVelocity().Dot(pushDirection) - rigidBody.LinearVelocity.Dot(pushDirection);
+                velocityDiff = Math.Max(0.0f, velocityDiff);
+                
+                if (velocityDiff < MIN_IMPULSE_THRESHOLD) continue;
+                
                 float pushForce = massRatio * 1.0f; // Magic adjustment factor
-                rigidBody.ApplyImpulse(pushDirection * velocityDiff * pushForce, collision.GetPosition() - rigidBody.GetGlobalPosition());
+                
+                Vector3 impulse = VectorUtils.RoundTo(pushDirection * velocityDiff * pushForce, 4);
+                Vector3 position = collision.GetPosition() - rigidBody.GetGlobalPosition();
+                position.Y = 0.0f;
+                
+                rigidBody.ApplyImpulse(impulse, position);
             }
         }
     }
