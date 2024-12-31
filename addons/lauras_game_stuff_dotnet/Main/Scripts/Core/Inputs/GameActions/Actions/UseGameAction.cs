@@ -19,11 +19,15 @@ public class UseGameAction : GameActionBase {
 
         RaycastResult.HitBodyData firstHitData = result.GetClosestHit();
         Node3D hitObject = firstHitData.Body;
+        Vector3 hitNormal = firstHitData.HitNormal;
+        Vector3 hitAtPosition = firstHitData.HitAtPosition;
 
         if (hitObject is RigidBody3D rigidBody3D) {
             ActorPickUpEvent pickUpEvent = new();
             pickUpEvent.SetActor(player);
             pickUpEvent.SetItem(rigidBody3D);
+            pickUpEvent.SetInteractAt(hitAtPosition);
+            pickUpEvent.SetInteractNormal(hitNormal);
             pickUpEvent.Fire();
             return;
         }

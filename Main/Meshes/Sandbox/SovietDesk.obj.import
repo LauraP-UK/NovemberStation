@@ -1,0 +1,22 @@
+[remap]
+
+importer="wavefront_obj"
+importer_version=1
+type="Mesh"
+uid="uid://doc74q4yn8ktn"
+path="res://.godot/imported/SovietDesk.obj-b1efdc92d68988849d7ad23dca389637.mesh"
+
+[deps]
+
+files=["res://.godot/imported/SovietDesk.obj-b1efdc92d68988849d7ad23dca389637.mesh"]
+
+source_file="res://Main/Meshes/Sandbox/SovietDesk.obj"
+dest_files=["res://.godot/imported/SovietDesk.obj-b1efdc92d68988849d7ad23dca389637.mesh", "res://.godot/imported/SovietDesk.obj-b1efdc92d68988849d7ad23dca389637.mesh"]
+
+[params]
+
+generate_tangents=true
+scale_mesh=Vector3(1, 1, 1)
+offset_mesh=Vector3(0, 0, 0)
+optimize_mesh=true
+force_disable_mesh_compression=false

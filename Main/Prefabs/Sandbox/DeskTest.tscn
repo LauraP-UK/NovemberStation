@@ -1,0 +1,21 @@
+[gd_scene load_steps=5 format=3 uid="uid://5afg6a1f8nd3"]
+
+[ext_resource type="Texture2D" uid="uid://dtpyhvdxhiwn0" path="res://Main/Meshes/Sandbox/SovietDesk_TableUVTexture.png" id="1_4tknt"]
+[ext_resource type="ArrayMesh" uid="uid://doc74q4yn8ktn" path="res://Main/Meshes/Sandbox/SovietDesk.obj" id="1_78gae"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_7a15w"]
+albedo_texture = ExtResource("1_4tknt")
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_r1oi5"]
+size = Vector3(2.20062, 1.05002, 1.08154)
+
+[node name="RigidBody3D" type="RigidBody3D"]
+mass = 50.0
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+material_override = SubResource("StandardMaterial3D_7a15w")
+mesh = ExtResource("1_78gae")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.000823975, 0.0256539, -0.0407715)
+shape = SubResource("BoxShape3D_r1oi5")

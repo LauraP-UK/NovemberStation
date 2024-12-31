@@ -1,7 +1,8 @@
-[gd_scene load_steps=10 format=3 uid="uid://bea3c2ji0la15"]
+[gd_scene load_steps=11 format=3 uid="uid://bea3c2ji0la15"]
 
 [ext_resource type="Script" path="res://Main/TestScript.cs" id="1_htyov"]
 [ext_resource type="PackedScene" uid="uid://cqvhghgw72hrv" path="res://Main/Prefabs/Sandbox/Geometry/PhysicsCube.tscn" id="2_y3p7f"]
+[ext_resource type="PackedScene" uid="uid://5afg6a1f8nd3" path="res://Main/Prefabs/Sandbox/DeskTest.tscn" id="3_dkfcn"]
 [ext_resource type="Texture2D" uid="uid://cnafjpoh1lxps" path="res://Main/Textures/Sandbox/Checkerboard1.png" id="3_foc71"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_vlb6p"]
@@ -38,15 +39,20 @@ environment = SubResource("Environment_1182q")
 
 [node name="SceneObjects" type="Node3D" parent="."]
 
+[node name="Desk" parent="SceneObjects" instance=ExtResource("3_dkfcn")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.08867, 4.5054)
+collision_layer = 4
+collision_mask = 7
+
 [node name="Cube 1" parent="SceneObjects" instance=ExtResource("2_y3p7f")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.6, 0)
+transform = Transform3D(-4.37114e-08, 0, 1, 0, 1, 0, -1, 0, -4.37114e-08, 0, 0.796451, 0)
 mass = 20.0
 
 [node name="Cube 2" parent="SceneObjects" instance=ExtResource("2_y3p7f")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.52183, 4.5, -0.420611)
 
 [node name="Cube 3" parent="SceneObjects" instance=ExtResource("2_y3p7f")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.5, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.43857, 0)
 mass = 10.0
 
 [node name="StaticBody3D" type="StaticBody3D" parent="SceneObjects"]

@@ -56,10 +56,8 @@ public static class Raycast {
 
             if (hitPosition.DistanceTo(end) < 0.01f) break; // Feasibly at the end
         }
-
         return raycastResult;
     }
     
-    
-    private static PhysicsDirectSpaceState3D GetWorld() => PhysicsServer3D.SpaceGetDirectState(TestScript.I().GetRid());
+    private static PhysicsDirectSpaceState3D GetWorld() => PhysicsServer3D.SpaceGetDirectState(TestScript.I().GetWorldRid());
 }
