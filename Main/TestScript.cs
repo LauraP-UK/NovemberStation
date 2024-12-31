@@ -14,7 +14,7 @@ public partial class TestScript : Node {
     
     private Player player;
 
-    private readonly List<RigidBody3D> _cubes = new();
+    private readonly Dictionary<RigidBody3D, Vector3> _cubes = new();
 
     public TestScript() {
         instance = this;
@@ -51,7 +51,7 @@ public partial class TestScript : Node {
         player.SetPosition(new Vector3(5f, 0.2f, 0f), new Vector3(0.0f, 90.0f, 0.0f));
         
         foreach (Node child in GetTree().Root.GetNode<Node3D>("Main/SceneObjects").GetChildren())
-            if (child is RigidBody3D cube) _cubes.Add(cube);
+            if (child is RigidBody3D cube) _cubes.Add(cube, cube.GlobalPosition);
         
         GD.Print($"Cubes: {_cubes.Count}");
     }
@@ -62,14 +62,23 @@ public partial class TestScript : Node {
     public override void _Process(double delta) {
         MovementActionTracker.Update();
 
-        foreach (RigidBody3D cube in _cubes) {
-            if (cube.Position.DistanceSquaredTo(player.GetPosition()) > DRAW_DISTANCE_SQUARED) continue;
+        if (player.GetModel().Position.Y < -20) player.SetPosition(new Vector3(5f, 0.2f, 0f), new Vector3(0.0f, 90.0f, 0.0f));
+        
+        foreach (RigidBody3D physicsObject in _cubes.Keys) {
+            float dist = physicsObject.Position.DistanceSquaredTo(player.GetPosition());
+            if (dist > 50 * 50) {
+                physicsObject.GlobalPosition = _cubes[physicsObject];
+                physicsObject.LinearVelocity = Vector3.Zero;
+                physicsObject.AngularVelocity = Vector3.Zero;
+            }
+
+            if (dist > DRAW_DISTANCE_SQUARED) continue;
             
             foreach (Direction direction in Directions.GetAdjacent()) {
-                Vector3 globalDirection = cube.GlobalTransform.Basis * direction.Offset;
-                Vector3 endPoint = cube.GlobalPosition + globalDirection;
+                Vector3 globalDirection = physicsObject.GlobalTransform.Basis * direction.Offset;
+                Vector3 endPoint = physicsObject.GlobalPosition + globalDirection;
                 
-                DebugDraw.Line(cube.GlobalPosition, endPoint, direction.GetAxisDebugColor());
+                //DebugDraw.Line(cube.GlobalPosition, endPoint, direction.GetAxisDebugColor());
             }
         }
     }

@@ -1,4 +1,4 @@
-[gd_scene load_steps=5 format=3 uid="uid://5afg6a1f8nd3"]
+[gd_scene load_steps=9 format=3 uid="uid://5afg6a1f8nd3"]
 
 [ext_resource type="Texture2D" uid="uid://dtpyhvdxhiwn0" path="res://Main/Meshes/Sandbox/SovietDesk_TableUVTexture.png" id="1_4tknt"]
 [ext_resource type="ArrayMesh" uid="uid://doc74q4yn8ktn" path="res://Main/Meshes/Sandbox/SovietDesk.obj" id="1_78gae"]
@@ -7,7 +7,19 @@
 albedo_texture = ExtResource("1_4tknt")
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_r1oi5"]
-size = Vector3(2.20062, 1.05002, 1.08154)
+size = Vector3(2.20062, 0.105576, 1.08154)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_je05q"]
+size = Vector3(0.358643, 1, 1)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_0g0tx"]
+size = Vector3(0.353333, 1, 1)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_c0qh4"]
+size = Vector3(0.302856, 0.0752106, 1)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_v2cyu"]
+size = Vector3(0.27832, 0.0791016, 1)
 
 [node name="RigidBody3D" type="RigidBody3D"]
 mass = 50.0
@@ -16,6 +28,22 @@ mass = 50.0
 material_override = SubResource("StandardMaterial3D_7a15w")
 mesh = ExtResource("1_78gae")
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.000823975, 0.0256539, -0.0407715)
+[node name="TableTop" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.000823975, 0.497875, -0.0407715)
 shape = SubResource("BoxShape3D_r1oi5")
+
+[node name="DrawLeg" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.822383, 0, 0)
+shape = SubResource("BoxShape3D_je05q")
+
+[node name="Leg" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.825226, 0, 0)
+shape = SubResource("BoxShape3D_0g0tx")
+
+[node name="Angle1" type="CollisionShape3D" parent="."]
+transform = Transform3D(0.866078, 0.499909, 0, -0.499909, 0.866078, 0, 0, 0, 1, 0.591294, 0.432426, 0)
+shape = SubResource("BoxShape3D_c0qh4")
+
+[node name="Angle2" type="CollisionShape3D" parent="."]
+transform = Transform3D(0.877707, -0.479197, 0, 0.479197, 0.877707, 0, 0, 0, 1, -0.616098, 0.419191, 0)
+shape = SubResource("BoxShape3D_v2cyu")

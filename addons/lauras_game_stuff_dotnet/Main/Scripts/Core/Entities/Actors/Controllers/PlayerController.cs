@@ -2,7 +2,7 @@ using System;
 using Godot;
 
 public class PlayerController : ControllerBase {
-    private const float SPEED = 5.0f, HOLD_DISTANCE = 2.1f, HOLD_SMOOTHNESS = 15.0f;
+    private const float SPEED = 5.0f, HOLD_DISTANCE = 2.1f, HOLD_SMOOTHNESS = 15.0f, ROTATION_SMOOTHNESS = 10.0f;
     private const long JUMP_COOLDOWN_MILLIS = 250L;
     private long _lastJump;
 
@@ -15,10 +15,16 @@ public class PlayerController : ControllerBase {
     private void OnPickUpItem(ActorPickUpEvent ev, ActorBase actor) {
         if (!actor.Equals(GetActor())) return;
         RigidBody3D hitBody = ev.GetItem();
-        if (hitBody == null || hitBody.Equals(_heldObject)) {
+        
+        if (hitBody == null || hitBody.Equals(_heldObject) || _heldObject != null) {
             if (_heldObject != null) {
                 _heldObject.FreezeMode = RigidBody3D.FreezeModeEnum.Static;
                 _heldObject.Freeze = false;
+                
+                Vector3 tossDirection = -((Player)GetActor()).GetCamera().GlobalTransform.Basis.Z * 0.1f;
+                Vector3 gravityAssist = Vector3.Down * 1.0f;
+                _heldObject.LinearVelocity += tossDirection + gravityAssist;
+                
                 _heldObject = null;
                 _heldObjectDirection = null;
             }
@@ -63,7 +69,7 @@ public class PlayerController : ControllerBase {
         }
     }
 
-    private long GetCurrentTimeMillis() => DateTimeOffset.Now.ToUnixTimeMilliseconds();
+    private static long GetCurrentTimeMillis() => DateTimeOffset.Now.ToUnixTimeMilliseconds();
     private long TimeSinceLastJump() => GetCurrentTimeMillis() - _lastJump;
 
     protected override void OnUpdate(float delta) {
@@ -96,7 +102,6 @@ public class PlayerController : ControllerBase {
 
         foreach (Direction direction in Directions.GetAdjacent()) {
             Vector3 globalNormal = globalBasis * direction.Offset;
-
             float dot = globalNormal.Dot(playerLookVector);
 
             if (dot > maxDot) {
@@ -116,10 +121,10 @@ public class PlayerController : ControllerBase {
         Quaternion currentRotation = obj.GlobalTransform.Basis.GetRotationQuaternion();
 
         if (_heldObjectDirection.SimpleDirection is SimpleDirection.UP or SimpleDirection.DOWN) {
-            float pitchOffset = _heldObjectDirection.SimpleDirection == SimpleDirection.UP ? 0.0f : Mathf.DegToRad(180.0f);
+            float pitchOffset = _heldObjectDirection.SimpleDirection == SimpleDirection.DOWN ? 0.0f : Mathf.DegToRad(180.0f);
             float targetPitch = playerYaw + pitchOffset;
 
-            targetRotation = new Vector3(Mathf.DegToRad(-90.0f), targetPitch, 0.0f);
+            targetRotation = new Vector3(Mathf.DegToRad(90.0f), targetPitch, 0.0f);
         }
         else {
             float yawOffset = 0.0f;
@@ -135,15 +140,9 @@ public class PlayerController : ControllerBase {
             float targetYaw = playerYaw + yawOffset;
             targetRotation = new Vector3(0.0f, targetYaw, 0.0f);
         }
+        Quaternion smoothedRotation = currentRotation.Slerp(Quaternion.FromEuler(targetRotation), ROTATION_SMOOTHNESS * delta);
         
-        //obj.GlobalRotation = targetRotation;
-        
-        // Smoothly interpolate towards the target rotation
-        Quaternion smoothedRotation = currentRotation.Slerp(Quaternion.FromEuler(targetRotation), 10.0f * delta);
-
-        // Apply the interpolated rotation back to the object
         Basis smoothedBasis = new(smoothedRotation);
         obj.GlobalTransform = new Transform3D(smoothedBasis, obj.GlobalTransform.Origin);
     }
-    
 }
