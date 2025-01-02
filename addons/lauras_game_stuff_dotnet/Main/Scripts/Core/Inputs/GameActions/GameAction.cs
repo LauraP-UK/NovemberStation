@@ -11,6 +11,7 @@ public class GameAction {
         JUMP,
         TURN_CAMERA,
         USE,
+        MOUSE_USE,
         QUIT,
         NONE
     }
@@ -25,6 +26,7 @@ public class GameAction {
     public static readonly GameActionBase JUMP = new MovementGameAction(Action.JUMP, new Vector3(0.0f, 10.0f, 0.0f));
     public static readonly GameActionBase TURN_CAMERA = new TurnCameraGameAction(Action.TURN_CAMERA);
     public static readonly GameActionBase USE = new UseGameAction(Action.USE);
+    public static readonly GameActionBase MOUSE_USE = new UseGameAction(Action.MOUSE_USE);
     public static readonly GameActionBase QUIT = new QuitGameAction(Action.QUIT);
     public static readonly GameActionBase NONE =new NoOpGameAction(Action.NONE);
 

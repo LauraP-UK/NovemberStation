@@ -1,19 +1,16 @@
 using System.Collections.Generic;
+using System.Linq;
 using Godot;
 
 public class KeyBinding {
-    private readonly AutoDictionary<Key, GameAction.Action> _keyToAction = new();
-
-    public void BindKey(Key key, GameAction.Action action) {
-        _keyToAction.Add(key, action);
-    }
-
-    public GameAction.Action? GetAction(Key key) {
-        return _keyToAction.TryGetValue(key, out GameAction.Action action) ? action : null;
-    }
-
-    public IEnumerable<Key> GetKeysForAction(GameAction.Action action) {
-        foreach (KeyValuePair<Key, GameAction.Action> pair in _keyToAction)
-            if (pair.Value == action) yield return pair.Key;
-    }
+    
+    public enum InputType { Key, MouseButton }
+    
+    private static readonly AutoDictionary<InputAction, GameAction.Action> _inputToAction = new();
+    
+    public static void BindInput(Key key, GameAction.Action action) => BindInput(InputAction.FromKey(key), action);
+    public static void BindInput(MouseButton mouseButton, GameAction.Action action) => BindInput(InputAction.FromMouseButton(mouseButton), action);
+    public static void BindInput(InputAction input, GameAction.Action action) => _inputToAction.Add(input, action);
+    public static GameAction.Action? GetAction(InputAction input) => _inputToAction.TryGetValue(input, out GameAction.Action action) ? action : null;
+    public static IEnumerable<InputAction> GetInputsForAction(GameAction.Action action) => from pair in _inputToAction where pair.Value == action select pair.Key;
 }

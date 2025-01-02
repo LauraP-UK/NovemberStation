@@ -7,7 +7,7 @@ public class QuitGameAction : GameActionBase {
     
     [EventListener]
     private void OnQuitKeyPress(KeyPressEvent ev, Key key) {
-        if (!IsValidKey(key)) return;
+        if (!IsValidInput(key)) return;
         TestScript.I().Quit();
     }
 }

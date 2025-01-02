@@ -4,37 +4,41 @@ using Godot;
 public class PlayerController : ControllerBase {
     private const float SPEED = 5.0f, HOLD_DISTANCE = 2.1f, HOLD_SMOOTHNESS = 15.0f, ROTATION_SMOOTHNESS = 10.0f;
     private const long JUMP_COOLDOWN_MILLIS = 250L;
+
+    private const uint PLAYER_LAYER = 1 << 0, // Layer 1
+        STATIC_LAYER = 1 << 1, // Layer 2
+        OBJECT_LAYER = 1 << 2; // Layer 3
+
+
     private long _lastJump;
 
     private RigidBody3D _heldObject;
     private Direction _heldObjectDirection;
 
-    public PlayerController(Player player) : base(player) { }
+    public PlayerController(Player player) : base(player) {
+        GetActor().GetModel().CollisionLayer = PLAYER_LAYER;
+    }
 
     [EventListener(PriorityLevels.HIGHEST)]
     private void OnPickUpItem(ActorPickUpEvent ev, ActorBase actor) {
         if (!actor.Equals(GetActor())) return;
         RigidBody3D hitBody = ev.GetItem();
-        
-        if (hitBody == null || hitBody.Equals(_heldObject) || _heldObject != null) {
-            if (_heldObject != null) {
-                _heldObject.FreezeMode = RigidBody3D.FreezeModeEnum.Static;
-                _heldObject.Freeze = false;
-                
-                Vector3 tossDirection = -((Player)GetActor()).GetCamera().GlobalTransform.Basis.Z * 0.1f;
-                Vector3 gravityAssist = Vector3.Down * 1.0f;
-                _heldObject.LinearVelocity += tossDirection + gravityAssist;
-                
-                _heldObject = null;
-                _heldObjectDirection = null;
-            }
 
+        if (hitBody == null || hitBody.Equals(_heldObject) || _heldObject != null) {
+            Vector3 tossDirection = -((Player)GetActor()).GetCamera().GlobalTransform.Basis.Z * 0.1f;
+            ReleaseHeldObject(tossDirection + Vector3.Down); // Mini push in a direction plus a nudge down
             ev.SetCanceled(true);
             return;
         }
 
-        _heldObject = hitBody;
-        _heldObjectDirection = FindClosestFace(_heldObject);
+        PickupObject(hitBody);
+    }
+
+    [EventListener(PriorityLevels.HIGHEST)]
+    private void OnPlayerUseClick(PlayerUseClickEvent ev, ActorBase actor) {
+        if (!actor.Equals(GetActor()) || !ev.IsPressed() || _heldObject == null) return;
+        Vector3 tossDirection = -((Player)GetActor()).GetCamera().GlobalTransform.Basis.Z * 20.0f; // Big push in the direction
+        ReleaseHeldObject(tossDirection + Vector3.Down);
     }
 
     [EventListener(PriorityLevels.TERMINUS)]
@@ -76,6 +80,27 @@ public class PlayerController : ControllerBase {
         if (_heldObject != null) UpdateHeldObjectPosition(delta);
     }
 
+    private void ReleaseHeldObject(Vector3? releaseVelocity = null) {
+        if (_heldObject == null) return;
+        
+        _heldObject.CollisionMask |= PLAYER_LAYER;
+        _heldObject.CollisionLayer |= OBJECT_LAYER;
+        _heldObject.FreezeMode = RigidBody3D.FreezeModeEnum.Static;
+        _heldObject.Freeze = false;
+        
+        _heldObject.LinearVelocity += releaseVelocity ?? Vector3.Down;
+
+        _heldObject = null;
+        _heldObjectDirection = null;
+    }
+    
+    private void PickupObject(RigidBody3D obj) {
+        _heldObject = obj;
+        _heldObject.CollisionMask &= ~PLAYER_LAYER;
+        _heldObject.CollisionLayer &= ~OBJECT_LAYER;
+        _heldObjectDirection = FindClosestFace(_heldObject);
+    }
+
     private void UpdateHeldObjectPosition(double delta) {
         Camera3D camera = ((Player)GetActor()).GetCamera();
 
@@ -85,10 +110,10 @@ public class PlayerController : ControllerBase {
         Vector3 directionToTarget = (targetPosition - currentPosition).Normalized();
         float distanceToTarget = currentPosition.DistanceTo(targetPosition);
         Vector3 targetVelocity = directionToTarget * (HOLD_SMOOTHNESS * distanceToTarget);
-        
+
         _heldObject.LinearVelocity = targetVelocity;
         _heldObject.AngularVelocity = Vector3.Zero;
-        
+
         RotateFaceToPlayer(_heldObject, (float)delta);
     }
 
@@ -96,7 +121,7 @@ public class PlayerController : ControllerBase {
         Transform3D globalTransform = obj.GlobalTransform;
         Basis globalBasis = globalTransform.Basis;
         Vector3 playerLookVector = -((Player)GetActor()).GetCamera().GlobalTransform.Basis.Z.Normalized();
-        
+
         Direction closestDirection = null;
         float maxDot = float.NegativeInfinity;
 
@@ -140,8 +165,9 @@ public class PlayerController : ControllerBase {
             float targetYaw = playerYaw + yawOffset;
             targetRotation = new Vector3(0.0f, targetYaw, 0.0f);
         }
+
         Quaternion smoothedRotation = currentRotation.Slerp(Quaternion.FromEuler(targetRotation), ROTATION_SMOOTHNESS * delta);
-        
+
         Basis smoothedBasis = new(smoothedRotation);
         obj.GlobalTransform = new Transform3D(smoothedBasis, obj.GlobalTransform.Origin);
     }

@@ -1,65 +1,44 @@
-[gd_scene load_steps=11 format=3 uid="uid://davr0xngcadpq"]
+[gd_scene load_steps=8 format=3 uid="uid://davr0xngcadpq"]
 
 [ext_resource type="Texture2D" uid="uid://c5q1hp1s028lo" path="res://Main/Textures/Sandbox/Noise1.png" id="1_fdpuu"]
+[ext_resource type="ArrayMesh" uid="uid://dr2qj2wsaaw61" path="res://Main/Meshes/Sandbox/GasCanTest.obj" id="2_w552r"]
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_81ih2"]
-size = Vector3(0.3, 1, 0.75)
-
-[sub_resource type="CylinderShape3D" id="CylinderShape3D_xwb52"]
-height = 0.1
-radius = 0.1
-
-[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_xfjek"]
-radius = 0.0634242
-height = 0.126848
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_54pac"]
-albedo_color = Color(0.2795, 0.43, 0.299567, 1)
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_dib4p"]
+albedo_color = Color(0.273, 0.42, 0.3024, 1)
 albedo_texture = ExtResource("1_fdpuu")
 
-[sub_resource type="BoxMesh" id="BoxMesh_870mv"]
+[sub_resource type="BoxShape3D" id="BoxShape3D_u6pys"]
+size = Vector3(0.315468, 0.771912, 0.86377)
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_12qtx"]
-albedo_color = Color(0.2795, 0.43, 0.299567, 1)
-albedo_texture = ExtResource("1_fdpuu")
+[sub_resource type="BoxShape3D" id="BoxShape3D_hr1vj"]
+size = Vector3(0.316162, 0.293915, 0.603981)
 
-[sub_resource type="CylinderMesh" id="CylinderMesh_smuik"]
-top_radius = 0.1
-bottom_radius = 0.1
-height = 0.1
+[sub_resource type="BoxShape3D" id="BoxShape3D_tucbw"]
+size = Vector3(0.316612, 0.391998, 0.17627)
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_j5sjk"]
-albedo_color = Color(0.2795, 0.43, 0.299567, 1)
-albedo_texture = ExtResource("1_fdpuu")
-
-[sub_resource type="TorusMesh" id="TorusMesh_p5j4q"]
-inner_radius = 0.1
-outer_radius = 0.2
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_66p85"]
+height = 0.186865
+radius = 0.098381
 
 [node name="RigidBody3D" type="RigidBody3D"]
 
-[node name="Main_Col" type="CollisionShape3D" parent="."]
-shape = SubResource("BoxShape3D_81ih2")
-
-[node name="Spout_Col" type="CollisionShape3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.551822, 0.26655)
-shape = SubResource("CylinderShape3D_xwb52")
+[node name="Canister" type="MeshInstance3D" parent="."]
+transform = Transform3D(0.53, 0, 0, 0, 0.53, 0, 0, 0, 0.53, 0, 0, 0)
+material_override = SubResource("StandardMaterial3D_dib4p")
+mesh = ExtResource("2_w552r")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="."]
-transform = Transform3D(-1.94734e-07, -1.05, 0, 4.455, -4.5897e-08, 0, 0, 0, 2.665, 0.00136289, 0.186352, -0.357267)
-shape = SubResource("CapsuleShape3D_xfjek")
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.000667572, -0.113556, 0.0202637)
+shape = SubResource("BoxShape3D_u6pys")
 
-[node name="CanMain" type="MeshInstance3D" parent="."]
-transform = Transform3D(0.3, 0, 0, 0, 1, 0, 0, 0, 0.75, 0, 0, 0)
-material_override = SubResource("StandardMaterial3D_54pac")
-mesh = SubResource("BoxMesh_870mv")
+[node name="CollisionShape3D2" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.00134277, 0.41621, -0.108303)
+shape = SubResource("BoxShape3D_hr1vj")
 
-[node name="Spout" type="MeshInstance3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.55057, 0.266127)
-material_override = SubResource("StandardMaterial3D_12qtx")
-mesh = SubResource("CylinderMesh_smuik")
+[node name="CollisionShape3D3" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.720745, 0.693201, 0, -0.693201, 0.720745, -0.00018692, 0.358007, 0.247544)
+shape = SubResource("BoxShape3D_tucbw")
 
-[node name="Handle1" type="MeshInstance3D" parent="."]
-transform = Transform3D(0.0274088, -0.999833, 0, 1.49975, 0.0182725, 0, 0, 0, 1, 0, 0.182351, -0.32478)
-material_override = SubResource("StandardMaterial3D_j5sjk")
-mesh = SubResource("TorusMesh_p5j4q")
+[node name="CollisionShape3D4" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.707107, -0.707107, 0, 0.707107, 0.707107, 0, 0.461144, 0.378162)
+shape = SubResource("CylinderShape3D_66p85")

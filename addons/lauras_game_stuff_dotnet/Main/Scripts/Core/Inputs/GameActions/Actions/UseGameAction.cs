@@ -4,10 +4,16 @@ using NovemberStation.Main;
 
 public class UseGameAction : GameActionBase {
     public UseGameAction(GameAction.Action action) : base(action) { }
+
+    [EventListener]
+    private void OnMouseUsePress(MouseClickEvent ev, Vector2 coords) {
+        if (!IsValidInput(ev.GetMouseButton())) return;
+        new PlayerUseClickEvent(ev.GetMouseButton(), ev.IsPressed(), coords).Fire();
+    }
     
     [EventListener]
     private void OnUseKeyPress(KeyPressEvent ev, Key key) {
-        if (!IsValidKey(key)) return;
+        if (!IsValidInput(key)) return;
         Player player = TestScript.I().GetPlayer();
         
         RaycastResult result = player.GetLookingAt(3.0f);

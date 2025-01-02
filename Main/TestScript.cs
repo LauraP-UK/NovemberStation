@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Godot;
 
 namespace NovemberStation.Main;
@@ -21,16 +22,16 @@ public partial class TestScript : Node {
 
         EventManager eventManager = new();
 
-        KeyBinding keyBinding = new();
-        keyBinding.BindKey(Key.W, GameAction.Action.MOVE_FORWARD);
-        keyBinding.BindKey(Key.S, GameAction.Action.MOVE_BACKWARD);
-        keyBinding.BindKey(Key.A, GameAction.Action.MOVE_LEFT);
-        keyBinding.BindKey(Key.D, GameAction.Action.MOVE_RIGHT);
-        keyBinding.BindKey(Key.Space, GameAction.Action.JUMP);
-        keyBinding.BindKey(Key.E, GameAction.Action.USE);
-        keyBinding.BindKey(Key.Escape, GameAction.Action.QUIT);
+        KeyBinding.BindInput(Key.W, GameAction.Action.MOVE_FORWARD);
+        KeyBinding.BindInput(Key.S, GameAction.Action.MOVE_BACKWARD);
+        KeyBinding.BindInput(Key.A, GameAction.Action.MOVE_LEFT);
+        KeyBinding.BindInput(Key.D, GameAction.Action.MOVE_RIGHT);
+        KeyBinding.BindInput(Key.Space, GameAction.Action.JUMP);
+        KeyBinding.BindInput(Key.E, GameAction.Action.USE);
+        KeyBinding.BindInput(Key.Escape, GameAction.Action.QUIT);
+        KeyBinding.BindInput(MouseButton.Left, GameAction.Action.MOUSE_USE);
         
-        inputController = new InputController(keyBinding);
+        inputController = new InputController();
         GameAction gameAction = new();
     }
 
@@ -55,8 +56,6 @@ public partial class TestScript : Node {
         
         GD.Print($"Cubes: {_cubes.Count}");
     }
-
-    private const float DRAW_DISTANCE = 7.0f, DRAW_DISTANCE_SQUARED = DRAW_DISTANCE * DRAW_DISTANCE;
     
     // Called every frame. 'delta' is the elapsed time since the previous frame.
     public override void _Process(double delta) {
@@ -71,15 +70,22 @@ public partial class TestScript : Node {
                 physicsObject.LinearVelocity = Vector3.Zero;
                 physicsObject.AngularVelocity = Vector3.Zero;
             }
+        }
 
-            if (dist > DRAW_DISTANCE_SQUARED) continue;
-            
-            foreach (Direction direction in Directions.GetAdjacent()) {
-                Vector3 globalDirection = physicsObject.GlobalTransform.Basis * direction.Offset;
-                Vector3 endPoint = physicsObject.GlobalPosition + globalDirection;
+        RaycastResult raycastResult = Raycast.Trace(player, 3.0f);
+        List<RaycastResult.HitBodyData> hitObjs = raycastResult.GetHitsSortedByDistance().Where(obj => obj.Body is RigidBody3D).ToList();
+
+        if (raycastResult.HasHit())
+            foreach (RaycastResult.HitBodyData hitObj in hitObjs)
+                HighlightObject((RigidBody3D) hitObj.Body);
+    }
+
+    private void HighlightObject(RigidBody3D obj) {
+        foreach (Direction direction in Directions.GetAdjacent()) {
+            Vector3 globalDirection = obj.GlobalTransform.Basis * direction.Offset;
+            Vector3 endPoint = obj.GlobalPosition + globalDirection;
                 
-                //DebugDraw.Line(cube.GlobalPosition, endPoint, direction.GetAxisDebugColor());
-            }
+            DebugDraw.Line(obj.GlobalPosition, endPoint, direction.GetAxisDebugColor());
         }
     }
 
