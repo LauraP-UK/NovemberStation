@@ -28,9 +28,9 @@ public partial class TestScript : Node {
         KeyBinding.BindInput(Key.D, GameAction.Action.MOVE_RIGHT);
         KeyBinding.BindInput(Key.Space, GameAction.Action.JUMP);
         KeyBinding.BindInput(Key.E, GameAction.Action.USE);
+        KeyBinding.BindInput(MouseButton.Left, GameAction.Action.USE);
         KeyBinding.BindInput(Key.Escape, GameAction.Action.QUIT);
-        KeyBinding.BindInput(MouseButton.Left, GameAction.Action.MOUSE_USE);
-        
+
         inputController = new InputController();
         GameAction gameAction = new();
     }

@@ -2,32 +2,33 @@ using System;
 using Godot;
 
 public class InputAction {
-    private KeyBinding.InputType Type { get; }
+    private enum InputType { KEY, MOUSE_BUTTON }
+    private InputType Type { get; }
     private Key? Key { get; }
     private MouseButton? MouseButton { get; }
 
-    private InputAction(KeyBinding.InputType type, Key? key = null, MouseButton? mouseButton = null) {
+    private InputAction(InputType type, Key? key = null, MouseButton? mouseButton = null) {
         Type = type;
         Key = key;
         MouseButton = mouseButton;
     }
 
     public bool Is(Key key) {
-        if (Type != KeyBinding.InputType.Key) return false;
+        if (Type != InputType.KEY) return false;
         return Key == key;
     }
 
     public bool Is(MouseButton mouseButton) {
-        if (Type != KeyBinding.InputType.MouseButton) return false;
+        if (Type != InputType.MOUSE_BUTTON) return false;
         return MouseButton == mouseButton;
     }
 
     public static InputAction FromKey(Key key) {
-        return new InputAction(KeyBinding.InputType.Key, key: key);
+        return new InputAction(InputType.KEY, key: key);
     }
 
     public static InputAction FromMouseButton(MouseButton mouseButton) {
-        return new InputAction(KeyBinding.InputType.MouseButton, mouseButton: mouseButton);
+        return new InputAction(InputType.MOUSE_BUTTON, mouseButton: mouseButton);
     }
 
     public override bool Equals(object? obj) {

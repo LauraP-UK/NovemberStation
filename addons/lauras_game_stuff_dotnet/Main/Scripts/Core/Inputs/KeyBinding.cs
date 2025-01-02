@@ -4,8 +4,6 @@ using Godot;
 
 public class KeyBinding {
     
-    public enum InputType { Key, MouseButton }
-    
     private static readonly AutoDictionary<InputAction, GameAction.Action> _inputToAction = new();
     
     public static void BindInput(Key key, GameAction.Action action) => BindInput(InputAction.FromKey(key), action);

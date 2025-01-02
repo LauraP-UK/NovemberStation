@@ -9,6 +9,10 @@ public class PlayerController : ControllerBase {
         STATIC_LAYER = 1 << 1, // Layer 2
         OBJECT_LAYER = 1 << 2; // Layer 3
 
+    private bool _altAction = false;
+    private float _holdDistanceModifier = 1.0f;
+    private Vector2 _rotationOffset = Vector2.Zero;
+
 
     private long _lastJump;
 
@@ -17,6 +21,27 @@ public class PlayerController : ControllerBase {
 
     public PlayerController(Player player) : base(player) {
         GetActor().GetModel().CollisionLayer = PLAYER_LAYER;
+    }
+
+    [EventListener]
+    private void OnAltHeld(KeyPressEvent ev, Key key) {
+        if (key != Key.Alt || _altAction) return;
+        _altAction = true;
+    }
+
+    [EventListener]
+    private void OnAltReleased(KeyReleaseEvent ev, Key key) {
+        if (key != Key.Alt) return;
+        _altAction = false;
+    }
+
+    [EventListener]
+    private void OnMouseScroll(MouseClickEvent ev, Vector2 position) {
+        if (_heldObject == null) return;
+        MouseButton button = ev.GetMouseButton();
+        if (button != MouseButton.WheelDown && button != MouseButton.WheelUp) return;
+        _holdDistanceModifier = Mathf.Clamp(_holdDistanceModifier + (button == MouseButton.WheelDown ? -0.05f : 0.05f), 0.5f, 1.5f);
+        
     }
 
     [EventListener(PriorityLevels.HIGHEST)]
@@ -61,6 +86,11 @@ public class PlayerController : ControllerBase {
 
         Vector2 turnDelta = ev.GetTurnDelta();
         if (!turnDelta.Equals(Vector2.Zero)) {
+            if (_altAction && _heldObject != null) {
+                _rotationOffset += turnDelta * 0.02f;
+                return;
+            }
+            
             Camera3D camera3D = player.GetCamera();
 
             Vector3 modelRotation = model.Rotation;
@@ -82,19 +112,22 @@ public class PlayerController : ControllerBase {
 
     private void ReleaseHeldObject(Vector3? releaseVelocity = null) {
         if (_heldObject == null) return;
-        
+
         _heldObject.CollisionMask |= PLAYER_LAYER;
         _heldObject.CollisionLayer |= OBJECT_LAYER;
         _heldObject.FreezeMode = RigidBody3D.FreezeModeEnum.Static;
         _heldObject.Freeze = false;
-        
+
         _heldObject.LinearVelocity += releaseVelocity ?? Vector3.Down;
 
         _heldObject = null;
         _heldObjectDirection = null;
     }
-    
+
     private void PickupObject(RigidBody3D obj) {
+        _holdDistanceModifier = 1.0f;
+        _rotationOffset = Vector2.Zero;
+        
         _heldObject = obj;
         _heldObject.CollisionMask &= ~PLAYER_LAYER;
         _heldObject.CollisionLayer &= ~OBJECT_LAYER;
@@ -104,7 +137,7 @@ public class PlayerController : ControllerBase {
     private void UpdateHeldObjectPosition(double delta) {
         Camera3D camera = ((Player)GetActor()).GetCamera();
 
-        Vector3 targetPosition = camera.GlobalTransform.Origin + -camera.GlobalTransform.Basis.Z * HOLD_DISTANCE;
+        Vector3 targetPosition = camera.GlobalTransform.Origin + -camera.GlobalTransform.Basis.Z * (HOLD_DISTANCE * _holdDistanceModifier);
         Vector3 currentPosition = _heldObject.GlobalTransform.Origin;
 
         Vector3 directionToTarget = (targetPosition - currentPosition).Normalized();
@@ -113,8 +146,8 @@ public class PlayerController : ControllerBase {
 
         _heldObject.LinearVelocity = targetVelocity;
         _heldObject.AngularVelocity = Vector3.Zero;
-
-        RotateFaceToPlayer(_heldObject, (float)delta);
+        
+        RotateFaceToPlayer(_heldObject, (float) delta);
     }
 
     public Direction FindClosestFace(RigidBody3D obj) {
@@ -166,6 +199,9 @@ public class PlayerController : ControllerBase {
             targetRotation = new Vector3(0.0f, targetYaw, 0.0f);
         }
 
+        targetRotation.Y += _rotationOffset.X;
+        targetRotation.X += -_rotationOffset.Y;
+        
         Quaternion smoothedRotation = currentRotation.Slerp(Quaternion.FromEuler(targetRotation), ROTATION_SMOOTHNESS * delta);
 
         Basis smoothedBasis = new(smoothedRotation);
