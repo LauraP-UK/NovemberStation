@@ -3,6 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 
 public class SmartDictionary<TKey, TValue> : Dictionary<TKey, TValue> {
+    
+    public SmartDictionary() { }
+    public SmartDictionary(IDictionary<TKey, TValue> dictionary) : base(dictionary) { }
+    
     public new void Add(TKey key, TValue value) {
         if (key == null) throw new ArgumentNullException(nameof(key));
         if (ContainsKey(key))
@@ -42,6 +46,14 @@ public class SmartDictionary<TKey, TValue> : Dictionary<TKey, TValue> {
     public TValue GetOrDefault(TKey key, TValue defaultValue) {
         if (key == null) throw new ArgumentNullException(nameof(key));
         return TryGetValue(key, out TValue value) ? value : defaultValue;
+    }
+    
+    public SmartDictionary<TKey, TValue> Clone() => new(this);
+    
+    public IDictionary<TKey, TValue> ClearAndReturn() {
+        IDictionary<TKey, TValue> copy = new SmartDictionary<TKey, TValue>(this);
+        Clear();
+        return copy;
     }
 
     public void RemoveAll(IEnumerable<TKey> keys) {
