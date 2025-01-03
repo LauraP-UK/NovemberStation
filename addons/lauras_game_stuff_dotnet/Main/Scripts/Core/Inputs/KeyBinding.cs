@@ -4,7 +4,7 @@ using Godot;
 
 public class KeyBinding {
     
-    private static readonly AutoDictionary<InputAction, GameAction.Action> _inputToAction = new();
+    private static readonly SmartDictionary<InputAction, GameAction.Action> _inputToAction = new();
     
     public static void BindInput(Key key, GameAction.Action action) => BindInput(InputAction.FromKey(key), action);
     public static void BindInput(MouseButton mouseButton, GameAction.Action action) => BindInput(InputAction.FromMouseButton(mouseButton), action);

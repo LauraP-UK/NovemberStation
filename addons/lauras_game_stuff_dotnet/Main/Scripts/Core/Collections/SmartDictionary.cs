@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-public class AutoDictionary<TKey, TValue> : Dictionary<TKey, TValue> {
+public class SmartDictionary<TKey, TValue> : Dictionary<TKey, TValue> {
     public new void Add(TKey key, TValue value) {
         if (key == null) throw new ArgumentNullException(nameof(key));
         if (ContainsKey(key))
