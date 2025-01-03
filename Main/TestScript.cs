@@ -1,6 +1,4 @@
 
-
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using Godot;
@@ -15,7 +13,7 @@ public partial class TestScript : Node {
     
     private Player player;
 
-    private readonly Dictionary<RigidBody3D, Vector3> _cubes = new();
+    private readonly Dictionary<RigidBody3D, Vector3> _dynamicObjects = new();
 
     public TestScript() {
         instance = this;
@@ -50,11 +48,15 @@ public partial class TestScript : Node {
         player = (Player) Characters.PLAYER.CreateActor();
         GetTree().Root.GetNode<Node>("Main").AddChild(player.GetModel());
         player.SetPosition(new Vector3(5f, 0.2f, 0f), new Vector3(0.0f, 90.0f, 0.0f));
-        
-        foreach (Node child in GetTree().Root.GetNode<Node3D>("Main/SceneObjects").GetChildren())
-            if (child is RigidBody3D cube) _cubes.Add(cube, cube.GlobalPosition);
-        
-        GD.Print($"Cubes: {_cubes.Count}");
+
+        foreach (Node child in GetTree().Root.GetNode<Node3D>("Main/SceneObjects").GetChildren()) {
+            if (child is RigidBody3D obj) {
+                _dynamicObjects.Add(obj, obj.GlobalPosition);
+                obj.AngularDamp = 1.5f;
+            }
+        }
+
+        GD.Print($"Dynamic Objects: {_dynamicObjects.Count}");
     }
     
     // Called every frame. 'delta' is the elapsed time since the previous frame.
@@ -63,10 +65,10 @@ public partial class TestScript : Node {
 
         if (player.GetModel().Position.Y < -20) player.SetPosition(new Vector3(5f, 0.2f, 0f), new Vector3(0.0f, 90.0f, 0.0f));
         
-        foreach (RigidBody3D physicsObject in _cubes.Keys) {
+        foreach (RigidBody3D physicsObject in _dynamicObjects.Keys) {
             float dist = physicsObject.Position.DistanceSquaredTo(player.GetPosition());
             if (dist > 50 * 50) {
-                physicsObject.GlobalPosition = _cubes[physicsObject];
+                physicsObject.GlobalPosition = _dynamicObjects[physicsObject];
                 physicsObject.LinearVelocity = Vector3.Zero;
                 physicsObject.AngularVelocity = Vector3.Zero;
             }

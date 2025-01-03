@@ -12,8 +12,7 @@ public class PlayerController : ControllerBase {
     private bool _altAction = false;
     private float _holdDistanceModifier = 1.0f;
     private Vector2 _rotationOffset = Vector2.Zero;
-
-
+    
     private long _lastJump;
 
     private RigidBody3D _heldObject;
@@ -52,7 +51,6 @@ public class PlayerController : ControllerBase {
         if (hitBody == null || hitBody.Equals(_heldObject) || _heldObject != null) {
             Vector3 tossDirection = -((Player)GetActor()).GetCamera().GlobalTransform.Basis.Z * 0.1f;
             ReleaseHeldObject(tossDirection + Vector3.Down); // Mini push in a direction plus a nudge down
-            ev.SetCanceled(true);
             return;
         }
 
