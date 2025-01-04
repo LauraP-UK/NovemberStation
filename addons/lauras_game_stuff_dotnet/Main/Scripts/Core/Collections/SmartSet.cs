@@ -23,9 +23,4 @@ public class SmartSet<T> : HashSet<T> {
         if (items == null) throw new ArgumentNullException(nameof(items));
         RemoveAll((IEnumerable<T>)items);
     }
-    
-    public void RemoveWhere(Func<T, bool> predicate) {
-        if (predicate == null) throw new ArgumentNullException(nameof(predicate));
-        foreach (T item in this.Where(predicate).ToList()) Remove(item);
-    }
 }

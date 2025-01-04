@@ -7,7 +7,7 @@ using Godot;
 public class EventManager {
     private static EventManager instance;
 
-    private readonly Dictionary<Type, HashSet<EventActionHolder>> _listeners = new();
+    private readonly SmartDictionary<Type, SmartSet<EventActionHolder>> _listeners = new();
 
     public EventManager() {
         if (instance == null) instance = this;
@@ -41,7 +41,7 @@ public class EventManager {
     }
 
     public void RegisterListener(Type eventType, Delegate callback, int priority, object owner = null) {
-        if (!_listeners.ContainsKey(eventType)) _listeners[eventType] = new HashSet<EventActionHolder>();
+        if (!_listeners.ContainsKey(eventType)) _listeners[eventType] = new SmartSet<EventActionHolder>();
 
         object actualOwner = owner ?? callback.Target;
         if (actualOwner == null) throw new ArgumentException("Owner cannot be null if callback has no target.");
@@ -67,13 +67,13 @@ public class EventManager {
     public void UnregisterListener<TEvent, TContext>(Action<TEvent, object> callback) where TEvent : EventBase<TContext> {
         Type eventID = typeof(TEvent);
 
-        if (_listeners.TryGetValue(eventID, out HashSet<EventActionHolder> list))
+        if (_listeners.TryGetValue(eventID, out SmartSet<EventActionHolder> list))
             list.RemoveWhere(listener => ReferenceEquals(listener.Callback, callback));
     }
 
     public void FireEvent<TContext>(EventBase<TContext> ev) {
         Type eventID = ev.GetType();
-        if (!_listeners.TryGetValue(eventID, out HashSet<EventActionHolder> listenerList))
+        if (!_listeners.TryGetValue(eventID, out SmartSet<EventActionHolder> listenerList))
             return;
 
         TContext additionalContext = ev.GetAdditionalContext();
@@ -100,9 +100,7 @@ public class EventManager {
             } else toRemove.Add(listener);
         }
 
-        if (toRemove.Count != 0)
-            foreach (EventActionHolder listener in toRemove)
-                listenerList.Remove(listener);
+        listenerList.RemoveAll(toRemove);
     }
 
     private void CleanupListeners() {

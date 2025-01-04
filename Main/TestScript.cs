@@ -1,4 +1,5 @@
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Godot;
@@ -42,7 +43,7 @@ public partial class TestScript : Node {
     // Called when the node enters the scene tree for the first time.
     public override void _Ready() {
         GD.Print("Start");
-
+        
         Input.MouseMode = Input.MouseModeEnum.Captured;
         
         player = (Player) Characters.PLAYER.CreateActor();
@@ -52,7 +53,7 @@ public partial class TestScript : Node {
         foreach (Node child in GetTree().Root.GetNode<Node3D>("Main/SceneObjects").GetChildren()) {
             if (child is RigidBody3D obj) {
                 _dynamicObjects.Add(obj, obj.GlobalPosition);
-                obj.AngularDamp = 1.5f;
+                obj.AngularDamp = 0.5f;
             }
         }
 
