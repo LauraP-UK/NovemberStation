@@ -7,6 +7,13 @@ public abstract class ControllerBase : Listener {
     private ActorBase _actor { get; }
     protected Vector3 _velocityInfluence = Vector3.Zero;
 
+    
+    
+    
+    
+    
+    
+    
     private const float MAX_SPEED = 4.0f;
 
     protected ControllerBase(ActorBase actor) {
