@@ -17,6 +17,8 @@ public abstract class ActorBase : IActor {
     public string GetName() => _name;
     public Vector3 GetPosition() => _model.Position;
     public CharacterBody3D GetModel() => _model;
+    public Node3D GetVisualModel() => GetModel().GetNode<Node3D>("WorldModel");
+    public CollisionShape3D GetCollisionShape() => GetModel().GetNode<CollisionShape3D>("CapsuleCollider");
     public ControllerBase GetController() => _controller;
     public void SetController(ControllerBase controller) => _controller = controller;
     public void SetName(string name) => _name = name;

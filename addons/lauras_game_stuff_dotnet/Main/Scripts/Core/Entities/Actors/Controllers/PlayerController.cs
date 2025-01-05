@@ -35,6 +35,18 @@ public class PlayerController : ControllerBase {
     }
 
     [EventListener]
+    private void OnShiftHeld(KeyPressEvent ev, Key key) {
+        if (key != Key.Shift || _sprinting) return;
+        _sprinting = true;
+    }
+
+    [EventListener]
+    private void OnShiftReleased(KeyReleaseEvent ev, Key key) {
+        if (key != Key.Shift) return;
+        _sprinting = false;
+    }
+
+    [EventListener]
     private void OnMouseScroll(MouseClickEvent ev, Vector2 position) {
         if (_heldObject == null) return;
         MouseButton button = ev.GetMouseButton();
@@ -65,22 +77,19 @@ public class PlayerController : ControllerBase {
     }
 
     [EventListener(PriorityLevels.TERMINUS)]
+    private void OnPlayerJump(PlayerJumpEvent ev, ActorBase player) {
+        if (!GetActor().GetModel().IsOnFloor() || TimeSinceLastJump() < JUMP_COOLDOWN_MILLIS) return;
+        _jumping = true;
+        _lastJump = GetCurrentTimeMillis();
+    }
+
+    [EventListener(PriorityLevels.TERMINUS)]
     private void OnPlayerMove(PlayerMoveEvent ev, Player player) {
         Vector3 direction = ev.GetDirection();
         CharacterBody3D model = player.GetModel();
 
-        if (!direction.Equals(Vector3.Zero)) {
-            Vector3 forward = model.GlobalTransform.Basis.Z.Normalized();
-            Vector3 right = model.GlobalTransform.Basis.X.Normalized();
-            Vector3 velocity = (forward * direction.Z + right * direction.X) * SPEED;
-
-            if (direction.Y > 0.0f && model.IsOnFloor() && TimeSinceLastJump() >= JUMP_COOLDOWN_MILLIS) {
-                velocity.Y = direction.Y * 4.5f;
-                _lastJump = GetCurrentTimeMillis();
-            }
-
-            _velocityInfluence = velocity;
-        }
+        if (!direction.Equals(Vector3.Zero))
+            _intendedDirection = GetActor().GetModel().GlobalTransform.Basis * direction;
 
         Vector2 turnDelta = ev.GetTurnDelta();
         if (!turnDelta.Equals(Vector2.Zero)) {

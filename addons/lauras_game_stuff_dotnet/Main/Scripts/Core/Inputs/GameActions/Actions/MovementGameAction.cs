@@ -11,13 +11,13 @@ public class MovementGameAction : GameActionBase {
     }
 
     [EventListener]
-    private void OnMoveKeyPress(KeyPressEvent ev, Key context) {
+    protected void OnMoveKeyPress(KeyPressEvent ev, Key context) {
         if (!IsValidInput(context)) return;
         _isKeyPressed = true;
     }
 
     [EventListener]
-    private void OnMoveKeyRelease(KeyReleaseEvent ev, Key context) {
+    protected void OnMoveKeyRelease(KeyReleaseEvent ev, Key context) {
         if (!IsValidInput(context)) return;
         _isKeyPressed = false;
     }

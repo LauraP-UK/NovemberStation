@@ -12,21 +12,24 @@ size = Vector3(0.2, 0.2, 0.2)
 [node name="PlayerRoot" type="CharacterBody3D"]
 collision_mask = 6
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+[node name="CapsuleCollider" type="CollisionShape3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
 shape = SubResource("CapsuleShape3D_f8i3f")
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+[node name="WorldModel" type="Node3D" parent="."]
+
+[node name="Capsule" type="MeshInstance3D" parent="WorldModel"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
 mesh = SubResource("CapsuleMesh_5d363")
 skeleton = NodePath("")
 
-[node name="MeshInstance3D2" type="MeshInstance3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5414, -0.218916)
-visible = false
+[node name="DebugCube" type="MeshInstance3D" parent="WorldModel"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.54, -0.5)
 mesh = SubResource("BoxMesh_abprh")
 skeleton = NodePath("")
 
-[node name="Camera" type="Camera3D" parent="."]
+[node name="Neck" type="Node3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.7, 0)
+
+[node name="Camera" type="Camera3D" parent="Neck"]
 current = true
