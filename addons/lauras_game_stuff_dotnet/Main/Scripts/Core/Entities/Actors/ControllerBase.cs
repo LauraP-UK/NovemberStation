@@ -6,6 +6,7 @@ public abstract class ControllerBase : Listener {
         JUMP_VELOCITY = 6.0f,
         WALK_SPEED = 4.5f,
         SPRINT_SPEED = 7.0f,
+        CROUCH_SPEED = WALK_SPEED * 0.5f,
         AIR_CAP = 0.85f,
         AIR_ACCELERATION = 800.0f,
         AIR_MOVE_SPEED = 500.0f,
@@ -14,28 +15,79 @@ public abstract class ControllerBase : Listener {
         GROUND_FRICTION = 6.0f,
         MAX_STEP_HEIGHT = 0.5f,
         APPROX_ACTOR_MASS = 80.0f,
-        MIN_IMPULSE_THRESHOLD = 1.25f;
+        MIN_IMPULSE_THRESHOLD = 1.25f,
+        CROUCH_TRANSLATE = 0.7f,
+        CROUCH_JUMP_HEIGHT = CROUCH_TRANSLATE * 0.9f;
+    
+    private static readonly float GRAVITY = (float) ProjectSettings.GetSetting("physics/3d/default_gravity");
 
     private ActorBase _actor { get; }
     private ulong _lastFrameOnFloor = ulong.MinValue;
     private bool _snappedToStairs;
-    private Vector3? _savedCamGlobalPosition = null;
+    private Vector3? _savedCamGlobalPosition;
 
     protected Vector3 _intendedDirection = Vector3.Zero;
-    protected bool _sprinting = false, _jumping, _crouching = false;
+    protected bool _sprinting = false, _jumping, _crouching, _crouchingLastFrame, _tryUncrouch;
+    protected readonly float _actorHeight = -1.0f;
 
     protected ControllerBase(ActorBase actor) {
         _actor = actor;
         _actor.SetController(this);
+        if (GetActor().GetCollisionShape().GetShape() is CapsuleShape3D capsule)
+            _actorHeight = capsule.Height;
     }
 
-    protected float GetSpeed() => _sprinting ? SPRINT_SPEED : WALK_SPEED;
-    protected abstract void OnUpdate(float delta);
+    protected ActorBase GetActor() => _actor;
+    protected float GetSpeed() => _crouching ? CROUCH_SPEED : _sprinting ? SPRINT_SPEED : WALK_SPEED;
 
+    protected abstract void OnUpdate(float delta);
+    public void Update(float delta) {
+        OnUpdate(delta);
+        CharacterBody3D model = GetActor().GetModel();
+
+        HandleCrouch(delta);
+        
+        if (model.IsOnFloor()) {
+            _lastFrameOnFloor = Engine.GetPhysicsFrames();
+            Vector3 velocity = model.GetVelocity();
+            velocity.Y = _jumping ? JUMP_VELOCITY : 0.0f;
+            model.SetVelocity(velocity);
+            HandleGroundPhysics(delta);
+        }
+        else HandleAirPhysics(delta);
+
+        PushAwayRigidBodies();
+        if (!SnapUpStairsCheck(delta)) {
+            model.MoveAndSlide();
+            SnapToStairsCheck();
+        }
+
+        SlideCamToOrigin(delta);
+        
+        _intendedDirection = Vector3.Zero;
+        _jumping = false;
+    }
+    
+    /* --- ---  LISTENERS  --- --- */
+
+    [EventListener(PriorityLevels.LOWEST)]
+    protected void OnCrouchEvent(ActorCrouchEvent ev, ActorBase actor) {
+        if (!actor.Equals(GetActor())) return;
+        if (!_crouching || ev.IsStartCrouch()) return;
+        if (!CanUncrouch()) {
+            ev.SetCanceled(true);
+            _tryUncrouch = true;
+        }
+    }
+    
+    
+    /* --- ---  MOVEMENT  --- --- */
     private void SaveCameraPosition() {
         if (GetActor() is not IViewable actor) return;
         _savedCamGlobalPosition ??= actor.GetCamera().GlobalPosition;
     }
+    
+    protected bool IsSurfaceTooSteep(Vector3 normal) => normal.AngleTo(Vector3.Up) > GetActor().GetModel().FloorMaxAngle;
 
     private void SlideCamToOrigin(float delta) {
         if (_savedCamGlobalPosition == null || GetActor() is not IViewable actor) return;
@@ -85,7 +137,7 @@ public abstract class ControllerBase : Listener {
         CharacterBody3D model = GetActor().GetModel();
         Vector3 velocity = VectorUtils.RoundTo(model.GetVelocity(), 4);
 
-        velocity.Y -= (float)ProjectSettings.GetSetting("physics/3d/default_gravity") * delta;
+        velocity.Y -= GRAVITY * delta;
         model.SetVelocity(velocity);
 
         float currentSpeedInDirection = velocity.Dot(_intendedDirection);
@@ -98,34 +150,7 @@ public abstract class ControllerBase : Listener {
             model.SetVelocity(model.GetVelocity() + accelSpeed * _intendedDirection);
         }
     }
-
-    public void Update(float delta) {
-        OnUpdate(delta);
-        CharacterBody3D model = GetActor().GetModel();
-
-        if (model.IsOnFloor()) {
-            _lastFrameOnFloor = Engine.GetPhysicsFrames();
-            Vector3 velocity = model.GetVelocity();
-            velocity.Y = _jumping ? JUMP_VELOCITY : 0.0f;
-            model.SetVelocity(velocity);
-            HandleGroundPhysics(delta);
-        }
-        else HandleAirPhysics(delta);
-
-        PushAwayRigidBodies();
-        if (!SnapUpStairsCheck(delta)) {
-            model.MoveAndSlide();
-            SnapToStairsCheck();
-        }
-
-        SlideCamToOrigin(delta);
-        
-        _intendedDirection = Vector3.Zero;
-        _jumping = false;
-    }
-
-    protected bool IsSurfaceTooSteep(Vector3 normal) => normal.AngleTo(Vector3.Up) > GetActor().GetModel().FloorMaxAngle;
-
+    
     protected bool RunBodyTestMotion(Transform3D from, Vector3 motion, PhysicsTestMotionResult3D result = null) {
         result ??= new PhysicsTestMotionResult3D();
         PhysicsTestMotionParameters3D physicsParams = new();
@@ -138,7 +163,7 @@ public abstract class ControllerBase : Listener {
 
     private bool SnapUpStairsCheck(float delta) {
         CharacterBody3D model = GetActor().GetModel();
-        if (!model.IsOnFloor() && !_snappedToStairs)
+        if ((!model.IsOnFloor() && !_snappedToStairs) || _jumping)
             return false;
 
         Vector3 expectedMove = model.Velocity * new Vector3(1.0f, 0.0f, 1.0f) * delta;
@@ -225,5 +250,52 @@ public abstract class ControllerBase : Listener {
         }
     }
 
-    protected ActorBase GetActor() => _actor;
+    protected void HandleCrouch(float delta) {
+        if (GetActor() is not Player player) return;
+        if (_actorHeight < 0.0f) return;
+        
+        if (_tryUncrouch && CanUncrouch()) {
+            _crouching = false;
+            _tryUncrouch = false;
+        }
+
+        CharacterBody3D model = player.GetModel();
+
+        float transY = 0.0f;
+        if (_crouchingLastFrame != _crouching && !model.IsOnFloor() && !_snappedToStairs)
+            transY = _crouching ? CROUCH_JUMP_HEIGHT : -CROUCH_JUMP_HEIGHT;
+
+        Node3D crouchNode = player.GetCrouchNode();
+        
+        if (transY != 0.0f) {
+            KinematicCollision3D result = new();
+            model.TestMove(model.Transform, new Vector3(0.0f, transY, 0.0f), result);
+            Vector3 modelPos = model.GetPosition();
+            Vector3 headPos = crouchNode.GetPosition();
+            modelPos.Y += result.GetTravel().Y;
+            headPos.Y -= result.GetTravel().Y;
+            headPos.Y = Mathf.Clamp(headPos.Y, -CROUCH_TRANSLATE, 0.0f);
+            model.SetPosition(modelPos);
+            crouchNode.SetPosition(headPos);
+        }
+        
+        Vector3 towards = new(0.0f, _crouching ? -CROUCH_TRANSLATE : 0.0f, 0.0f);
+        towards.Y = Mathf.MoveToward(crouchNode.GetPosition().Y, towards.Y, 7.0f * delta);
+        crouchNode.SetPosition(towards);
+
+        CollisionShape3D collisionShape = player.GetCollisionShape();
+        CapsuleShape3D capsule = (CapsuleShape3D) collisionShape.GetShape();
+        float actorHeight = _crouching ? _actorHeight - CROUCH_TRANSLATE : _actorHeight;
+        capsule.Height = actorHeight;
+        Vector3 position = collisionShape.GetPosition();
+        position.Y = actorHeight / 2;
+        collisionShape.SetPosition(position);
+        
+        _crouchingLastFrame = _crouching;
+    }
+
+    private bool CanUncrouch() {
+        CharacterBody3D model = GetActor().GetModel();
+        return !model.TestMove(model.Transform, new Vector3(0.0f, CROUCH_TRANSLATE, 0.0f));
+    }
 }

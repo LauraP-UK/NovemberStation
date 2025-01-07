@@ -59,7 +59,6 @@ public class PlayerController : ControllerBase {
         }
         
         _crouching = ev.IsStartCrouch();
-        GD.Print($"Player is crouching: {_crouching}");
     }
 
     [EventListener]

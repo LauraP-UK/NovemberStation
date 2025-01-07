@@ -28,10 +28,12 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.54, -0.20391)
 mesh = SubResource("BoxMesh_abprh")
 skeleton = NodePath("")
 
-[node name="Head" type="Node3D" parent="."]
+[node name="HeadOrigin" type="Node3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.7, 0)
 
-[node name="Camera" type="Camera3D" parent="Head"]
+[node name="CrouchControl" type="Node3D" parent="HeadOrigin"]
+
+[node name="Camera" type="Camera3D" parent="HeadOrigin/CrouchControl"]
 current = true
 
 [node name="StairsRaycasts" type="Node3D" parent="."]

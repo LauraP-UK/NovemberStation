@@ -70,12 +70,6 @@ public partial class TestScript : Node {
         if (raycastResult.HasHit())
             foreach (RaycastResult.HitBodyData hitObj in hitObjs)
                 HighlightObject((RigidBody3D) hitObj.Body);
-
-        RayCast3D frontCast = player.GetFrontRaycast();
-        Vector3 frontCastStart = frontCast.GlobalPosition;
-        Vector3 frontCastEnd = frontCast.IsColliding() ? frontCast.GetCollisionPoint() : frontCastStart + Vector3.Down * 2;
-        
-        //DebugDraw.Line(frontCastStart, frontCastEnd, frontCast.IsColliding() ? Colors.Aqua : Colors.Red);
     }
 
     private void HighlightObject(RigidBody3D obj) {

@@ -4,10 +4,13 @@ using Godot;
 
 public class Player : ActorBase, IViewable {
     
-    private Camera3D _camera;
+    private readonly Camera3D _camera;
+    private readonly Node3D _crouchNode;
     
     public Player(CharacterBody3D body) : base(body) {
         new PlayerController(this);
+        _crouchNode = GetModel().GetNode<Node3D>("HeadOrigin/CrouchControl");
+        _camera = _crouchNode.GetNode<Camera3D>("Camera");
 
         List<VisualInstance3D> children = GetVisualModel()
             .GetChildren()
@@ -22,7 +25,8 @@ public class Player : ActorBase, IViewable {
         GetCamera().SetCullMaskValue(2, false);
     }
 
-    public Camera3D GetCamera() => _camera ??= GetModel().GetNode<Camera3D>("Head/Camera");
+    public Camera3D GetCamera() => _camera;
+    public Node3D GetCrouchNode() => _crouchNode;
     
     public RaycastResult GetLookingAt(float distance) => Raycast.Trace(this, distance);
 }
