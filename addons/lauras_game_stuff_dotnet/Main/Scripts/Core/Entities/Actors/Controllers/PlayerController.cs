@@ -9,7 +9,7 @@ public class PlayerController : ControllerBase {
         STATIC_LAYER = 1 << 1, // Layer 2
         OBJECT_LAYER = 1 << 2; // Layer 3
 
-    private bool _altAction = false;
+    private bool _altAction;
     private float _holdDistanceModifier = 1.0f;
     private Vector2 _rotationOffset = Vector2.Zero;
     
@@ -18,10 +18,10 @@ public class PlayerController : ControllerBase {
     private RigidBody3D _heldObject;
     private Direction _heldObjectDirection;
 
-    public PlayerController(Player player) : base(player) {
-        GetActor().GetModel().CollisionLayer = PLAYER_LAYER;
-    }
+    public PlayerController(Player player) : base(player) => GetActor().GetModel().CollisionLayer = PLAYER_LAYER;
 
+
+    /* --- ---  LISTENERS  --- --- */
     [EventListener]
     private void OnAltHeld(KeyPressEvent ev, Key key) {
         if (key != Key.Alt || _altAction) return;
@@ -110,6 +110,8 @@ public class PlayerController : ControllerBase {
         }
     }
 
+    /* --- ---  METHODS  --- --- */
+    
     private static long GetCurrentTimeMillis() => DateTimeOffset.Now.ToUnixTimeMilliseconds();
     private long TimeSinceLastJump() => GetCurrentTimeMillis() - _lastJump;
 

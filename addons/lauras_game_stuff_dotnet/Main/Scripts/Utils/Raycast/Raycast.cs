@@ -5,12 +5,12 @@ using NovemberStation.Main;
 
 public static class Raycast {
     
-    public static RaycastResult Trace(Player actor, Vector3 end) {
+    public static RaycastResult Trace(IViewable actor, Vector3 end) {
         Vector3 origin = actor.GetCamera().GlobalTransform.Origin;
         return Trace(origin, end);
     }
     
-    public static RaycastResult Trace(Player actor, float distance) {
+    public static RaycastResult Trace(IViewable actor, float distance) {
         Vector3 origin = actor.GetCamera().GlobalTransform.Origin;
         Vector3 forward = -actor.GetCamera().GlobalTransform.Basis.Z.Normalized();
         Vector3 target = origin + forward * distance;

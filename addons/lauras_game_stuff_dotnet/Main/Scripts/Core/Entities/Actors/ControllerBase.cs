@@ -1,11 +1,10 @@
 using System;
-using System.Diagnostics;
 using Godot;
 
 public abstract class ControllerBase : Listener {
     private const float
         JUMP_VELOCITY = 6.0f,
-        WALK_SPEED = 5.0f,
+        WALK_SPEED = 4.5f,
         SPRINT_SPEED = 7.0f,
         AIR_CAP = 0.85f,
         AIR_ACCELERATION = 800.0f,
@@ -13,13 +12,17 @@ public abstract class ControllerBase : Listener {
         GROUND_ACCELERATION = 50.0f,
         GROUND_DECELERATION = 10.0f,
         GROUND_FRICTION = 6.0f,
-        MAX_STEP_HEIGHT = 0.5f;
+        MAX_STEP_HEIGHT = 0.5f,
+        APPROX_ACTOR_MASS = 80.0f,
+        MIN_IMPULSE_THRESHOLD = 1.25f;
 
     private ActorBase _actor { get; }
-    protected Vector3 _intendedDirection = Vector3.Zero;
-    protected ulong _lastFrameOnFloor = ulong.MinValue;
+    private ulong _lastFrameOnFloor = ulong.MinValue;
+    private bool _snappedToStairs;
+    private Vector3? _savedCamGlobalPosition = null;
 
-    protected bool _sprinting = false, _jumping, _snappedToStairs = false;
+    protected Vector3 _intendedDirection = Vector3.Zero;
+    protected bool _sprinting = false, _jumping;
 
     protected ControllerBase(ActorBase actor) {
         _actor = actor;
@@ -27,9 +30,33 @@ public abstract class ControllerBase : Listener {
     }
 
     protected float GetSpeed() => _sprinting ? SPRINT_SPEED : WALK_SPEED;
-
     protected abstract void OnUpdate(float delta);
 
+    private void SaveCameraPosition() {
+        if (GetActor() is not IViewable actor) return;
+        _savedCamGlobalPosition ??= actor.GetCamera().GlobalPosition;
+    }
+
+    private void SlideCamToOrigin(float delta) {
+        if (_savedCamGlobalPosition == null || GetActor() is not IViewable actor) return;
+        Camera3D camera = actor.GetCamera();
+        
+        Vector3 globalPosition = camera.GetGlobalPosition();
+        globalPosition.Y = _savedCamGlobalPosition.Value.Y;
+        camera.SetGlobalPosition(globalPosition);
+        
+        Vector3 position = camera.GetPosition();
+        position.Y = Mathf.Clamp(position.Y, -0.7f, 0.7f);
+        camera.SetPosition(position);
+
+        float moveAmount = Math.Max(GetActor().GetModel().Velocity.Length() * delta, WALK_SPEED / 2 * delta);
+        position.Y = Mathf.MoveToward(position.Y, 0.0f, moveAmount);
+        camera.SetPosition(position);
+        _savedCamGlobalPosition = camera.GlobalPosition;
+        
+        if (position.Y == 0.0f) _savedCamGlobalPosition = null;
+    }
+    
     protected void HandleGroundPhysics(float delta) {
         CharacterBody3D model = GetActor().GetModel();
         float speed = GetSpeed();
@@ -91,6 +118,8 @@ public abstract class ControllerBase : Listener {
             SnapToStairsCheck();
         }
 
+        SlideCamToOrigin(delta);
+        
         _intendedDirection = Vector3.Zero;
         _jumping = false;
     }
@@ -130,14 +159,11 @@ public abstract class ControllerBase : Listener {
             frontCast.SetGlobalPosition(downCheckResult.GetCollisionPoint() + new Vector3(0, MAX_STEP_HEIGHT, 0) + expectedMove.Normalized() * 0.1f);
             frontCast.ForceRaycastUpdate();
 
-            DebugDraw.Line(frontCast.GlobalPosition,
-                frontCast.IsColliding() ? frontCast.GetCollisionPoint() : frontCast.GlobalPosition + frontCast.TargetPosition,
-                frontCast.IsColliding() ? Colors.Aqua : Colors.Red
-            );
-
             if (!frontCast.IsColliding() || IsSurfaceTooSteep(frontCast.GetCollisionNormal()))
                 return false;
 
+            SaveCameraPosition();
+            
             model.SetGlobalPosition(stepPosClearance.Origin + downCheckResult.GetTravel());
             model.ApplyFloorSnap();
             _snappedToStairs = true;
@@ -158,6 +184,9 @@ public abstract class ControllerBase : Listener {
         if (!model.IsOnFloor() && model.GetVelocity().Y <= 0 && (wasOnFloor || _snappedToStairs) && floorBelow) {
             PhysicsTestMotionResult3D result = new();
             if (RunBodyTestMotion(model.GlobalTransform, new Vector3(0.0f, -MAX_STEP_HEIGHT, 0.0f), result)) {
+                
+                SaveCameraPosition();
+                
                 float transY = result.GetTravel().Y;
                 Vector3 position = model.GetPosition();
                 model.SetPosition(new Vector3(position.X, position.Y += transY, position.Z));
@@ -168,9 +197,6 @@ public abstract class ControllerBase : Listener {
 
         _snappedToStairs = didSnap;
     }
-
-    private const float APPROX_ACTOR_MASS = 80.0f;
-    private const float MIN_IMPULSE_THRESHOLD = 1.25f;
 
     private void PushAwayRigidBodies() {
         CharacterBody3D model = GetActor().GetModel();

@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Godot;
 
-public class Player : ActorBase {
+public class Player : ActorBase, IViewable {
     
     private Camera3D _camera;
     
@@ -22,7 +22,7 @@ public class Player : ActorBase {
         GetCamera().SetCullMaskValue(2, false);
     }
 
-    public Camera3D GetCamera() => _camera ??= GetModel().GetNode<Camera3D>("Neck/Camera");
+    public Camera3D GetCamera() => _camera ??= GetModel().GetNode<Camera3D>("Head/Camera");
     
     public RaycastResult GetLookingAt(float distance) => Raycast.Trace(this, distance);
 }
