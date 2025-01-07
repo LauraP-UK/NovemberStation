@@ -2,7 +2,7 @@ using System;
 using Godot;
 
 public class PlayerController : ControllerBase {
-    private const float SPEED = 5.0f, HOLD_DISTANCE = 2.1f, HOLD_SMOOTHNESS = 15.0f, ROTATION_SMOOTHNESS = 10.0f;
+    private const float HOLD_DISTANCE = 2.1f, HOLD_SMOOTHNESS = 15.0f, ROTATION_SMOOTHNESS = 10.0f;
     private const long JUMP_COOLDOWN_MILLIS = 250L;
 
     private const uint PLAYER_LAYER = 1 << 0, // Layer 1

@@ -67,8 +67,7 @@ public partial class TestScript : Node {
         if (player.GetModel().Position.Y < -20) player.SetPosition(new Vector3(5f, 0.2f, 0f), new Vector3(0.0f, 90.0f, 0.0f));
         
         foreach (RigidBody3D physicsObject in _dynamicObjects.Keys) {
-            float dist = physicsObject.Position.DistanceSquaredTo(player.GetPosition());
-            if (dist > 50 * 50) {
+            if (physicsObject.GlobalPosition.Y < -20) {
                 physicsObject.GlobalPosition = _dynamicObjects[physicsObject];
                 physicsObject.LinearVelocity = Vector3.Zero;
                 physicsObject.AngularVelocity = Vector3.Zero;
@@ -81,6 +80,12 @@ public partial class TestScript : Node {
         if (raycastResult.HasHit())
             foreach (RaycastResult.HitBodyData hitObj in hitObjs)
                 HighlightObject((RigidBody3D) hitObj.Body);
+
+        RayCast3D frontCast = player.GetFrontRaycast();
+        Vector3 frontCastStart = frontCast.GlobalPosition;
+        Vector3 frontCastEnd = frontCast.IsColliding() ? frontCast.GetCollisionPoint() : frontCastStart + Vector3.Down * 2;
+        
+        //DebugDraw.Line(frontCastStart, frontCastEnd, frontCast.IsColliding() ? Colors.Aqua : Colors.Red);
     }
 
     private void HighlightObject(RigidBody3D obj) {

@@ -24,7 +24,7 @@ mesh = SubResource("CapsuleMesh_5d363")
 skeleton = NodePath("")
 
 [node name="DebugCube" type="MeshInstance3D" parent="WorldModel"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.54, -0.5)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.54, -0.20391)
 mesh = SubResource("BoxMesh_abprh")
 skeleton = NodePath("")
 
@@ -33,3 +33,14 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.7, 0)
 
 [node name="Camera" type="Camera3D" parent="Neck"]
 current = true
+
+[node name="StairsRaycasts" type="Node3D" parent="."]
+
+[node name="BelowCast" type="RayCast3D" parent="StairsRaycasts"]
+target_position = Vector3(0, -0.75, 0)
+collision_mask = 14
+
+[node name="FrontCast" type="RayCast3D" parent="StairsRaycasts"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.56, -0.55)
+target_position = Vector3(0, -0.5, 0)
+collision_mask = 15
