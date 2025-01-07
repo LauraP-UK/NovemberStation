@@ -20,16 +20,6 @@ public partial class TestScript : Node {
         instance = this;
 
         EventManager eventManager = new();
-
-        KeyBinding.BindInput(Key.W, GameAction.Action.MOVE_FORWARD);
-        KeyBinding.BindInput(Key.S, GameAction.Action.MOVE_BACKWARD);
-        KeyBinding.BindInput(Key.A, GameAction.Action.MOVE_LEFT);
-        KeyBinding.BindInput(Key.D, GameAction.Action.MOVE_RIGHT);
-        KeyBinding.BindInput(Key.Space, GameAction.Action.JUMP);
-        KeyBinding.BindInput(Key.E, GameAction.Action.USE);
-        KeyBinding.BindInput(MouseButton.Left, GameAction.Action.USE);
-        KeyBinding.BindInput(Key.Escape, GameAction.Action.QUIT);
-
         inputController = new InputController();
         GameAction gameAction = new();
     }

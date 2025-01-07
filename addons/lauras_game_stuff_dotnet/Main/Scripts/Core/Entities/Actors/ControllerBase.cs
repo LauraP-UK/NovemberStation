@@ -22,7 +22,7 @@ public abstract class ControllerBase : Listener {
     private Vector3? _savedCamGlobalPosition = null;
 
     protected Vector3 _intendedDirection = Vector3.Zero;
-    protected bool _sprinting = false, _jumping;
+    protected bool _sprinting = false, _jumping, _crouching = false;
 
     protected ControllerBase(ActorBase actor) {
         _actor = actor;
