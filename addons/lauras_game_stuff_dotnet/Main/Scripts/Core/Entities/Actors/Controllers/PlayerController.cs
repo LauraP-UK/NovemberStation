@@ -4,13 +4,12 @@ using Godot;
 public class PlayerController : ControllerBase {
     private const float HOLD_DISTANCE = 2.1f, HOLD_SMOOTHNESS = 15.0f, ROTATION_SMOOTHNESS = 10.0f;
     private const long JUMP_COOLDOWN_MILLIS = 250L;
-    private const bool TOGGLE_CROUCH = false; //TODO: Make this a setting
 
     private const uint PLAYER_LAYER = 1 << 0, // Layer 1
         STATIC_LAYER = 1 << 1, // Layer 2
         OBJECT_LAYER = 1 << 2; // Layer 3
 
-    private bool _altAction;
+    private bool _altAction, _toggleCrouch;
     private float _holdDistanceModifier = 1.0f;
     private Vector2 _rotationOffset = Vector2.Zero;
     
@@ -23,6 +22,12 @@ public class PlayerController : ControllerBase {
 
 
     /* --- ---  LISTENERS  --- --- */
+    [EventListener]
+    private void OnCrouchToggle(KeyPressEvent ev, Key key) {
+        if (key != Key.C) return;
+        _toggleCrouch = !_toggleCrouch;
+    }
+    
     [EventListener]
     private void OnAltHeld(KeyPressEvent ev, Key key) {
         if (key != Key.Alt || _altAction) return;
@@ -50,14 +55,12 @@ public class PlayerController : ControllerBase {
     [EventListener(PriorityLevels.TERMINUS)]
     private void OnCrouchEvent(ActorCrouchEvent ev, ActorBase actor) {
         if (!actor.Equals(GetActor())) return;
-        
-        if (TOGGLE_CROUCH) {
+        if (_toggleCrouch) {
             if (!ev.IsStartCrouch()) return;
-            _crouching = !_crouching;
-            GD.Print($"Player is crouching: {_crouching}");
+            if (_crouching && !CanUncrouch()) _tryUncrouch = true;
+            else _crouching = !_crouching;
             return;
         }
-        
         _crouching = ev.IsStartCrouch();
     }
 

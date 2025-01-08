@@ -56,8 +56,8 @@ public abstract class ControllerBase : Listener {
         }
         else HandleAirPhysics(delta);
 
-        PushAwayRigidBodies();
         if (!SnapUpStairsCheck(delta)) {
+            PushAwayRigidBodies();
             model.MoveAndSlide();
             SnapToStairsCheck();
         }
@@ -74,10 +74,9 @@ public abstract class ControllerBase : Listener {
     protected void OnCrouchEvent(ActorCrouchEvent ev, ActorBase actor) {
         if (!actor.Equals(GetActor())) return;
         if (!_crouching || ev.IsStartCrouch()) return;
-        if (!CanUncrouch()) {
-            ev.SetCanceled(true);
-            _tryUncrouch = true;
-        }
+        if (CanUncrouch()) return;
+        ev.SetCanceled(true);
+        _tryUncrouch = true;
     }
     
     
@@ -88,6 +87,8 @@ public abstract class ControllerBase : Listener {
     }
     
     protected bool IsSurfaceTooSteep(Vector3 normal) => normal.AngleTo(Vector3.Up) > GetActor().GetModel().FloorMaxAngle;
+    
+    protected bool CanUncrouch() => !GetActor().GetModel().TestMove(GetActor().GetModel().Transform, new Vector3(0.0f, CROUCH_TRANSLATE, 0.0f));
 
     private void SlideCamToOrigin(float delta) {
         if (_savedCamGlobalPosition == null || GetActor() is not IViewable actor) return;
@@ -231,19 +232,20 @@ public abstract class ControllerBase : Listener {
                 float massRatio = Math.Min(1.0f, APPROX_ACTOR_MASS / rigidBody.Mass);
 
                 Vector3 pushDirection = -collision.GetNormal();
-                pushDirection.Y = 0.0f;
-                pushDirection = pushDirection.Normalized();
+                //pushDirection = pushDirection.Normalized();
 
                 float velocityDiff = model.GetVelocity().Dot(pushDirection) - rigidBody.LinearVelocity.Dot(pushDirection);
                 velocityDiff = Math.Max(0.0f, velocityDiff);
 
                 if (velocityDiff < MIN_IMPULSE_THRESHOLD) continue;
+                
+                pushDirection.Y = 0.0f;
 
-                float pushForce = massRatio * 1.0f; // Magic adjustment factor
+                float pushForce = massRatio * 2.0f; // Magic adjustment factor
 
                 Vector3 impulse = VectorUtils.RoundTo(pushDirection * velocityDiff * pushForce, 4);
                 Vector3 position = collision.GetPosition() - rigidBody.GetGlobalPosition();
-                position.Y = 0.0f;
+                //position.Y = 0.0f;
 
                 rigidBody.ApplyImpulse(impulse, position);
             }
@@ -292,10 +294,5 @@ public abstract class ControllerBase : Listener {
         collisionShape.SetPosition(position);
         
         _crouchingLastFrame = _crouching;
-    }
-
-    private bool CanUncrouch() {
-        CharacterBody3D model = GetActor().GetModel();
-        return !model.TestMove(model.Transform, new Vector3(0.0f, CROUCH_TRANSLATE, 0.0f));
     }
 }

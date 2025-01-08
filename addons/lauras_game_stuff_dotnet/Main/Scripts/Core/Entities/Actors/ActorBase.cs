@@ -28,4 +28,9 @@ public abstract class ActorBase : IActor {
         _model.Position = position;
         if (rotation != default) _model.RotationDegrees = rotation;
     }
+    
+    public override bool Equals(object obj) {
+        if (obj == null || GetType() != obj.GetType()) return false;
+        return _uuid == ((ActorBase) obj)._uuid;
+    }
 }
