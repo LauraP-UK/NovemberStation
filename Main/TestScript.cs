@@ -10,7 +10,6 @@ public partial class TestScript : Node {
 
     private static TestScript instance;
     private static readonly Scheduler scheduler = new();
-    private static InputController inputController;
     
     private Player player;
 
@@ -18,9 +17,7 @@ public partial class TestScript : Node {
 
     public TestScript() {
         instance = this;
-
         EventManager eventManager = new();
-        inputController = new InputController();
         GameAction gameAction = new();
     }
 
@@ -28,7 +25,7 @@ public partial class TestScript : Node {
 
     public Player GetPlayer() => player;
 
-    public override void _Input(InputEvent @event) => inputController.ProcessInput(@event);
+    public override void _Input(InputEvent @event) => InputController.ProcessInput(@event);
 
     // Called when the node enters the scene tree for the first time.
     public override void _Ready() {
