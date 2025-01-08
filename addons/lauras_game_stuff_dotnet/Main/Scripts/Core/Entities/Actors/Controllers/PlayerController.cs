@@ -2,14 +2,14 @@ using System;
 using Godot;
 
 public class PlayerController : ControllerBase {
-    private const float SPEED = 5.0f, HOLD_DISTANCE = 2.1f, HOLD_SMOOTHNESS = 15.0f, ROTATION_SMOOTHNESS = 10.0f;
+    private const float HOLD_DISTANCE = 2.1f, HOLD_SMOOTHNESS = 15.0f, ROTATION_SMOOTHNESS = 10.0f;
     private const long JUMP_COOLDOWN_MILLIS = 250L;
 
     private const uint PLAYER_LAYER = 1 << 0, // Layer 1
         STATIC_LAYER = 1 << 1, // Layer 2
         OBJECT_LAYER = 1 << 2; // Layer 3
 
-    private bool _altAction = false;
+    private bool _altAction, _toggleCrouch;
     private float _holdDistanceModifier = 1.0f;
     private Vector2 _rotationOffset = Vector2.Zero;
     
@@ -18,10 +18,16 @@ public class PlayerController : ControllerBase {
     private RigidBody3D _heldObject;
     private Direction _heldObjectDirection;
 
-    public PlayerController(Player player) : base(player) {
-        GetActor().GetModel().CollisionLayer = PLAYER_LAYER;
-    }
+    public PlayerController(Player player) : base(player) => GetActor().GetModel().CollisionLayer = PLAYER_LAYER;
 
+
+    /* --- ---  LISTENERS  --- --- */
+    [EventListener]
+    private void OnCrouchToggle(KeyPressEvent ev, Key key) {
+        if (key != Key.C) return;
+        _toggleCrouch = !_toggleCrouch;
+    }
+    
     [EventListener]
     private void OnAltHeld(KeyPressEvent ev, Key key) {
         if (key != Key.Alt || _altAction) return;
@@ -32,6 +38,30 @@ public class PlayerController : ControllerBase {
     private void OnAltReleased(KeyReleaseEvent ev, Key key) {
         if (key != Key.Alt) return;
         _altAction = false;
+    }
+
+    [EventListener]
+    private void OnShiftHeld(KeyPressEvent ev, Key key) {
+        if (key != Key.Shift || _sprinting) return;
+        _sprinting = true;
+    }
+
+    [EventListener]
+    private void OnShiftReleased(KeyReleaseEvent ev, Key key) {
+        if (key != Key.Shift) return;
+        _sprinting = false;
+    }
+    
+    [EventListener(PriorityLevels.TERMINUS)]
+    private void OnCrouchEvent(ActorCrouchEvent ev, ActorBase actor) {
+        if (!actor.Equals(GetActor())) return;
+        if (_toggleCrouch) {
+            if (!ev.IsStartCrouch()) return;
+            if (_crouching && !CanUncrouch()) _tryUncrouch = true;
+            else _crouching = !_crouching;
+            return;
+        }
+        _crouching = ev.IsStartCrouch();
     }
 
     [EventListener]
@@ -65,22 +95,19 @@ public class PlayerController : ControllerBase {
     }
 
     [EventListener(PriorityLevels.TERMINUS)]
+    private void OnPlayerJump(PlayerJumpEvent ev, ActorBase player) {
+        if (!GetActor().GetModel().IsOnFloor() || TimeSinceLastJump() < JUMP_COOLDOWN_MILLIS) return;
+        _jumping = true;
+        _lastJump = GetCurrentTimeMillis();
+    }
+
+    [EventListener(PriorityLevels.TERMINUS)]
     private void OnPlayerMove(PlayerMoveEvent ev, Player player) {
         Vector3 direction = ev.GetDirection();
         CharacterBody3D model = player.GetModel();
 
-        if (!direction.Equals(Vector3.Zero)) {
-            Vector3 forward = model.GlobalTransform.Basis.Z.Normalized();
-            Vector3 right = model.GlobalTransform.Basis.X.Normalized();
-            Vector3 velocity = (forward * direction.Z + right * direction.X) * SPEED;
-
-            if (direction.Y > 0.0f && model.IsOnFloor() && TimeSinceLastJump() >= JUMP_COOLDOWN_MILLIS) {
-                velocity.Y = direction.Y * 4.5f;
-                _lastJump = GetCurrentTimeMillis();
-            }
-
-            _velocityInfluence = velocity;
-        }
+        if (!direction.Equals(Vector3.Zero))
+            _intendedDirection = GetActor().GetModel().GlobalTransform.Basis * direction;
 
         Vector2 turnDelta = ev.GetTurnDelta();
         if (!turnDelta.Equals(Vector2.Zero)) {
@@ -101,6 +128,8 @@ public class PlayerController : ControllerBase {
         }
     }
 
+    /* --- ---  METHODS  --- --- */
+    
     private static long GetCurrentTimeMillis() => DateTimeOffset.Now.ToUnixTimeMilliseconds();
     private long TimeSinceLastJump() => GetCurrentTimeMillis() - _lastJump;
 

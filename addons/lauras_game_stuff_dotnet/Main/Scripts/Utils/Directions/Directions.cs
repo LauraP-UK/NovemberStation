@@ -95,4 +95,8 @@ public static class Directions {
     public static Direction GetFromName(string typeName) {
         return GetAll().FirstOrDefault(d => string.Equals(d.Name, typeName, StringComparison.OrdinalIgnoreCase));
     }
+    
+    public static Direction GetFromOffset(Vector3 offset) {
+        return GetAll().FirstOrDefault(d => d.Offset == offset);
+    }
 }

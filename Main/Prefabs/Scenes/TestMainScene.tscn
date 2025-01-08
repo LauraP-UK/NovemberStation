@@ -1,10 +1,11 @@
-[gd_scene load_steps=12 format=3 uid="uid://bea3c2ji0la15"]
+[gd_scene load_steps=25 format=3 uid="uid://bea3c2ji0la15"]
 
 [ext_resource type="Script" path="res://Main/TestScript.cs" id="1_htyov"]
 [ext_resource type="PackedScene" uid="uid://cqvhghgw72hrv" path="res://Main/Prefabs/Sandbox/Geometry/PhysicsCube.tscn" id="2_y3p7f"]
 [ext_resource type="PackedScene" uid="uid://5afg6a1f8nd3" path="res://Main/Prefabs/Sandbox/DeskTest.tscn" id="3_dkfcn"]
 [ext_resource type="Texture2D" uid="uid://cnafjpoh1lxps" path="res://Main/Textures/Sandbox/Checkerboard1.png" id="3_foc71"]
 [ext_resource type="PackedScene" uid="uid://davr0xngcadpq" path="res://Main/Prefabs/Sandbox/GasCanTest.tscn" id="5_y86oe"]
+[ext_resource type="Texture2D" uid="uid://c5q1hp1s028lo" path="res://Main/Textures/Sandbox/Noise1.png" id="6_eukhs"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_vlb6p"]
 sky_horizon_color = Color(0.64625, 0.65575, 0.67075, 1)
@@ -19,14 +20,60 @@ sky = SubResource("Sky_iivj2")
 tonemap_mode = 2
 glow_enabled = true
 
+[sub_resource type="BoxShape3D" id="BoxShape3D_rr383"]
+size = Vector3(50, 1, 50)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_egs0u"]
+albedo_texture = ExtResource("3_foc71")
+texture_filter = 0
+
+[sub_resource type="BoxMesh" id="BoxMesh_ohcx2"]
+size = Vector3(50, 1, 50)
+
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_2fucf"]
 albedo_texture = ExtResource("3_foc71")
+texture_filter = 0
 
 [sub_resource type="BoxMesh" id="BoxMesh_ud0el"]
 size = Vector3(25, 1, 25)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_cfnm2"]
 size = Vector3(25, 1, 25)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_twa2s"]
+size = Vector3(1, 0.05, 0.3)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_m6scb"]
+albedo_color = Color(0.3904, 0.44448, 0.64, 1)
+albedo_texture = ExtResource("3_foc71")
+anisotropy = -1.0
+subsurf_scatter_strength = 0.52
+texture_filter = 0
+
+[sub_resource type="BoxMesh" id="BoxMesh_43pen"]
+size = Vector3(1, 0.05, 0.3)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_30sw7"]
+size = Vector3(1, 0.5, 3)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_4qq63"]
+albedo_color = Color(0.29, 0.29, 0.29, 1)
+albedo_texture = ExtResource("6_eukhs")
+texture_filter = 1
+
+[sub_resource type="BoxMesh" id="BoxMesh_jtvxb"]
+size = Vector3(1, 0.5, 3)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_7wshy"]
+albedo_color = Color(0.66, 0.66, 0.66, 1)
+albedo_texture = ExtResource("3_foc71")
+texture_filter = 0
+
+[sub_resource type="BoxMesh" id="BoxMesh_wq1ow"]
+size = Vector3(1, 1, 2.1)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_wmdie"]
+size = Vector3(1, 1, 2.1)
 
 [node name="Main" type="Node3D"]
 script = ExtResource("1_htyov")
@@ -50,6 +97,12 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.37726, 2.08867, 4.49939)
 collision_layer = 12
 collision_mask = 15
 
+[node name="GasCan" parent="SceneObjects" instance=ExtResource("5_y86oe")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.78371, 1.51406, -4.61508)
+collision_layer = 12
+collision_mask = 15
+mass = 5.0
+
 [node name="Cube 1" parent="SceneObjects" instance=ExtResource("2_y3p7f")]
 transform = Transform3D(-4.37114e-08, 0, 1, 0, 1, 0, -1, 0, -4.37114e-08, 0, 0.796451, 0)
 collision_layer = 12
@@ -67,21 +120,151 @@ collision_layer = 12
 collision_mask = 15
 mass = 10.0
 
-[node name="StaticBody3D" type="StaticBody3D" parent="SceneObjects"]
+[node name="Floor2" type="StaticBody3D" parent="SceneObjects"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 37.5, -0.5, 0)
 collision_layer = 2
 collision_mask = 7
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="SceneObjects/StaticBody3D"]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="SceneObjects/Floor2"]
+shape = SubResource("BoxShape3D_rr383")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="SceneObjects/Floor2"]
+material_override = SubResource("StandardMaterial3D_egs0u")
+mesh = SubResource("BoxMesh_ohcx2")
+
+[node name="Floor1" type="StaticBody3D" parent="SceneObjects"]
+collision_layer = 2
+collision_mask = 7
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="SceneObjects/Floor1"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
 material_override = SubResource("StandardMaterial3D_2fucf")
 mesh = SubResource("BoxMesh_ud0el")
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="SceneObjects/StaticBody3D"]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="SceneObjects/Floor1"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
 shape = SubResource("BoxShape3D_cfnm2")
 
-[node name="RigidBody3D" parent="SceneObjects" instance=ExtResource("5_y86oe")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.78371, 1.51406, -4.61508)
-collision_layer = 12
-collision_mask = 15
-mass = 5.0
+[node name="Ramp" type="StaticBody3D" parent="SceneObjects"]
+transform = Transform3D(9.70296, -2.41922, 0, 2.41922, 9.70296, 0, 0, 0, 10, 17.209, 0.548, 3)
+collision_layer = 2
+collision_mask = 7
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="SceneObjects/Ramp"]
+shape = SubResource("BoxShape3D_twa2s")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="SceneObjects/Ramp"]
+material_override = SubResource("StandardMaterial3D_m6scb")
+mesh = SubResource("BoxMesh_43pen")
+
+[node name="Steps" type="Node3D" parent="SceneObjects"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14.5, 0, 0)
+
+[node name="Step" type="StaticBody3D" parent="SceneObjects/Steps"]
+collision_layer = 2
+collision_mask = 7
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="SceneObjects/Steps/Step"]
+shape = SubResource("BoxShape3D_30sw7")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="SceneObjects/Steps/Step"]
+material_override = SubResource("StandardMaterial3D_4qq63")
+mesh = SubResource("BoxMesh_jtvxb")
+
+[node name="Step2" type="StaticBody3D" parent="SceneObjects/Steps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0.25, 0)
+collision_layer = 2
+collision_mask = 7
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="SceneObjects/Steps/Step2"]
+shape = SubResource("BoxShape3D_30sw7")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="SceneObjects/Steps/Step2"]
+material_override = SubResource("StandardMaterial3D_4qq63")
+mesh = SubResource("BoxMesh_jtvxb")
+
+[node name="Step3" type="StaticBody3D" parent="SceneObjects/Steps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0.5, 0)
+collision_layer = 2
+collision_mask = 7
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="SceneObjects/Steps/Step3"]
+shape = SubResource("BoxShape3D_30sw7")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="SceneObjects/Steps/Step3"]
+material_override = SubResource("StandardMaterial3D_4qq63")
+mesh = SubResource("BoxMesh_jtvxb")
+
+[node name="Step4" type="StaticBody3D" parent="SceneObjects/Steps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 0.75, 0)
+collision_layer = 2
+collision_mask = 7
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="SceneObjects/Steps/Step4"]
+shape = SubResource("BoxShape3D_30sw7")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="SceneObjects/Steps/Step4"]
+material_override = SubResource("StandardMaterial3D_4qq63")
+mesh = SubResource("BoxMesh_jtvxb")
+
+[node name="Steps2" type="Node3D" parent="SceneObjects"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 18.5, 1, 0)
+
+[node name="Step" type="StaticBody3D" parent="SceneObjects/Steps2"]
+collision_layer = 2
+collision_mask = 7
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="SceneObjects/Steps2/Step"]
+shape = SubResource("BoxShape3D_30sw7")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="SceneObjects/Steps2/Step"]
+material_override = SubResource("StandardMaterial3D_4qq63")
+mesh = SubResource("BoxMesh_jtvxb")
+
+[node name="Step2" type="StaticBody3D" parent="SceneObjects/Steps2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0.25, 0)
+collision_layer = 2
+collision_mask = 7
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="SceneObjects/Steps2/Step2"]
+shape = SubResource("BoxShape3D_30sw7")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="SceneObjects/Steps2/Step2"]
+material_override = SubResource("StandardMaterial3D_4qq63")
+mesh = SubResource("BoxMesh_jtvxb")
+
+[node name="Step3" type="StaticBody3D" parent="SceneObjects/Steps2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0.5, 0)
+collision_layer = 2
+collision_mask = 7
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="SceneObjects/Steps2/Step3"]
+shape = SubResource("BoxShape3D_30sw7")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="SceneObjects/Steps2/Step3"]
+material_override = SubResource("StandardMaterial3D_4qq63")
+mesh = SubResource("BoxMesh_jtvxb")
+
+[node name="Step4" type="StaticBody3D" parent="SceneObjects/Steps2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 0.75, 0)
+collision_layer = 2
+collision_mask = 7
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="SceneObjects/Steps2/Step4"]
+shape = SubResource("BoxShape3D_30sw7")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="SceneObjects/Steps2/Step4"]
+material_override = SubResource("StandardMaterial3D_4qq63")
+mesh = SubResource("BoxMesh_jtvxb")
+
+[node name="Platform" type="StaticBody3D" parent="SceneObjects"]
+transform = Transform3D(3, 0, 0, 0, 3, 0, 0, 0, 3, 23.5, 0.5, 1.5)
+collision_layer = 2
+collision_mask = 7
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="SceneObjects/Platform"]
+material_override = SubResource("StandardMaterial3D_7wshy")
+mesh = SubResource("BoxMesh_wq1ow")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="SceneObjects/Platform"]
+shape = SubResource("BoxShape3D_wmdie")

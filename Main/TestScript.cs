@@ -10,7 +10,6 @@ public partial class TestScript : Node {
 
     private static TestScript instance;
     private static readonly Scheduler scheduler = new();
-    private static InputController inputController;
     
     private Player player;
 
@@ -18,19 +17,7 @@ public partial class TestScript : Node {
 
     public TestScript() {
         instance = this;
-
         EventManager eventManager = new();
-
-        KeyBinding.BindInput(Key.W, GameAction.Action.MOVE_FORWARD);
-        KeyBinding.BindInput(Key.S, GameAction.Action.MOVE_BACKWARD);
-        KeyBinding.BindInput(Key.A, GameAction.Action.MOVE_LEFT);
-        KeyBinding.BindInput(Key.D, GameAction.Action.MOVE_RIGHT);
-        KeyBinding.BindInput(Key.Space, GameAction.Action.JUMP);
-        KeyBinding.BindInput(Key.E, GameAction.Action.USE);
-        KeyBinding.BindInput(MouseButton.Left, GameAction.Action.USE);
-        KeyBinding.BindInput(Key.Escape, GameAction.Action.QUIT);
-
-        inputController = new InputController();
         GameAction gameAction = new();
     }
 
@@ -38,7 +25,7 @@ public partial class TestScript : Node {
 
     public Player GetPlayer() => player;
 
-    public override void _Input(InputEvent @event) => inputController.ProcessInput(@event);
+    public override void _Input(InputEvent @event) => InputController.ProcessInput(@event);
 
     // Called when the node enters the scene tree for the first time.
     public override void _Ready() {
@@ -67,8 +54,7 @@ public partial class TestScript : Node {
         if (player.GetModel().Position.Y < -20) player.SetPosition(new Vector3(5f, 0.2f, 0f), new Vector3(0.0f, 90.0f, 0.0f));
         
         foreach (RigidBody3D physicsObject in _dynamicObjects.Keys) {
-            float dist = physicsObject.Position.DistanceSquaredTo(player.GetPosition());
-            if (dist > 50 * 50) {
+            if (physicsObject.GlobalPosition.Y < -20) {
                 physicsObject.GlobalPosition = _dynamicObjects[physicsObject];
                 physicsObject.LinearVelocity = Vector3.Zero;
                 physicsObject.AngularVelocity = Vector3.Zero;

@@ -11,22 +11,39 @@ size = Vector3(0.2, 0.2, 0.2)
 
 [node name="PlayerRoot" type="CharacterBody3D"]
 collision_mask = 6
+platform_on_leave = 2
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+[node name="CapsuleCollider" type="CollisionShape3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
 shape = SubResource("CapsuleShape3D_f8i3f")
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+[node name="WorldModel" type="Node3D" parent="."]
+
+[node name="Capsule" type="MeshInstance3D" parent="WorldModel"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
 mesh = SubResource("CapsuleMesh_5d363")
 skeleton = NodePath("")
 
-[node name="MeshInstance3D2" type="MeshInstance3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5414, -0.218916)
-visible = false
+[node name="DebugCube" type="MeshInstance3D" parent="WorldModel"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.54, -0.20391)
 mesh = SubResource("BoxMesh_abprh")
 skeleton = NodePath("")
 
-[node name="Camera" type="Camera3D" parent="."]
+[node name="HeadOrigin" type="Node3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.7, 0)
+
+[node name="CrouchControl" type="Node3D" parent="HeadOrigin"]
+
+[node name="Camera" type="Camera3D" parent="HeadOrigin/CrouchControl"]
 current = true
+
+[node name="StairsRaycasts" type="Node3D" parent="."]
+
+[node name="BelowCast" type="RayCast3D" parent="StairsRaycasts"]
+target_position = Vector3(0, -0.75, 0)
+collision_mask = 14
+
+[node name="FrontCast" type="RayCast3D" parent="StairsRaycasts"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.56, -0.55)
+target_position = Vector3(0, -0.5, 0)
+collision_mask = 15
