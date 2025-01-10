@@ -3,7 +3,7 @@ using System.Linq;
 using Godot;
 using NovemberStation.Main;
 
-public class MovementActionTracker {
+public static class MovementActionTracker {
 
     private static readonly List<MovementGameAction> _movementActions = new();
     private static JumpGameAction _jumpAction;

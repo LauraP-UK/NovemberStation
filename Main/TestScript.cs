@@ -18,7 +18,7 @@ public partial class TestScript : Node {
     public TestScript() {
         instance = this;
         EventManager eventManager = new();
-        GameAction gameAction = new();
+        GameAction.Init();
     }
 
     public static TestScript I() => instance;
@@ -45,6 +45,73 @@ public partial class TestScript : Node {
         }
 
         GD.Print($"Dynamic Objects: {_dynamicObjects.Count}");
+        CallDeferred("TestMenu");
+    }
+
+    private void TestMenu() {
+        Input.MouseMode = Input.MouseModeEnum.Visible;
+        player.GetController().SetLocked(true);
+        
+        CanvasLayer uiLayer = GetTree().Root.GetNodeOrNull<CanvasLayer>("UILayer");
+        if (uiLayer == null) {
+            uiLayer = new CanvasLayer();
+            uiLayer.Name = "UILayer";
+            GetTree().Root.AddChild(uiLayer);
+        }
+        
+        TextureElement textureElement = new("res://Main/Prefabs/UI/FormElements/TextureRectDefault.tscn",
+            rect => {
+                rect.ExpandMode = TextureRect.ExpandModeEnum.IgnoreSize;
+                rect.SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
+                rect.SizeFlagsVertical = Control.SizeFlags.ExpandFill;
+                rect.Size = new Vector2(400, 300);
+            });
+        ButtonElement buttonElement = new("res://Main/Prefabs/UI/FormElements/ButtonDefault.tscn",
+            button => button.SetText("Click to play!"));
+
+        int clickCount = 0;
+        
+        buttonElement.SetOnPressed(() => {
+            switch (clickCount) {
+                case 0: {
+                    buttonElement.GetElement().SetText("Jokes on you, there's no game!");
+                    break;
+                }
+                case 1: {
+                    buttonElement.GetElement().SetText("Ok, fine. Click again.");
+                    break;
+                }
+                case 2: {
+                    player.GetController().SetLocked(false);
+                    GetTree().Root.RemoveChild(uiLayer);
+                    Input.MouseMode = Input.MouseModeEnum.Captured;
+                    break;
+                }
+            }
+            clickCount++;
+        });
+        
+        ContainerLayout layout1 = new(new Container());
+        ContainerLayout layout2 = new(new Container());
+        ContainerLayout mainLayout = new(new Container());
+
+        layout1.AddElement(textureElement);
+        layout2.AddElement(buttonElement);
+        
+        mainLayout.AddElement(layout1);
+        mainLayout.AddElement(layout2);
+
+        Container builtMenu = mainLayout.Build();
+
+        uiLayer.AddChild(builtMenu);
+
+        builtMenu.AnchorLeft = 0.25f;
+        builtMenu.AnchorRight = 0.75f;
+        builtMenu.AnchorTop = 0.25f;
+        builtMenu.AnchorBottom = 0.75f;
+
+        builtMenu.SetSize(new Vector2(400, 300));
+        builtMenu.Position = new Vector2(400, 200);
     }
     
     // Called every frame. 'delta' is the elapsed time since the previous frame.
@@ -85,4 +152,8 @@ public partial class TestScript : Node {
     
     public void Quit() => GetTree().Quit();
     public Rid GetWorldRid() => GetTree().Root.GetWorld3D().Space;
+
+    public void AddActionNode(ActionNode node) {
+        GetTree().Root.GetNode<Node>("Main/Actions").AddChild(node);
+    }
 }

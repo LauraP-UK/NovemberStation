@@ -23,7 +23,7 @@ public abstract class ControllerBase : Listener {
 
     private ActorBase _actor { get; }
     private ulong _lastFrameOnFloor = ulong.MinValue;
-    private bool _snappedToStairs;
+    private bool _snappedToStairs, _lockedMode = false;
     private Vector3? _savedCamGlobalPosition;
 
     protected Vector3 _intendedDirection = Vector3.Zero;
@@ -39,6 +39,8 @@ public abstract class ControllerBase : Listener {
 
     protected ActorBase GetActor() => _actor;
     protected float GetSpeed() => _crouching ? CROUCH_SPEED : _sprinting ? SPRINT_SPEED : WALK_SPEED;
+    public void SetLocked(bool locked) => _lockedMode = locked;
+    public bool IsLocked() => _lockedMode;
 
     protected abstract void OnUpdate(float delta);
     public void Update(float delta) {
@@ -70,16 +72,45 @@ public abstract class ControllerBase : Listener {
     
     /* --- ---  LISTENERS  --- --- */
 
-    [EventListener(PriorityLevels.LOWEST)]
+    [EventListener(PriorityLevels.HIGHEST)]
     protected void OnCrouchEvent(ActorCrouchEvent ev, ActorBase actor) {
         if (!actor.Equals(GetActor())) return;
+        if (_lockedMode) {
+            ev.SetCanceled(true);
+            return;
+        }
+        
         if (!_crouching || ev.IsStartCrouch()) return;
         if (CanUncrouch()) return;
         ev.SetCanceled(true);
         _tryUncrouch = true;
     }
-    
-    
+
+    [EventListener(PriorityLevels.HIGHEST)]
+    protected void OnPickUpItem(ActorPickUpEvent ev, ActorBase actor) {
+        if (!actor.Equals(GetActor())) return;
+        if (_lockedMode) ev.SetCanceled(true);
+    }
+
+    [EventListener(PriorityLevels.HIGHEST)]
+    protected void OnPlayerUseClick(PlayerUseClickEvent ev, ActorBase actor) {
+        if (!actor.Equals(GetActor())) return;
+        if (_lockedMode) ev.SetCanceled(true);
+    }
+
+    [EventListener(PriorityLevels.HIGHEST)]
+    protected void OnPlayerJump(PlayerJumpEvent ev, ActorBase player) {
+        if (!player.Equals(GetActor())) return;
+        if (_lockedMode) ev.SetCanceled(true);
+    }
+
+    [EventListener(PriorityLevels.HIGHEST)]
+    protected void OnPlayerMove(PlayerMoveEvent ev, Player player) {
+        if (!player.Equals(GetActor())) return;
+        if (_lockedMode) ev.SetCanceled(true);
+    }
+
+
     /* --- ---  MOVEMENT  --- --- */
     private void SaveCameraPosition() {
         if (GetActor() is not IViewable actor) return;
