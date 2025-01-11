@@ -1,5 +1,6 @@
 
 using System;
+using System.Linq;
 using Godot;
 
 public abstract class FormElement<T> : Listener, IFormElement where T : Control {
@@ -7,14 +8,41 @@ public abstract class FormElement<T> : Listener, IFormElement where T : Control 
     private readonly SmartDictionary<string, ActionNode> _actions = new();
     private ILayoutElement _topLevelLayout;
 
-    protected FormElement(T element = null) => SetElement(element);
-    protected FormElement(string path, Action<T> initialiser = null) => LoadElement(path, initialiser);
-    
+    protected FormElement(T element = null, Action<T> onReady = null) {
+        SetElement(element);
+        OnReady(onReady);
+    }
+
+    protected FormElement(string path,Action<T> onReady = null) {
+        LoadElement(path);
+        OnReady(onReady);
+    }
+
     public void SetElement(T element) => _element = element;
     public T GetElement() => _element;
     Control IFormElement.GetElement() => GetElement();
     public ILayoutElement GetTopLevelLayout() => _topLevelLayout;
     public void SetTopLevelLayout(ILayoutElement layout) => _topLevelLayout = layout;
+
+    private void OnReady(Action<T> onReady = null) {
+        AddAction(Node.SignalName.Ready, elem => {
+            Control element = ((IFormElement)elem).GetElement();
+            onReady?.Invoke(element as T);
+        });
+    }
+    
+    public void OnResize(Action<IFormObject> onResize) {
+        if (onResize == null) return;
+        AddAction(Control.SignalName.Resized, _ => onResize(this));
+    }
+
+    [EventListener]
+    protected void OnWindowResize(WindowResizeEvent ev, Vector2 v) {
+        foreach (string signal in _actions.Keys.Where(signal => signal == Control.SignalName.Resized)) {
+            _actions[signal].RunActionNoArgs();
+            return;
+        }
+    }
 
     protected void AddAction(string signal, Action<IFormObject> action) {
         AddAction(signal, (formObj, _) => action(formObj));
@@ -43,7 +71,7 @@ public abstract class FormElement<T> : Listener, IFormElement where T : Control 
         }
     }
     
-    public void LoadElement(string path, Action<T> initialiser = null) {
+    public void LoadElement(string path) {
         if (!ResourceLoader.Exists(path)) {
             GD.PrintErr($"ERROR: FormElement.LoadElement() : No scene found at path '{path}', cannot load {typeof(T)}.");
             return;
@@ -57,10 +85,6 @@ public abstract class FormElement<T> : Listener, IFormElement where T : Control 
         if (instance is not T element)
             throw new InvalidCastException($"ERROR: FormElement.LoadElement() : Scene at path '{path}' is not of type {typeof(T)}.");
         
-        initialiser?.Invoke(element);
         SetElement(element);
-        OnElementReady(element);
     }
-    
-    protected virtual void OnElementReady(T element) { }
 }

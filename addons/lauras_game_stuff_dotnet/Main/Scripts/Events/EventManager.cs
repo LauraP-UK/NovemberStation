@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using Godot;
+using NovemberStation.Main;
 
 public class EventManager {
     private static EventManager instance;
@@ -14,6 +15,16 @@ public class EventManager {
         else throw new InvalidOperationException("ERROR: EventManager.<init> : Multiple EventManagers attempted to be initialised.");
         Scheduler.ScheduleRepeating(5000L, 5000L, _ => { CleanupListeners(); });
     }
+    
+    public static void HookWindowResize(Viewport viewport) {
+        viewport.Connect(Viewport.SignalName.SizeChanged, Callable.From(() => {
+            WindowResizeEvent ev = new();
+            ev.SetSize(viewport.GetVisibleRect().Size);
+            ev.Fire();
+        }));
+    }
+    
+    
 
     public static EventManager I() {
         if (instance == null) throw new InvalidOperationException("ERROR: EventManager.I() : EventManager has not been initialised, make sure to create it first!");

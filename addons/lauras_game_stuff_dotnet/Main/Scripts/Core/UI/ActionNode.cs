@@ -1,49 +1,65 @@
-
 using System;
 using Godot;
 using Godot.Collections;
 using Array = Godot.Collections.Array;
 
 public partial class ActionNode : Node {
-        private readonly string _signalName;
-        private readonly Action<IFormObject, object[]> _callback;
-        private readonly IFormElement _formElement;
+    private readonly string _signalName;
+    private readonly Action<IFormObject, object[]> _callback;
+    private readonly IFormObject _formElement;
 
-        public ActionNode(string signalName, Action<IFormObject, object[]> callback, IFormElement formElement) {
-            _signalName = signalName;
-            _callback = callback;
-            _formElement = formElement;
+    public ActionNode(string signalName, Action<IFormObject, object[]> callback, IFormObject formElement) {
+        _signalName = signalName;
+        _callback = callback;
+        _formElement = formElement;
+    }
+
+    public override void _Ready() => GetControlNode().Connect(_signalName, GetCallable());
+
+    public void RunActionNoArgs() {
+        try {
+            _callback?.Invoke(_formElement, System.Array.Empty<object>());
+        }
+        catch (Exception e) {
+            GD.PrintErr($"Error in ActionNode callback for {_signalName}: {e.Message}\n{e.StackTrace}");
+        }
+    }
+
+    public void RunActionArgs(params object[] args) {
+        try {
+            _callback?.Invoke(_formElement, args);
+        }
+        catch (Exception e) {
+            GD.PrintErr($"Error in ActionNode callback for {_signalName}: {e.Message}\n{e.StackTrace}");
+        }
+    }
+
+    private Callable GetCallable() {
+        int paramsCount = -1;
+
+        Control node = GetControlNode();
+
+        foreach (Dictionary dictionary in node.GetSignalList()) {
+            if ((string)dictionary["name"] != _signalName) continue;
+            paramsCount = ((Array)dictionary["args"]).Count;
+            break;
         }
 
-        public override void _Ready() => _formElement.GetElement().Connect(_signalName, GetCallable());
+        if (paramsCount == -1)
+            throw new InvalidOperationException($"Signal '{_signalName}' not found on node '{node.Name}'.");
 
-        private void RunActionNoArgs() {
-            try {
-                _callback?.Invoke(_formElement, System.Array.Empty<object>()); // Invoke callback with an empty argument array
-            } catch (Exception e) {
-                GD.PrintErr($"Error in ActionNode callback for {_signalName}: {e.Message}\n{e.StackTrace}");
-            }
-        }
+        return paramsCount == 0 ? Callable.From(RunActionNoArgs) : Callable.From((Action<object[]>)RunActionArgs);
+    }
 
-        // Overloaded method for signals with arguments
-        private void RunActionArgs(params object[] args) {
-            try {
-                _callback?.Invoke(_formElement, args);
-            } catch (Exception e) {
-                GD.PrintErr($"Error in ActionNode callback for {_signalName}: {e.Message}\n{e.StackTrace}");
-            }
+    private Control GetControlNode() {
+        switch (_formElement) {
+            case IFormElement formElement:
+                return formElement.GetElement();
+            case ILayoutElement layoutElement:
+                return layoutElement.GetContainer();
+            default:
+                GD.PrintErr($"ERROR: ActionNode.GetElement() : IFormObject {_formElement} is not a valid type.");
+                return null;
         }
-
-        private Callable GetCallable() {
-            int paramsCount = -1;
-            foreach (Dictionary dictionary in _formElement.GetElement().GetSignalList()) {
-                if ((string) dictionary["name"] != _signalName) continue;
-                paramsCount = ((Array) dictionary["args"]).Count;
-                break;
-            }
-            if (paramsCount == -1)
-                throw new InvalidOperationException($"Signal '{_signalName}' not found on node '{_formElement.GetElement().Name}'.");
-            
-            return paramsCount == 0 ? Callable.From(RunActionNoArgs) : Callable.From((Action<object[]>) RunActionArgs);
-        }
+    }
 }
