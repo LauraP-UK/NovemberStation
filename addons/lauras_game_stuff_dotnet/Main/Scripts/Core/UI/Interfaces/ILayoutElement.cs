@@ -4,5 +4,6 @@ using Godot;
 
 public interface ILayoutElement : IFormObject {
     public Container GetContainer();
-    public Container Build(Container parent, HashSet<ILayoutElement> processedLayouts, bool warnOnCircularReference = true);
+    public string GetUuid();
+    public Container Build(ILayoutElement parent, HashSet<ILayoutElement> processedLayouts, bool warnOnCircularReference = true);
 }

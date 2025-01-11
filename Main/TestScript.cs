@@ -68,17 +68,40 @@ public partial class TestScript : Node {
             });
         ButtonElement buttonElement = new("res://Main/Prefabs/UI/FormElements/ButtonDefault.tscn",
             button => button.SetText("Click to play!"));
-
-        int clickCount = 0;
+        ButtonElement buttonElement2 = new("res://Main/Prefabs/UI/FormElements/ButtonDefault.tscn",
+            button => {
+                button.SetText("Click to play!");
+                button.Position = buttonElement.GetElement().Position + new Vector2(buttonElement.GetElement().Size.X, 0.0f);
+            });
         
-        buttonElement.SetOnPressed(() => {
+        int clickCount = 0;
+
+        /*buttonElement.OnButtonDown((element, menu) => {
+            ButtonElement button = (ButtonElement) element;
+            Container menuContainer = (Container) menu;
+            
+            button.GetElement().SetText("AAHHH! Don't press me!");
+        });
+        buttonElement.OnToggled((element, menu, objParams) => {
+            ButtonElement button = (ButtonElement) element;
+            Container menuContainer = (Container) menu;
+            bool toddledState = (bool) objParams[0];
+            
+            button.GetElement().SetText("I'm toggled: " + toddledState);
+        });*/
+        
+        buttonElement.OnPressed(formObject => {
+            Button element = ((ButtonElement)formObject).GetElement();
+
             switch (clickCount) {
                 case 0: {
-                    buttonElement.GetElement().SetText("Jokes on you, there's no game!");
+                    element.SetText("Jokes on you, there's no game!");
+                    element.Position += new Vector2(0.0f, element.Size.Y);
                     break;
                 }
                 case 1: {
-                    buttonElement.GetElement().SetText("Ok, fine. Click again.");
+                    element.SetText("Ok, fine. Click again.");
+                    element.Position += new Vector2(0.0f, element.Size.Y);
                     break;
                 }
                 case 2: {
@@ -90,6 +113,13 @@ public partial class TestScript : Node {
             }
             clickCount++;
         });
+        buttonElement2.OnPressed(formObject => {
+            ButtonElement buttonElement = (ButtonElement)formObject;
+            Button element = buttonElement.GetElement();
+            string random = Randf.Random("Haha, I moved!", "Try again!", "Can't catch me!", "I'm over here now!", "Too slow!", "Neh neh neh neh neh!", "Kachow!", "Bazinga!");
+            element.SetText(random);
+            element.Position = new Vector2(Randf.Random(0.0f, 200.0f), Randf.Random(0.0f, 200.0f));
+        });
         
         ContainerLayout layout1 = new(new Container());
         ContainerLayout layout2 = new(new Container());
@@ -97,6 +127,7 @@ public partial class TestScript : Node {
 
         layout1.AddElement(textureElement);
         layout2.AddElement(buttonElement);
+        layout2.AddElement(buttonElement2);
         
         mainLayout.AddElement(layout1);
         mainLayout.AddElement(layout2);
@@ -104,6 +135,8 @@ public partial class TestScript : Node {
         Container builtMenu = mainLayout.Build();
 
         uiLayer.AddChild(builtMenu);
+        
+        buttonElement2.GetElement().Position = buttonElement.GetElement().Position + new Vector2(buttonElement.GetElement().Size.X, 0.0f);
 
         builtMenu.AnchorLeft = 0.25f;
         builtMenu.AnchorRight = 0.75f;
@@ -123,8 +156,8 @@ public partial class TestScript : Node {
         foreach (RigidBody3D physicsObject in _dynamicObjects.Keys) {
             if (physicsObject.GlobalPosition.Y < -20) {
                 physicsObject.GlobalPosition = _dynamicObjects[physicsObject];
-                physicsObject.LinearVelocity = Vector3.Zero;
-                physicsObject.AngularVelocity = Vector3.Zero;
+                physicsObject.LinearVelocity = new Vector3(physicsObject.LinearVelocity.X, 1.0f, physicsObject.LinearVelocity.Z);
+                //physicsObject.AngularVelocity = Vector3.Zero;
             }
         }
 

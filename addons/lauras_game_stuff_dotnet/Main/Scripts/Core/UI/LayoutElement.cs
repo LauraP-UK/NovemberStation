@@ -7,6 +7,7 @@ public abstract class LayoutElement<T> : Listener, ILayoutElement where T : Cont
     private Guid _uuid;
     private SmartSet<IFormObject> _elements = new();
     private T _container;
+    private ILayoutElement _topLevelLayout;
     
     public LayoutElement(T container = null) {
         SetContainer(container);
@@ -26,6 +27,8 @@ public abstract class LayoutElement<T> : Listener, ILayoutElement where T : Cont
     public void RemoveElement(IFormObject element) => _elements.Remove(element);
     public SmartSet<IFormObject> GetElements() => _elements;
     public string GetUuid() => _uuid.ToString();
+    public ILayoutElement GetTopLevelLayout() => _topLevelLayout;
+    public void SetTopLevelLayout(ILayoutElement layout) => _topLevelLayout = layout;
 
     public TType Clone<TType>() where TType : LayoutElement<T> {
         LayoutElement<T> clone = (LayoutElement<T>) MemberwiseClone();
@@ -55,65 +58,56 @@ public abstract class LayoutElement<T> : Listener, ILayoutElement where T : Cont
     
     /* --- Build --- */
 
-    public Container Build(Container parent = null, HashSet<ILayoutElement> processedLayouts = null, bool warnOnCircularReference = true) {
+    public Container Build(ILayoutElement parent = null, HashSet<ILayoutElement> processedLayouts = null, bool warnOnCircularReference = true) {
         if (processedLayouts != null && processedLayouts.Contains(this)) {
             if (warnOnCircularReference) {
                 GD.PrintErr($"WARNING: LayoutElement.Build() : Circular reference detected, skipping... Type is: {GetType()} - ({typeof(T)}).");
-                return parent;
+                return parent?.GetContainer();
             }
             throw new InvalidOperationException($"ERROR: LayoutElement.Build() : Circular reference detected, cannot build layout. Type is: {GetType()} - ({typeof(T)}).");
         }
 
         T thisContainer = GetContainer();
+        
+        SetTopLevelLayout(parent == null ? this : parent.GetTopLevelLayout());
 
-        parent ??= thisContainer;
-        if (parent == null)
-            throw new NullReferenceException($"ERROR: LayoutElement.Build() : Parent is null, cannot build layout. Type is: {GetType()} - ({typeof(T)}).");
-        GD.Print($"{GetUuid()} : Building layout '{thisContainer.GetInstanceId()}' with type '{GetType()}' - ({typeof(T)}).");
-        GD.Print($"{GetUuid()} : I have {GetElements().Count} elements.");
+        parent ??= this;
+        if (parent.GetContainer() == null)
+            throw new NullReferenceException($"ERROR: LayoutElement.Build() : Parent container is null, cannot build layout. Type is: {GetType()} - ({typeof(T)}).");
         
         processedLayouts ??= new HashSet<ILayoutElement>();
         processedLayouts.Add(this);
         
+        GD.Print($"Building layout: {GetUuid()} - {GetType()} - {typeof(T)}");
+        
         PreBuild(thisContainer);
         
-        int debugCounter = 0;
-        
         foreach (IFormObject formElementBase in GetElements()) {
-            GD.Print($"{GetUuid()} : Building element {debugCounter} : '{formElementBase.GetType()}'...");
             switch (formElementBase) {
                 case IFormElement formElement: {
-                    GD.Print($"{GetUuid()} : - Building form element '{formElement.GetType()}'...");
                     Control element = formElement.GetElement();
                     if (element == null) {
-                        GD.PrintErr($"ERROR: LayoutElement.Build() : Element is null, cannot add to parent '{parent.GetInstanceId()}'.");
+                        GD.PrintErr($"ERROR: LayoutElement.Build() : Element is null, cannot add to parent '{parent.GetUuid()}'.");
                         continue;
                     }
-                    GD.Print($"{GetUuid()} : - Connecting signals for form element '{formElement.GetType()}'...");
                     formElement.ConnectSignals();
-                    GD.Print($"{GetUuid()} : - Adding form element '{formElement.GetType()}' to parent '{parent.GetInstanceId()}'...");
+                    formElement.SetTopLevelLayout(GetTopLevelLayout());
                     thisContainer.AddChild(element);
-                    GD.Print($"{GetUuid()} : - Form element '{formElement.GetType()}' added to parent '{parent.GetInstanceId()}'.");
+                    GD.Print($"Top level layout is: {GetTopLevelLayout().GetUuid()}");
                     break;
                 }
                 case ILayoutElement layoutElement:
-                    GD.Print($"{GetUuid()} : - Found a layout element '{layoutElement.GetType()}'... Building this now...");
-                    Container built = layoutElement.Build(thisContainer, processedLayouts);
+                    Container built = layoutElement.Build(this, processedLayouts);
                     if (built == null) {
-                        GD.PrintErr($"ERROR: LayoutElement.Build() : Layout is null, cannot add to parent '{parent.GetInstanceId()}'.");
+                        GD.PrintErr($"ERROR: LayoutElement.Build() : Layout is null, cannot add to parent '{parent.GetUuid()}'.");
                         continue;
                     }
-                    GD.Print($"{GetUuid()} : - Adding layout element '{layoutElement.GetType()}' to parent '{parent.GetInstanceId()}'...");
-                    thisContainer.AddChild(built); // Add child layout to parent
-                    GD.Print($"{GetUuid()} : - Layout element '{layoutElement.GetType()}' added to parent '{parent.GetInstanceId()}'.");
+                    thisContainer.AddChild(built);
                     break;
             }
-            debugCounter++;
         }
         
         PostBuild(thisContainer);
-        GD.Print($"{GetUuid()} : I ({GetType()}) built successfully.");
-        GD.Print($"{GetUuid()} : Returning parent '{parent.GetInstanceId()}'.");
         return thisContainer;
     }
 
