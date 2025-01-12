@@ -1,14 +1,13 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Godot;
 
-public class YesNoForm {
+public class YesNoForm : FormBase {
     
     private readonly ButtonElement _yesButton, _noButton;
     private readonly LabelElement _label, _title;
-    private readonly Control _menu;
-    private readonly ControlLayout _menuLayout;
     private const string
         FORM_PATH = "res://Main/Prefabs/UI/Forms/YesNoFormTest.tscn",
         TITLE_PATH = "Content/CenterContainer/Control/VBoxContainer/Info/InfoList/Title",
@@ -16,10 +15,7 @@ public class YesNoForm {
         YES_BUTTON_PATH = "Content/CenterContainer/Control/VBoxContainer/Buttons/ButtonsList/Accept_btn",
         NO_BUTTON_PATH = "Content/CenterContainer/Control/VBoxContainer/Buttons/ButtonsList/Decline_btn";
 
-    public YesNoForm(string nodeName) {
-        _menu = Loader.SafeInstantiate<Control>(FORM_PATH, true);
-        _menu.Name = nodeName;
-        
+    public YesNoForm(string nodeName) : base(nodeName, FORM_PATH) {
         Label titleNode = _menu.GetNode<Label>(TITLE_PATH);
         Label labelNode = _menu.GetNode<Label>(DESCRIPTION_PATH);
         Button yesButton = _menu.GetNode<Button>(YES_BUTTON_PATH);
@@ -39,12 +35,36 @@ public class YesNoForm {
         _menuLayout.Build();
     }
     
-    private List<IFormElement> GetElements() => new(){ _title, _label, _yesButton, _noButton };
+    protected override List<IFormElement> GetElements() => new(){ _title, _label, _yesButton, _noButton };
+    private List<ButtonElement> GetButtons() => new(){ _yesButton, _noButton };
     public void SetTitle(string title) => _title.GetElement().SetText(title);
     public void SetDescription(string description) => _label.GetElement().SetText(description);
     public void SetYesText(string text) => _yesButton.GetElement().SetText(text);
     public void SetNoText(string text) => _noButton.GetElement().SetText(text);
     public void OnYes(Action<IFormObject> onYes) => _yesButton.OnPressed(onYes);
     public void OnNo(Action<IFormObject> onNo) => _noButton.OnPressed(onNo);
-    public Control GetMenu() => _menu;
+
+    protected override void KeyboardInput(Key key) {
+        switch (key) {
+            case Key.W: {
+                _yesButton.GetElement().GrabFocus();
+                return;
+            }
+            case Key.S: {
+                _noButton.GetElement().GrabFocus();
+                return;
+            }
+            case Key.Space: {
+                foreach (ButtonElement button in GetButtons().Where(button => button.GetElement().HasFocus())) {
+                    button.ForcePressed();
+                    return;
+                }
+                break;
+            }
+            case Key.Escape: {
+                _noButton.ForcePressed();
+                return;
+            }
+        }
+    }
 }

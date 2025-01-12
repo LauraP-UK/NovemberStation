@@ -31,6 +31,7 @@ public class CharacterType {
         
         actor.SetName(GetName());
         actor.SetPosition(Vector3.Zero);
+        actor.GetModel().ProcessMode = Node.ProcessModeEnum.Pausable;
         return actor;
     }
 

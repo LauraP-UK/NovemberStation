@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using Godot;
@@ -35,7 +34,7 @@ public partial class TestScript : Node {
         Input.MouseMode = Input.MouseModeEnum.Captured;
 
         player = (Player)Characters.PLAYER.CreateActor();
-        GetTree().Root.GetNode<Node>("Main").AddChild(player.GetModel());
+        GetTree().Root.GetNode<Node>("Main/PlayerHolder").AddChild(player.GetModel());
         player.SetPosition(new Vector3(5f, 0.2f, 0f), new Vector3(0.0f, 90.0f, 0.0f));
 
         foreach (Node child in GetTree().Root.GetNode<Node3D>("Main/SceneObjects").GetChildren()) {
@@ -82,11 +81,11 @@ public partial class TestScript : Node {
 
     public override void _PhysicsProcess(double delta) {
         base._PhysicsProcess(delta);
-        player.GetController().Update((float)delta);
+        if (!GetTree().Paused) player.GetController().Update((float)delta);
     }
     
     public void PopPauseMenu() {
-        if (FindChildren("PauseMenu").Count > 0)
+        if (_uiLayer.GetChildren().Any(child => child.Name == "PauseMenu"))
             return;
         
         Input.MouseMode = Input.MouseModeEnum.Visible;
@@ -102,11 +101,15 @@ public partial class TestScript : Node {
             _uiLayer.RemoveChild(pauseMenu.GetMenu());
             Input.MouseMode = Input.MouseModeEnum.Captured;
             player.GetController().SetLocked(false);
+            pauseMenu.Destroy();
+            Pause(false);
         });
-
+        
+        Pause(true);
         _uiLayer.AddChild(pauseMenu.GetMenu());
     }
 
     public void Quit() => GetTree().Quit();
     public Rid GetWorldRid() => GetTree().Root.GetWorld3D().Space;
+    public void Pause(bool pause) => GetTree().Paused = pause;
 }

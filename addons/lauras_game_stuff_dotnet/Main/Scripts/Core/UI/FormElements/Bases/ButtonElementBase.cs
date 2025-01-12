@@ -10,4 +10,10 @@ public class ButtonElementBase<T> : FormElement<T> where T : BaseButton {
     public void OnButtonDown(Action<IFormObject> action) => AddAction(BaseButton.SignalName.ButtonDown, action);
     public void OnButtonUp(Action<IFormObject> action) => AddAction(BaseButton.SignalName.ButtonUp, action);
     public void OnToggled(Action<IFormObject, object[]> action) => AddAction(BaseButton.SignalName.Toggled, action);
+    
+    public void ForcePressed() => GetElement().EmitSignal(BaseButton.SignalName.Pressed);
+    public void ForceButtonDown() => GetElement().EmitSignal(BaseButton.SignalName.ButtonDown);
+    public void ForceButtonUp() => GetElement().EmitSignal(BaseButton.SignalName.ButtonUp);
+    public void ForceToggled(bool pressed) => GetElement().EmitSignal(BaseButton.SignalName.Toggled, pressed);
+    
 }
