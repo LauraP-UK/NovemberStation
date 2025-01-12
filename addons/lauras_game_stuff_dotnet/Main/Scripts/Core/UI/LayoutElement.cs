@@ -69,16 +69,7 @@ public abstract class LayoutElement<T> : Listener, ILayoutElement where T : Cont
     }
     
     public void LoadContainer(string path) {
-        if (!ResourceLoader.Exists(path)) {
-            GD.PrintErr($"ERROR: LayoutElement.LoadContainer() : No scene found at path '{path}', cannot load {typeof(T)}.");
-            return;
-        }
-        
-        PackedScene packedScene = GD.Load<PackedScene>(path);
-        if (packedScene == null)
-            throw new NullReferenceException($"ERROR: LayoutElement.LoadContainer() : No scene found at path '{path}', cannot load {typeof(T)}.");
-        
-        Node instance = packedScene.Instantiate();
+        Node instance = Loader.SafeInstantiate<Node>(path);
         if (instance is not T container)
             throw new InvalidCastException($"ERROR: LayoutElement.LoadContainer() : Scene at path '{path}' is not of type {typeof(T)}.");
         
@@ -107,7 +98,7 @@ public abstract class LayoutElement<T> : Listener, ILayoutElement where T : Cont
         processedLayouts ??= new HashSet<ILayoutElement>();
         processedLayouts.Add(this);
         
-        GD.Print($"Building layout: {GetUuid()} - {GetType()} - {typeof(T)}");
+        if (_onReadyAction != null) thisContainer.AddChild(_onReadyAction);
         
         PreBuild(thisContainer);
         
@@ -132,7 +123,6 @@ public abstract class LayoutElement<T> : Listener, ILayoutElement where T : Cont
                         continue;
                     }
                     thisContainer.AddChild(built);
-                    if (_onReadyAction != null) thisContainer.AddChild(_onReadyAction);
                     break;
             }
         }

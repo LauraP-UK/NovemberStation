@@ -1,4 +1,3 @@
-
 using System;
 using System.Linq;
 using Godot;
@@ -13,7 +12,7 @@ public abstract class FormElement<T> : Listener, IFormElement where T : Control 
         OnReady(onReady);
     }
 
-    protected FormElement(string path,Action<T> onReady = null) {
+    protected FormElement(string path, Action<T> onReady = null) {
         LoadElement(path);
         OnReady(onReady);
     }
@@ -25,12 +24,13 @@ public abstract class FormElement<T> : Listener, IFormElement where T : Control 
     public void SetTopLevelLayout(ILayoutElement layout) => _topLevelLayout = layout;
 
     private void OnReady(Action<T> onReady = null) {
+        if (onReady != null) GD.Print($"Adding onReady action for {typeof(T)}");
         AddAction(Node.SignalName.Ready, elem => {
             Control element = ((IFormElement)elem).GetElement();
             onReady?.Invoke(element as T);
         });
     }
-    
+
     public void OnResize(Action<IFormObject> onResize) {
         if (onResize == null) return;
         AddAction(Control.SignalName.Resized, _ => onResize(this));
@@ -47,7 +47,7 @@ public abstract class FormElement<T> : Listener, IFormElement where T : Control 
     protected void AddAction(string signal, Action<IFormObject> action) {
         AddAction(signal, (formObj, _) => action(formObj));
     }
-    
+
     protected void AddAction(string signal, Action<IFormObject, object[]> action) {
         if (_element == null) GD.PrintErr($"WARN: FormElement.AddAction() : No element set, cannot guarantee signal '{signal}' will be connected.");
         else if (!_element.HasSignal(signal)) GD.PrintErr($"WARN: FormElement.AddAction() : Signal '{signal}' not found on element '{_element.Name}'.");
@@ -70,21 +70,12 @@ public abstract class FormElement<T> : Listener, IFormElement where T : Control 
             _element.AddChild(action);
         }
     }
-    
+
     public void LoadElement(string path) {
-        if (!ResourceLoader.Exists(path)) {
-            GD.PrintErr($"ERROR: FormElement.LoadElement() : No scene found at path '{path}', cannot load {typeof(T)}.");
-            return;
-        }
-        
-        PackedScene packedScene = GD.Load<PackedScene>(path);
-        if (packedScene == null)
-            throw new NullReferenceException($"ERROR: FormElement.LoadElement() : No scene found at path '{path}', cannot load {typeof(T)}.");
-        
-        Node instance = packedScene.Instantiate();
+        Node instance = Loader.SafeInstantiate<Node>(path);
         if (instance is not T element)
             throw new InvalidCastException($"ERROR: FormElement.LoadElement() : Scene at path '{path}' is not of type {typeof(T)}.");
-        
+
         SetElement(element);
     }
 }

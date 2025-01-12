@@ -268,3 +268,5 @@ mesh = SubResource("BoxMesh_wq1ow")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="SceneObjects/Platform"]
 shape = SubResource("BoxShape3D_wmdie")
+
+[node name="UILayer" type="CanvasLayer" parent="."]

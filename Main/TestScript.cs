@@ -10,6 +10,7 @@ public partial class TestScript : Node {
     private static readonly Scheduler scheduler = new();
 
     private Player player;
+    private CanvasLayer _uiLayer;
 
     private readonly Dictionary<RigidBody3D, Vector3> _dynamicObjects = new();
 
@@ -45,82 +46,7 @@ public partial class TestScript : Node {
         }
 
         GD.Print($"Dynamic Objects: {_dynamicObjects.Count}");
-        CallDeferred("TestMenu");
-    }
-
-    private void TestMenu() {
-        Input.MouseMode = Input.MouseModeEnum.Visible;
-        player.GetController().SetLocked(true);
-
-        CanvasLayer uiLayer = GetTree().Root.GetNodeOrNull<CanvasLayer>("UILayer");
-        if (uiLayer == null) {
-            uiLayer = new CanvasLayer();
-            uiLayer.Name = "UILayer";
-            GetTree().Root.AddChild(uiLayer);
-        }
-
-        TextureElement texture = new("res://Main/Prefabs/UI/FormElements/TextureRectDefault.tscn",
-            texture => {
-                texture.SetExpandMode(TextureRect.ExpandModeEnum.KeepSize);
-                texture.ZIndex = -100;
-
-            });
-        ButtonElement btn1 = new("res://Main/Prefabs/UI/FormElements/ButtonDefault.tscn",
-            button => button.SetText("Click to play!"));
-        ButtonElement btn2 = new("res://Main/Prefabs/UI/FormElements/ButtonDefault.tscn",
-            button => {
-                button.SetText("Resize the window!");
-            });
-
-        int clickCount = 0;
-
-        btn1.OnPressed(formObject => {
-            Button button = ((ButtonElement)formObject).GetElement();
-
-            switch (clickCount) {
-                case 0: {
-                    button.SetText("Jokes on you, there's no game!");
-                    break;
-                }
-                case 1: {
-                    button.SetText("Ok, fine. Click again.");
-                    break;
-                }
-                case 2: {
-                    player.GetController().SetLocked(false);
-                    GetTree().Root.RemoveChild(uiLayer);
-                    Input.MouseMode = Input.MouseModeEnum.Captured;
-                    break;
-                }
-            }
-
-            clickCount++;
-        });
-        btn2.OnResize(obj => {
-            Button btn = ((Button)((IFormElement)obj).GetElement());
-            btn.Text = "" + GetViewport().GetVisibleRect().Size;
-        });
-        
-        VBoxContainerLayout btnLayout = new(new VBoxContainer());
-        CenterContainerLayout textureLayout = new(new CenterContainer(), container => {
-            container.SetPosition(new Vector2(0, 0));
-            container.Size = GetViewport().GetVisibleRect().Size;
-        });
-        CenterContainerLayout mainLayout = new(new CenterContainer(), container => {
-            container.Position = new Vector2(0.0f, 0.0f);
-            container.Size = GetViewport().GetVisibleRect().Size;
-        });
-
-        btnLayout.AddElement(btn1);
-        btnLayout.AddElement(btn2);
-        textureLayout.AddElement(texture);
-
-        mainLayout.AddElement(textureLayout);
-        mainLayout.AddElement(btnLayout);
-
-        Control builtMenu = mainLayout.Build();
-
-        uiLayer.AddChild(builtMenu);
+        _uiLayer = GetTree().Root.GetNodeOrNull<CanvasLayer>("Main/UILayer");
     }
 
     // Called every frame. 'delta' is the elapsed time since the previous frame.
@@ -157,6 +83,28 @@ public partial class TestScript : Node {
     public override void _PhysicsProcess(double delta) {
         base._PhysicsProcess(delta);
         player.GetController().Update((float)delta);
+    }
+    
+    public void PopPauseMenu() {
+        if (FindChildren("PauseMenu").Count > 0)
+            return;
+        
+        Input.MouseMode = Input.MouseModeEnum.Visible;
+        player.GetController().SetLocked(true);
+        
+        YesNoForm pauseMenu = new("PauseMenu");
+        pauseMenu.SetTitle("Pause Menu");
+        pauseMenu.SetDescription("Do you want to quit?");
+        pauseMenu.SetYesText("Quit");
+        pauseMenu.SetNoText("Cancel");
+        pauseMenu.OnYes(_ => Quit());
+        pauseMenu.OnNo(_ => {
+            _uiLayer.RemoveChild(pauseMenu.GetMenu());
+            Input.MouseMode = Input.MouseModeEnum.Captured;
+            player.GetController().SetLocked(false);
+        });
+
+        _uiLayer.AddChild(pauseMenu.GetMenu());
     }
 
     public void Quit() => GetTree().Quit();
