@@ -14,10 +14,11 @@ public abstract class FormBase : Listener {
 
     protected abstract List<IFormElement> GetElements();
     protected virtual void OnDestroy() { }
-    protected virtual void KeyboardInput(Key key) {}
+    protected virtual void KeyboardBehaviour(Key key) {}
 
     public Control GetMenu() => _menu;
     public void Destroy() {
+        OnDestroy();
         EventManager eventManager = EventManager.I();
         _menu.QueueFree();
         eventManager.UnregisterByOwner(this);
@@ -25,5 +26,5 @@ public abstract class FormBase : Listener {
     }
     
     [EventListener]
-    protected void OnKeyPress(KeyPressEvent ev, Key key) => KeyboardInput(key);
+    protected void OnKeyPress(KeyPressEvent ev, Key key) => KeyboardBehaviour(key);
 }

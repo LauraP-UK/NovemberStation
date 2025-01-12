@@ -91,20 +91,43 @@ public partial class TestScript : Node {
         Input.MouseMode = Input.MouseModeEnum.Visible;
         player.GetController().SetLocked(true);
         
-        YesNoForm pauseMenu = new("PauseMenu");
+        BinaryChoiceForm pauseMenu = new("PauseMenu");
         pauseMenu.SetTitle("Pause Menu");
         pauseMenu.SetDescription("Do you want to quit?");
-        pauseMenu.SetYesText("Quit");
-        pauseMenu.SetNoText("Cancel");
-        pauseMenu.OnYes(_ => Quit());
-        pauseMenu.OnNo(_ => {
+        pauseMenu.SetUpperText("Resume");
+        pauseMenu.SetLowerText(Randf.RandomChanceIn(1, 10) ? "Quip?" : "Quit");
+        pauseMenu.OnUpperButton(_ => {
             _uiLayer.RemoveChild(pauseMenu.GetMenu());
             Input.MouseMode = Input.MouseModeEnum.Captured;
             player.GetController().SetLocked(false);
             pauseMenu.Destroy();
             Pause(false);
         });
-        
+        pauseMenu.OnLowerButton(_ => Quit());
+        pauseMenu.SetKeyboardBehaviour((key, form) => {
+            switch (key) {
+                case Key.W: {
+                    form.GetUpperButton().GetElement().GrabFocus();
+                    return;
+                }
+                case Key.S: {
+                    form.GetLowerButton().GetElement().GrabFocus();
+                    return;
+                }
+                case Key.Space: {
+                    foreach (ButtonElement button in form.GetButtons().Where(button => button.GetElement().HasFocus())) {
+                        button.ForcePressed();
+                        return;
+                    }
+                    break;
+                }
+                case Key.Escape: {
+                    form.GetUpperButton().ForcePressed();
+                    return;
+                }
+            }
+        });
+
         Pause(true);
         _uiLayer.AddChild(pauseMenu.GetMenu());
     }
