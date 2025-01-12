@@ -5,23 +5,12 @@ using Godot;
 namespace NovemberStation.Main;
 
 public partial class TestScript : Node {
-    private static TestScript instance;
-    private static readonly Scheduler scheduler = new();
-
-    private Player player;
-    private CanvasLayer _uiLayer;
-
     private readonly Dictionary<RigidBody3D, Vector3> _dynamicObjects = new();
 
     public TestScript() {
-        instance = this;
-        EventManager eventManager = new();
-        GameAction.Init();
+        GameManager.Init();
+        GameManager.I().SetActiveScene(this);
     }
-
-    public static TestScript I() => instance;
-
-    public Player GetPlayer() => player;
 
     public override void _Input(InputEvent @event) => InputController.ProcessInput(@event);
 
@@ -30,12 +19,14 @@ public partial class TestScript : Node {
         GD.Print("Start");
         
         EventManager.HookWindowResize(GetViewport());
+        GameManager.I().SetUILayer();
 
         Input.MouseMode = Input.MouseModeEnum.Captured;
 
-        player = (Player)Characters.PLAYER.CreateActor();
+        Player player = (Player)Characters.PLAYER.CreateActor();
         GetTree().Root.GetNode<Node>("Main/PlayerHolder").AddChild(player.GetModel());
         player.SetPosition(new Vector3(5f, 0.2f, 0f), new Vector3(0.0f, 90.0f, 0.0f));
+        GameManager.I().SetPlayer(player);
 
         foreach (Node child in GetTree().Root.GetNode<Node3D>("Main/SceneObjects").GetChildren()) {
             if (child is RigidBody3D obj) {
@@ -45,12 +36,12 @@ public partial class TestScript : Node {
         }
 
         GD.Print($"Dynamic Objects: {_dynamicObjects.Count}");
-        _uiLayer = GetTree().Root.GetNodeOrNull<CanvasLayer>("Main/UILayer");
     }
 
     // Called every frame. 'delta' is the elapsed time since the previous frame.
     public override void _Process(double delta) {
         MovementActionTracker.Update();
+        Player player = GameManager.I().GetPlayer();
 
         if (player.GetModel().Position.Y < -20) player.SetPosition(new Vector3(5f, 0.2f, 0f), new Vector3(0.0f, 90.0f, 0.0f));
 
@@ -81,58 +72,7 @@ public partial class TestScript : Node {
 
     public override void _PhysicsProcess(double delta) {
         base._PhysicsProcess(delta);
+        Player player = GameManager.I().GetPlayer();
         if (!GetTree().Paused) player.GetController().Update((float)delta);
     }
-    
-    public void PopPauseMenu() {
-        if (_uiLayer.GetChildren().Any(child => child.Name == "PauseMenu"))
-            return;
-        
-        Input.MouseMode = Input.MouseModeEnum.Visible;
-        player.GetController().SetLocked(true);
-        
-        BinaryChoiceForm pauseMenu = new("PauseMenu");
-        pauseMenu.SetTitle("Pause Menu");
-        pauseMenu.SetDescription("Do you want to quit?");
-        pauseMenu.SetUpperText("Resume");
-        pauseMenu.SetLowerText(Randf.RandomChanceIn(1, 10) ? "Quip?" : "Quit");
-        pauseMenu.OnUpperButton(_ => {
-            _uiLayer.RemoveChild(pauseMenu.GetMenu());
-            Input.MouseMode = Input.MouseModeEnum.Captured;
-            player.GetController().SetLocked(false);
-            pauseMenu.Destroy();
-            Pause(false);
-        });
-        pauseMenu.OnLowerButton(_ => Quit());
-        pauseMenu.SetKeyboardBehaviour((key, form) => {
-            switch (key) {
-                case Key.W: {
-                    form.GetUpperButton().GetElement().GrabFocus();
-                    return;
-                }
-                case Key.S: {
-                    form.GetLowerButton().GetElement().GrabFocus();
-                    return;
-                }
-                case Key.Space: {
-                    foreach (ButtonElement button in form.GetButtons().Where(button => button.GetElement().HasFocus())) {
-                        button.ForcePressed();
-                        return;
-                    }
-                    break;
-                }
-                case Key.Escape: {
-                    form.GetUpperButton().ForcePressed();
-                    return;
-                }
-            }
-        });
-
-        Pause(true);
-        _uiLayer.AddChild(pauseMenu.GetMenu());
-    }
-
-    public void Quit() => GetTree().Quit();
-    public Rid GetWorldRid() => GetTree().Root.GetWorld3D().Space;
-    public void Pause(bool pause) => GetTree().Paused = pause;
 }

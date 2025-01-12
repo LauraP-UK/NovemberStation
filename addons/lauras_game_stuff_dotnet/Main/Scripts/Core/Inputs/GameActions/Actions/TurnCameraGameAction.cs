@@ -9,7 +9,7 @@ public class TurnCameraGameAction : GameActionBase {
     private void OnMouseMove(MouseMoveEvent ev, Vector2 delta) {
         PlayerMoveEvent moveEvent = new();
         moveEvent.SetTurnDelta(delta);
-        moveEvent.SetActor(TestScript.I().GetPlayer());
+        moveEvent.SetActor(GameManager.I().GetPlayer());
         moveEvent.Fire();
     }
 }

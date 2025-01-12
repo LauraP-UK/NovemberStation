@@ -8,6 +8,7 @@ public class BinaryChoiceForm : FormBase {
     
     private readonly ButtonElement _upperButton, _lowerButton;
     private readonly LabelElement _label, _title;
+    private readonly TextureRectElement _background;
     private Action<Key, BinaryChoiceForm> _keyboardBehaviour;
     
     private const string
@@ -15,13 +16,15 @@ public class BinaryChoiceForm : FormBase {
         TITLE_PATH = "Content/CenterContainer/Control/VBoxContainer/Info/InfoList/Title",
         DESCRIPTION_PATH = "Content/CenterContainer/Control/VBoxContainer/Info/InfoList/DecriptionControl/Description",
         UPPER_BUTTON_PATH = "Content/CenterContainer/Control/VBoxContainer/Buttons/ButtonsList/Accept_btn",
-        LOWER_BUTTON_PATH = "Content/CenterContainer/Control/VBoxContainer/Buttons/ButtonsList/Decline_btn";
+        LOWER_BUTTON_PATH = "Content/CenterContainer/Control/VBoxContainer/Buttons/ButtonsList/Decline_btn",
+        BACKGROUND_PATH = "Background/BackgroundTexture";
 
     public BinaryChoiceForm(string nodeName, Action<Key, BinaryChoiceForm> keyboardBehaviour = null) : base(nodeName, FORM_PATH) {
         Label titleNode = _menu.GetNode<Label>(TITLE_PATH);
         Label labelNode = _menu.GetNode<Label>(DESCRIPTION_PATH);
         Button upperButton = _menu.GetNode<Button>(UPPER_BUTTON_PATH);
         Button lowerButton = _menu.GetNode<Button>(LOWER_BUTTON_PATH);
+        TextureRect background = _menu.GetNode<TextureRect>(BACKGROUND_PATH);
         
         _keyboardBehaviour = keyboardBehaviour;
         
@@ -29,6 +32,7 @@ public class BinaryChoiceForm : FormBase {
         _label = new LabelElement(labelNode);
         _upperButton = new ButtonElement(upperButton);
         _lowerButton = new ButtonElement(lowerButton);
+        _background = new TextureRectElement(background);
         
         _menuLayout = new ControlLayout(_menu, _ => {
             foreach (IFormElement element in GetElements()) {
@@ -46,13 +50,20 @@ public class BinaryChoiceForm : FormBase {
     public ButtonElement GetLowerButton() => _lowerButton;
     public LabelElement GetTitleLabel() => _title;
     public LabelElement GetDescriptionLabel() => _label;
+    public TextureRectElement GetBackground() => _background;
     
     public void SetTitle(string title) => _title.GetElement().SetText(title);
     public void SetDescription(string description) => _label.GetElement().SetText(description);
+    public void SetBackgroundTexture(Texture2D texture) => _background.GetElement().Texture = texture;
+    public void SetBackgroundTexture(string path) {
+        Texture2D texture2D = ResourceLoader.Load<Texture2D>(path);
+        _background.GetElement().SetTexture(texture2D);
+    }
+
     public void SetUpperText(string text) => _upperButton.GetElement().SetText(text);
     public void SetLowerText(string text) => _lowerButton.GetElement().SetText(text);
-    public void OnUpperButton(Action<IFormObject> onYes) => _upperButton.OnPressed(onYes);
-    public void OnLowerButton(Action<IFormObject> onNo) => _lowerButton.OnPressed(onNo);
+    public void OnUpperButton(Action<IFormObject> onUpper) => _upperButton.OnPressed(onUpper);
+    public void OnLowerButton(Action<IFormObject> onLower) => _lowerButton.OnPressed(onLower);
     
     public void SetKeyboardBehaviour(Action<Key, BinaryChoiceForm> keyboardBehaviour) => _keyboardBehaviour = keyboardBehaviour;
     public static void DefaultKeyboardBehaviour(Key key, BinaryChoiceForm form) {

@@ -14,7 +14,7 @@ public class UseGameAction : GameActionBase {
     [EventListener]
     private void OnUseKeyPress(KeyPressEvent ev, Key key) {
         if (!IsValidInput(key)) return;
-        Player player = TestScript.I().GetPlayer();
+        Player player = GameManager.I().GetPlayer();
         
         RaycastResult result = player.GetLookingAt(3.0f);
         
@@ -43,7 +43,7 @@ public class UseGameAction : GameActionBase {
     
     private void FireEmptyEvent() {
         ActorPickUpEvent pickUpEvent = new();
-        pickUpEvent.SetActor(TestScript.I().GetPlayer());
+        pickUpEvent.SetActor(GameManager.I().GetPlayer());
         pickUpEvent.SetItem(null);
         pickUpEvent.Fire();
     }

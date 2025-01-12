@@ -27,7 +27,7 @@ public static class MovementActionTracker {
         
         if (_jumpAction != null && _jumpAction.IsKeyPressed()) {
             PlayerJumpEvent jumpEvent = new();
-            jumpEvent.SetFrom(TestScript.I().GetPlayer().GetPosition());
+            jumpEvent.SetFrom(GameManager.I().GetPlayer().GetPosition());
             jumpEvent.Fire();
         }
     }
