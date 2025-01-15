@@ -18,17 +18,22 @@ public abstract class FormElement<T> : Listener, IFormElement where T : Control 
     }
 
     public void SetElement(T element) => _element = element;
+
     public T GetElement() => _element;
-    Control IFormElement.GetElement() => GetElement();
+    Control IFormElement.GetElement() => GetNode();
     public ILayoutElement GetTopLevelLayout() => _topLevelLayout;
     public void SetTopLevelLayout(ILayoutElement layout) => _topLevelLayout = layout;
+    public Control GetNode() => GetElement();
 
     private void OnReady(Action<T> onReady = null) {
-        if (onReady != null) GD.Print($"Adding onReady action for {typeof(T)}");
         AddAction(Node.SignalName.Ready, elem => {
-            Control element = ((IFormElement)elem).GetElement();
-            onReady?.Invoke(element as T);
+            Control element = elem.GetNode();
+            
+            if (element is not T control) throw new InvalidCastException($"ERROR: FormElement.OnReady() : Element is not of type {typeof(T)}. Element: {element.Name}, Type: {element.GetType()}");
+            onReady?.Invoke(control);
+            ConnectSignals();
         });
+        ConnectSignal(Node.SignalName.Ready, true);
     }
 
     public void OnResize(Action<IFormObject> onResize) {
@@ -50,6 +55,7 @@ public abstract class FormElement<T> : Listener, IFormElement where T : Control 
 
     protected void AddAction(string signal, Action<IFormObject, object[]> action) {
         if (_element == null) GD.PrintErr($"WARN: FormElement.AddAction() : No element set, cannot guarantee signal '{signal}' will be connected.");
+        else if (!IsValid()) return;
         else if (!_element.HasSignal(signal)) GD.PrintErr($"WARN: FormElement.AddAction() : Signal '{signal}' not found on element '{_element.Name}'.");
         _actions.Add(signal, new ActionNode(signal, action, this));
     }
@@ -59,23 +65,38 @@ public abstract class FormElement<T> : Listener, IFormElement where T : Control 
         action.QueueFree();
         _actions.Remove(signal);
     }
+    
+    private void ConnectSignal(string signal, bool clearAfterConnect = false) {
+        if (!IsValid()) return;
+        if (!_element.HasSignal(signal)) {
+            GD.PrintErr($"ERROR: FormElement.ConnectSignal() : Signal '{signal}' not found on element '{_element.Name}'.");
+            return;
+        }
+        if (!_actions.TryGetValue(signal, out ActionNode action)) {
+            GD.PrintErr($"ERROR: FormElement.ConnectSignal() : Action for signal '{signal}' not found.");
+            return;
+        }
+
+        if (_element.IsConnected(signal, action.GetCallable())) {
+            GD.Print($"WARN: FormElement.ConnectSignal() : Signal '{signal}' is already connected.");
+            return;
+        }
+        
+        _element.AddChild(action);
+        if (clearAfterConnect) _actions.Remove(signal);
+    }
 
     public void ConnectSignals() {
-        foreach (string signal in _actions.Keys) {
-            ActionNode action = _actions[signal];
-            if (!_element.HasSignal(signal)) {
-                GD.PrintErr($"ERROR: FormElement.ConnectSignals() : Signal '{signal}' not found on element '{_element.Name}'.");
-                continue;
-            }
-            _element.AddChild(action);
-        }
+        if (!IsValid()) return;
+        foreach (string signal in _actions.Keys) ConnectSignal(signal);
     }
 
     public void LoadElement(string path) {
         Node instance = Loader.SafeInstantiate<Node>(path);
         if (instance is not T element)
             throw new InvalidCastException($"ERROR: FormElement.LoadElement() : Scene at path '{path}' is not of type {typeof(T)}.");
-
         SetElement(element);
     }
+
+    private bool IsValid() => GodotObject.IsInstanceValid(_element) && !_element.IsQueuedForDeletion();
 }

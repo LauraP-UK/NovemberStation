@@ -34,7 +34,7 @@ public partial class ActionNode : Node {
         }
     }
 
-    private Callable GetCallable() {
+    public Callable GetCallable() {
         int paramsCount = -1;
 
         Control node = GetControlNode();
@@ -51,15 +51,5 @@ public partial class ActionNode : Node {
         return paramsCount == 0 ? Callable.From(RunActionNoArgs) : Callable.From((Action<object[]>)RunActionArgs);
     }
 
-    private Control GetControlNode() {
-        switch (_formElement) {
-            case IFormElement formElement:
-                return formElement.GetElement();
-            case ILayoutElement layoutElement:
-                return layoutElement.GetContainer();
-            default:
-                GD.PrintErr($"ERROR: ActionNode.GetElement() : IFormObject {_formElement} is not a valid type.");
-                return null;
-        }
-    }
+    private Control GetControlNode() => _formElement.GetNode();
 }

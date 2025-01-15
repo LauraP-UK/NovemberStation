@@ -25,7 +25,8 @@ public abstract class LayoutElement<T> : Listener, ILayoutElement where T : Cont
     public void SetContainer(T container) => _container = container;
     public T GetContainer() => _container;
     Control ILayoutElement.GetContainer() => GetContainer();
-    
+    public Control GetNode() => GetContainer();
+
     public void AddElement(IFormObject element) => _elements.Add(element);
     public void RemoveElement(IFormObject element) => _elements.Remove(element);
     public SmartSet<IFormObject> GetElements() => _elements;
@@ -47,7 +48,7 @@ public abstract class LayoutElement<T> : Listener, ILayoutElement where T : Cont
     }
 
     [EventListener]
-    protected void OnWindowResize(WindowResizeEvent ev, Vector2 v) => _onReadyAction?.RunActionNoArgs();
+    protected void OnWindowResize(WindowResizeEvent ev, Vector2 v) => _onResizeAction?.RunActionNoArgs();
 
 
     protected void AddAction(string signal, Action<IFormObject> action) {
@@ -56,6 +57,7 @@ public abstract class LayoutElement<T> : Listener, ILayoutElement where T : Cont
     
     protected void AddAction(string signal, Action<IFormObject, object[]> action) {
         if (_container == null) GD.PrintErr($"WARN: LayoutElement.AddAction() : No container set, cannot guarantee signal '{signal}' will be connected.");
+        else if (!IsValid()) return;
         else if (!_container.HasSignal(signal)) GD.PrintErr($"WARN: LayoutElement.AddAction() : Signal '{signal}' not found on container '{_container.Name}'.");
         _onReadyAction = new ActionNode(signal, action, this);
     }
@@ -88,6 +90,10 @@ public abstract class LayoutElement<T> : Listener, ILayoutElement where T : Cont
         }
 
         T thisContainer = GetContainer();
+        if (!IsValid()) {
+            GD.PrintErr($"ERROR: LayoutElement.Build() : Container is no longer valid, cannot build layout. Type is: {GetType()} - ({typeof(T)}).");
+            return null;
+        }
         
         SetTopLevelLayout(parent == null ? this : parent.GetTopLevelLayout());
 
@@ -105,12 +111,11 @@ public abstract class LayoutElement<T> : Listener, ILayoutElement where T : Cont
         foreach (IFormObject formElementBase in GetElements()) {
             switch (formElementBase) {
                 case IFormElement formElement: {
-                    Control element = formElement.GetElement();
+                    Control element = formElementBase.GetNode();
                     if (element == null) {
                         GD.PrintErr($"ERROR: LayoutElement.Build() : Element is null, cannot add to parent '{parent.GetUuid()}'.");
                         continue;
                     }
-                    formElement.ConnectSignals();
                     formElement.SetTopLevelLayout(GetTopLevelLayout());
                     thisContainer.AddChild(element);
                     GD.Print($"Top level layout is: {GetTopLevelLayout().GetUuid()}");
@@ -134,6 +139,8 @@ public abstract class LayoutElement<T> : Listener, ILayoutElement where T : Cont
     public virtual void PreBuild(Control container) { }
     public virtual void PostBuild(Control container) { }
 
+    private bool IsValid() => GodotObject.IsInstanceValid(_container) && !_container.IsQueuedForDeletion();
+    
     public override bool Equals(object obj) {
         if (obj == null || GetType() != obj.GetType()) return false;
         return _uuid == ((LayoutElement<T>) obj)._uuid;
