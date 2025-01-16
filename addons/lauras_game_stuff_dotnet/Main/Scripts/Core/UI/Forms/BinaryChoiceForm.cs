@@ -15,7 +15,7 @@ public class BinaryChoiceForm : FormBase {
     private readonly LabelElement _label, _title;
     private readonly TextureRectElement _backgroundImg;
     private readonly NinePatchRectElement _backgroundNinePatch;
-    private Action<Key, BinaryChoiceForm> _keyboardBehaviour;
+    private Action<Key, BinaryChoiceForm, bool> _keyboardBehaviour;
     private BackgroundType _backgroundType = BackgroundType.IMAGE;
     
     private const string
@@ -27,7 +27,7 @@ public class BinaryChoiceForm : FormBase {
         BACKGROUND_IMG_PATH = "Background/BackgroundTexture",
         BACKGROUND_NINEPATCH_PATH = "Background/BackgroundNinePatch";
 
-    public BinaryChoiceForm(string nodeName, Action<Key, BinaryChoiceForm> keyboardBehaviour = null) : base(nodeName, FORM_PATH) {
+    public BinaryChoiceForm(string nodeName, Action<Key, BinaryChoiceForm, bool> keyboardBehaviour = null) : base(nodeName, FORM_PATH) {
         Label titleNode = FindNode<Label>(TITLE_PATH);
         Label labelNode = FindNode<Label>(DESCRIPTION_PATH);
         Button upperButton = FindNode<Button>(UPPER_BUTTON_PATH);
@@ -115,8 +115,9 @@ public class BinaryChoiceForm : FormBase {
     public void OnUpperButton(Action<IFormObject> onUpper) => _upperButton.OnPressed(onUpper);
     public void OnLowerButton(Action<IFormObject> onLower) => _lowerButton.OnPressed(onLower);
     
-    public void SetKeyboardBehaviour(Action<Key, BinaryChoiceForm> keyboardBehaviour) => _keyboardBehaviour = keyboardBehaviour;
-    public static void DefaultKeyboardBehaviour(Key key, BinaryChoiceForm form) {
+    public void SetKeyboardBehaviour(Action<Key, BinaryChoiceForm, bool> keyboardBehaviour) => _keyboardBehaviour = keyboardBehaviour;
+    public static void DefaultKeyboardBehaviour(Key key, BinaryChoiceForm form, bool isPressed) {
+        if (!isPressed) return;
         switch (key) {
             case Key.W: {
                 form.GetUpperButton().GetElement().GrabFocus();
@@ -140,11 +141,11 @@ public class BinaryChoiceForm : FormBase {
         }
     }
 
-    protected override void KeyboardBehaviour(Key key) {
+    protected override void KeyboardBehaviour(Key key, bool isPressed) {
         if (_keyboardBehaviour != null) {
-            _keyboardBehaviour(key, this);
+            _keyboardBehaviour(key, this, isPressed);
             return;
         }
-        DefaultKeyboardBehaviour(key, this);
+        DefaultKeyboardBehaviour(key, this, isPressed);
     }
 }

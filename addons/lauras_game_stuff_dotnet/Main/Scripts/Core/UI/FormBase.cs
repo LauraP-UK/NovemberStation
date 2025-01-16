@@ -21,7 +21,7 @@ public abstract class FormBase : Listener, IFormObject {
     }
     
     protected virtual void OnDestroy() { }
-    protected virtual void KeyboardBehaviour(Key key) {}
+    protected virtual void KeyboardBehaviour(Key key, bool isPressed) {}
 
     public Control GetMenu() => _menu;
     public void Destroy() {
@@ -40,7 +40,10 @@ public abstract class FormBase : Listener, IFormObject {
     protected T FindNode<T>(string nodePath) where T : Node => _menu.GetNode<T>(nodePath);
     
     [EventListener]
-    protected void OnKeyPress(KeyPressEvent ev, Key key) => KeyboardBehaviour(key);
+    protected void OnKeyPress(KeyPressEvent ev, Key key) => KeyboardBehaviour(key, true);
+    
+    [EventListener]
+    protected void OnKeyRelease(KeyReleaseEvent ev, Key key) => KeyboardBehaviour(key, false);
 
     public void UnregisterListeners() => EventManager.I().UnregisterByOwner(this);
 

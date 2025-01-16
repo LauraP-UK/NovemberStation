@@ -10,6 +10,11 @@ public class ShopItemDisplayButton : FormBase, IFocusable {
     private readonly ColorRectElement _bgColor;
     private readonly ButtonElement _button;
     
+    private static readonly Color
+        DEFAULT_BG_COLOR = Colors.Black,
+        FOCUS_BG_COLOR = Colors.DimGray,
+        SELECTED_BG_COLOR = Colors.Red;
+    
     private Action<Key, ShopItemDisplayButton> _keyboardBehaviour;
     
     private const string
@@ -17,16 +22,16 @@ public class ShopItemDisplayButton : FormBase, IFocusable {
         OBJ_NAME_LABEL = "Content/ObjName",
         OBJ_COST_LABEL = "Content/ObjCost",
         OBJ_IMG_TEXTURE = "Content/ObjImg",
-        BUTTION = "Button",
+        BUTTON = "Button",
         BG_COLOUR = "BGContainer/BGColour",
-        CREDITS_SYMBOL = "\u20bd";
+        CREDITS_SYMBOL = " \u20bd";
 
     public ShopItemDisplayButton(string formName, Action<Key, ShopItemDisplayButton> keyboardBehaviour = null) : base(formName, FORM_PATH) {
         Label nameLabel = FindNode<Label>(OBJ_NAME_LABEL);
         Label costLabel = FindNode<Label>(OBJ_COST_LABEL);
         TextureRect textureRect = FindNode<TextureRect>(OBJ_IMG_TEXTURE);
         ColorRect bgColor = FindNode<ColorRect>(BG_COLOUR);
-        Button button = FindNode<Button>(BUTTION);
+        Button button = FindNode<Button>(BUTTON);
         
         _keyboardBehaviour = keyboardBehaviour;
         
@@ -35,6 +40,12 @@ public class ShopItemDisplayButton : FormBase, IFocusable {
         _objTexture = new TextureRectElement(textureRect);
         _bgColor = new ColorRectElement(bgColor);
         _button = new ButtonElement(button);
+        
+        _button.AddAction(Control.SignalName.FocusEntered, _ => _bgColor.SetColor(FOCUS_BG_COLOR));
+        _button.AddAction(Control.SignalName.FocusExited, _ => _bgColor.SetColor(DEFAULT_BG_COLOR));
+        
+        _button.AddAction(Control.SignalName.MouseEntered, _ => GrabFocus());
+        //_button.AddAction(Control.SignalName.MouseExited, _ => _bgColor.SetColor(DEFAULT_BG_COLOR));
         
         _menuLayout = new ControlLayout(_menu, _ => _menuLayout.ConnectSignals());
         _menuLayout.Build();
@@ -62,4 +73,7 @@ public class ShopItemDisplayButton : FormBase, IFocusable {
     public void OnPressed(Action<ShopItemDisplayButton> onPressed) => _button.OnPressed(_ => onPressed(this));
     
     public void GrabFocus() => GetButton().GetElement().GrabFocus();
+
+    public bool HasFocus() => GetButton().GetElement().HasFocus();
+    public void VisualPress(bool pressed) => GetBgColor().SetColor(pressed ? SELECTED_BG_COLOR : FOCUS_BG_COLOR);
 }

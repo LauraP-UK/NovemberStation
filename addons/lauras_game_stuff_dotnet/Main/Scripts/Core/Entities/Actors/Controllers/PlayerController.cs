@@ -29,9 +29,10 @@ public class PlayerController : ControllerBase {
         
         GD.Print("INFO: PlayerController.OnOpenShop() : I should open the shop now.");
         TestDisplayForm testDisplayForm = new("TestMenu");
-        testDisplayForm.GetScrollDisplay().SetKeyboardEnabled(false);
+        testDisplayForm.GetScrollDisplay().SetKeyboardEnabled(true);
+        testDisplayForm.GetScrollDisplay().SetOnSelectElement<ShopItemDisplayButton>(elem => elem.GetButton().ForcePressed());
         testDisplayForm.SetOnReady(form => {
-            for (int i = 0; i < 8; i++) {
+            for (int i = 0; i < 4; i++) {
                 string name = Randf.Random("Plengle", "Amplic", "Dromp", "Climble", "Clomble", "Weng", "Aftalnic", "Kepron", "Snoof", "Grank");
                 ShopItemDisplayButton item = new(name);
                 item.SetName(name);
@@ -43,9 +44,44 @@ public class PlayerController : ControllerBase {
                     "res://Main/Textures/Placeholder/TestBG001.jpg")
                 );
                 item.OnPressed(elem => GD.Print($"INFO: PlayerController.OnOpenShop() : Button pressed! Name: {elem.GetName()}  Cost: {elem.GetCost()}"));
+                item.GetButton().OnButtonDown(btn => item.VisualPress(true));
+                item.GetButton().OnButtonUp(btn => item.VisualPress(false));
                 
                 item.SetTopLevelLayout(form.GetTopLevelLayout());
                 form.GetScrollDisplay().AddElement(item);
+            }
+        });
+        testDisplayForm.GetScrollDisplay().SetKeyboardBehaviour((pressedKey, form, isPressed) => {
+            switch (pressedKey) {
+                case Key.W: {
+                    if (!isPressed) return;
+                    form.MoveFocus(-1);
+                    break;
+                }
+                case Key.S: {
+                    if (!isPressed) return;
+                    form.MoveFocus(1);
+                    break;
+                }
+                case Key.Space: {
+                    if (isPressed) {
+                        if (form.GetOnSelectElement() == null) {
+                            GD.PrintErr("ERROR: ScrollDisplayList.DefaultKeyboardBehaviour() : No onSelectElement action set.");
+                            break;
+                        }
+
+                        IFormObject focusedElement = form.GetFocusedElement() ?? form.FocusElement(0);
+                        if (focusedElement != null) {
+                            form.GetOnSelectElement().Invoke(focusedElement);
+                            ((ShopItemDisplayButton) focusedElement).VisualPress(true);
+                        }
+                    }
+                    else {
+                        IFormObject focusedElement = form.GetFocusedElement();
+                        ((ShopItemDisplayButton)focusedElement)?.VisualPress(false);
+                    }
+                    break;
+                }
             }
         });
         

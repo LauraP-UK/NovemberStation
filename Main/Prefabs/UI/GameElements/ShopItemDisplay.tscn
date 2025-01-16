@@ -1,13 +1,21 @@
-[gd_scene load_steps=5 format=3 uid="uid://dib8gdtdmi0dh"]
+[gd_scene load_steps=9 format=3 uid="uid://dib8gdtdmi0dh"]
 
 [ext_resource type="Texture2D" uid="uid://cnafjpoh1lxps" path="res://Main/Textures/Sandbox/Checkerboard1.png" id="1_t7q2x"]
 
 [sub_resource type="LabelSettings" id="LabelSettings_hbhbq"]
 font_size = 15
 
-[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_11mr8"]
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_r7k4f"]
 
-[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_dglpa"]
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_qgljl"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_cqioo"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_vxlwv"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_6dfh3"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_gkg40"]
 
 [node name="Control" type="Control"]
 layout_mode = 3
@@ -98,7 +106,11 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_styles/pressed = SubResource("StyleBoxEmpty_11mr8")
-theme_override_styles/normal = SubResource("StyleBoxEmpty_dglpa")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_r7k4f")
+theme_override_styles/disabled = SubResource("StyleBoxEmpty_qgljl")
+theme_override_styles/hover_pressed = SubResource("StyleBoxEmpty_cqioo")
+theme_override_styles/hover = SubResource("StyleBoxEmpty_vxlwv")
+theme_override_styles/pressed = SubResource("StyleBoxEmpty_6dfh3")
+theme_override_styles/normal = SubResource("StyleBoxEmpty_gkg40")
 shortcut_feedback = false
 shortcut_in_tooltip = false

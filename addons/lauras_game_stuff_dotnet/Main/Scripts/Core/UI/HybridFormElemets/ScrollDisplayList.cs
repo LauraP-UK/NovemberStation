@@ -8,7 +8,7 @@ public class ScrollDisplayList : FormBase {
     private readonly VBoxContainerLayout _displayList;
     private readonly ScrollContainerLayout _scrollContainer;
     private Action<IFormObject> _onSelectElement;
-    private Action<Key, ScrollDisplayList> _keyboardBehaviour;
+    private Action<Key, ScrollDisplayList, bool> _keyboardBehaviour;
     private bool _keyboardEnabled = false;
     
     private const string
@@ -16,7 +16,7 @@ public class ScrollDisplayList : FormBase {
         DISPLAY_LIST = "ScrollContainer/DisplayList",
         SCROLL_CONTAINER = "ScrollContainer";
 
-    public ScrollDisplayList(string formName, Action<Key, ScrollDisplayList> keyboardBehaviour = null) : base(formName, FORM_PATH) {
+    public ScrollDisplayList(string formName, Action<Key, ScrollDisplayList, bool> keyboardBehaviour = null) : base(formName, FORM_PATH) {
         VBoxContainer displayList = FindNode<VBoxContainer>(DISPLAY_LIST);
         ScrollContainer scrollContainer = FindNode<ScrollContainer>(SCROLL_CONTAINER);
         
@@ -73,37 +73,49 @@ public class ScrollDisplayList : FormBase {
     public void SetKeyboardEnabled(bool value) => _keyboardEnabled = value;
     public bool IsKeyboardEnabled() => _keyboardEnabled;
     
-    private void MoveFocus(int steps) {
+    public void MoveFocus(int steps) {
         List<IFormObject> listObjects = GetDisplayObjects();
         if (listObjects == null || listObjects.Count == 0) return;
         
-        int currentIndex = listObjects.FindIndex(obj => obj.GetNode().HasFocus());
+        int currentIndex = listObjects.FindIndex(obj => obj is IFocusable focusable && focusable.HasFocus());
+        
         int originalIndex = currentIndex;
 
         do {
             currentIndex = (currentIndex + steps + listObjects.Count) % listObjects.Count;
             if (currentIndex == originalIndex) return;
-        } while (listObjects[currentIndex] is not IFocusable focusObj);
+        } while (listObjects[currentIndex] is not IFocusable);
 
         ((IFocusable) listObjects[currentIndex]).GrabFocus();
     }
-    public IFormObject GetFocusedElement() => GetDisplayObjects().Find(obj => obj.GetNode().HasFocus());
+    public IFormObject GetFocusedElement() => GetDisplayObjects().Find(obj => obj is IFocusable focusable && focusable.HasFocus());
     public IFormObject FocusElement(int index) {
         List<IFormObject> listObjects = GetDisplayObjects();
         if (listObjects == null || listObjects.Count == 0) {
             GD.PrintErr("ERROR: ScrollDisplayList.FocusElement() : No elements to focus.");
             return null;
         }
-        if (index < 0 || index >= listObjects.Count)
+
+        if (index < 0 || index >= listObjects.Count) {
             GD.PrintErr($"ERROR: ScrollDisplayList.FocusElement() : Index {index} out of bounds, clamping to 0 to {listObjects.Count - 1}.");
-        index = Mathf.Clamp(index, 0, listObjects.Count - 1);
+            index = Mathf.Clamp(index, 0, listObjects.Count - 1);
+        }
+        
         IFormObject toFocus = listObjects[index];
-        toFocus.GetNode().GrabFocus();
+
+        if (toFocus is IFocusable focusable)
+            focusable.GrabFocus();
+        else {
+            GD.PrintErr($"ERROR: ScrollDisplayList.FocusElement() : Element at index {index} does not implement IFocusable.");
+            return null;
+        }
+        
         return toFocus;
     }
     
-    public void SetKeyboardBehaviour(Action<Key, ScrollDisplayList> keyboardBehaviour) => _keyboardBehaviour = keyboardBehaviour;
-    public static void DefaultKeyboardBehaviour(Key key, ScrollDisplayList form) {
+    public void SetKeyboardBehaviour(Action<Key, ScrollDisplayList, bool> keyboardBehaviour) => _keyboardBehaviour = keyboardBehaviour;
+    public static void DefaultKeyboardBehaviour(Key key, ScrollDisplayList form, bool isPressed) {
+        if (!isPressed) return;
         switch (key) {
             case Key.W: {
                 form.MoveFocus(-1);
@@ -119,17 +131,17 @@ public class ScrollDisplayList : FormBase {
                     break;
                 }
                 IFormObject focusedElement = form.GetFocusedElement() ?? form.FocusElement(0);
-                form._onSelectElement.Invoke(focusedElement);
+                if (focusedElement != null) form._onSelectElement.Invoke(focusedElement);
                 break;
             }
         }
     }
-    protected override void KeyboardBehaviour(Key key) {
+    protected override void KeyboardBehaviour(Key key, bool isPressed) {
         if (!IsKeyboardEnabled()) return;
         if (_keyboardBehaviour != null) {
-            _keyboardBehaviour(key, this);
+            _keyboardBehaviour(key, this, isPressed);
             return;
         }
-        DefaultKeyboardBehaviour(key, this);
+        DefaultKeyboardBehaviour(key, this, isPressed);
     }
 }

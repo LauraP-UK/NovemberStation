@@ -133,7 +133,8 @@ public class GameManager {
         });
         pauseMenu.OnLowerButton(_ => Quit());
         
-        pauseMenu.SetKeyboardBehaviour((key, form) => {
+        pauseMenu.SetKeyboardBehaviour((key, form, isPressed) => {
+            if (!isPressed) return;
             switch (key) {
                 case Key.W: {
                     form.GetUpperButton().GetElement().GrabFocus();
