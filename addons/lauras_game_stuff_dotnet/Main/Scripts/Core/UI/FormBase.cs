@@ -40,10 +40,7 @@ public abstract class FormBase : Listener, IFormObject {
     protected T FindNode<T>(string nodePath) where T : Node => _menu.GetNode<T>(nodePath);
     
     [EventListener]
-    protected void OnKeyPress(KeyPressEvent ev, Key key) {
-        GD.Print($"I am {GetType()} and I am handling a key press event. The key is {key}");
-        KeyboardBehaviour(key);
-    }
+    protected void OnKeyPress(KeyPressEvent ev, Key key) => KeyboardBehaviour(key);
 
     public void UnregisterListeners() => EventManager.I().UnregisterByOwner(this);
 

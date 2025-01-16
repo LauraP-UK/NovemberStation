@@ -17,7 +17,6 @@ public abstract class TextureElementBase<T> : FormElement<T> where T : Control {
             default:
                 throw new NotSupportedException($"TextureElementBase does not support {element.GetType().Name}");
         }
-        element.SetCustomMinimumSize(texture.GetSize());
     }
     
     public void SetTexture(string path) {

@@ -25,8 +25,6 @@ public class ScrollDisplayList : FormBase {
         _displayList = new VBoxContainerLayout(displayList);
         _scrollContainer = new ScrollContainerLayout(scrollContainer);
         
-        _displayList.GetContainer().SizeFlagsVertical = Control.SizeFlags.Expand;
-        
         _menuLayout = new ControlLayout(_menu, _ => {
             foreach (IFormObject element in getAllElements()) {
                 switch (element) {
@@ -85,9 +83,9 @@ public class ScrollDisplayList : FormBase {
         do {
             currentIndex = (currentIndex + steps + listObjects.Count) % listObjects.Count;
             if (currentIndex == originalIndex) return;
-        } while (listObjects[currentIndex].GetNode().GetFocusMode() != Control.FocusModeEnum.All);
+        } while (listObjects[currentIndex] is not IFocusable focusObj);
 
-        listObjects[currentIndex].GetNode().GrabFocus();
+        ((IFocusable) listObjects[currentIndex]).GrabFocus();
     }
     public IFormObject GetFocusedElement() => GetDisplayObjects().Find(obj => obj.GetNode().HasFocus());
     public IFormObject FocusElement(int index) {
@@ -106,7 +104,6 @@ public class ScrollDisplayList : FormBase {
     
     public void SetKeyboardBehaviour(Action<Key, ScrollDisplayList> keyboardBehaviour) => _keyboardBehaviour = keyboardBehaviour;
     public static void DefaultKeyboardBehaviour(Key key, ScrollDisplayList form) {
-        GD.Print($"ScrollDisplayList.DefaultKeyboardBehaviour() : Key pressed: {key}");
         switch (key) {
             case Key.W: {
                 form.MoveFocus(-1);
@@ -122,7 +119,6 @@ public class ScrollDisplayList : FormBase {
                     break;
                 }
                 IFormObject focusedElement = form.GetFocusedElement() ?? form.FocusElement(0);
-                GD.Print($"ScrollDisplayList.DefaultKeyboardBehaviour() : Selected element: {focusedElement.GetNode().Name}");
                 form._onSelectElement.Invoke(focusedElement);
                 break;
             }

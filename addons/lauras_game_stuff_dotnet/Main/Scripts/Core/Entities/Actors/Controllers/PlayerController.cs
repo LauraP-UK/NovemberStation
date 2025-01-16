@@ -23,6 +23,40 @@ public class PlayerController : ControllerBase {
 
     /* --- ---  LISTENERS  --- --- */
     [EventListener]
+    private void OnOpenShop(KeyPressEvent ev, Key key) {
+        if (IsLocked()) return;
+        if (key != Key.V) return;
+        
+        GD.Print("INFO: PlayerController.OnOpenShop() : I should open the shop now.");
+        TestDisplayForm testDisplayForm = new("TestMenu");
+        testDisplayForm.GetScrollDisplay().SetKeyboardEnabled(false);
+        testDisplayForm.SetOnReady(form => {
+            for (int i = 0; i < 8; i++) {
+                string name = Randf.Random("Plengle", "Amplic", "Dromp", "Climble", "Clomble", "Weng", "Aftalnic", "Kepron", "Snoof", "Grank");
+                ShopItemDisplayButton item = new(name);
+                item.SetName(name);
+                item.SetCost(Randf.Random(1, 100) * 5);
+                item.SetHeight(125);
+                item.SetTexture(Randf.Random(
+                    "res://Main/Textures/Sandbox/Checkerboard1.png",
+                    "res://Main/Textures/Sandbox/Noise1.png",
+                    "res://Main/Textures/Placeholder/TestBG001.jpg")
+                );
+                item.OnPressed(elem => GD.Print($"INFO: PlayerController.OnOpenShop() : Button pressed! Name: {elem.GetName()}  Cost: {elem.GetCost()}"));
+                
+                item.SetTopLevelLayout(form.GetTopLevelLayout());
+                form.GetScrollDisplay().AddElement(item);
+            }
+        });
+        
+        GameManager.I().GetUILayer().AddChild(testDisplayForm.GetMenu());
+        GameManager.I().Pause(true);
+
+        Input.MouseMode = Input.MouseModeEnum.Visible;
+        SetLocked(true);
+    }
+    
+    [EventListener]
     private void OnCrouchToggle(KeyPressEvent ev, Key key) {
         if (IsLocked()) return;
         if (key != Key.C) return;

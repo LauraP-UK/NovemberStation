@@ -54,8 +54,8 @@ public partial class TestScript : Node {
         List<RaycastResult.HitBodyData> hitObjs = raycastResult.GetHitsSortedByDistance().Where(obj => obj.Body is RigidBody3D).ToList();
 
         if (!raycastResult.HasHit()) return;
-        foreach (RaycastResult.HitBodyData hitObj in hitObjs)
-            HighlightObject((RigidBody3D)hitObj.Body);
+        //foreach (RaycastResult.HitBodyData hitObj in hitObjs)
+            //HighlightObject((RigidBody3D)hitObj.Body);
     }
 
     public override void _PhysicsProcess(double delta) {

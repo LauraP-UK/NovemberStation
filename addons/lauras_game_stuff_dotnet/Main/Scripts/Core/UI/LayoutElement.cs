@@ -1,14 +1,15 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Godot;
 
 public abstract class LayoutElement<T> : Listener, ILayoutElement where T : Control {
     private Guid _uuid;
     private SmartSet<IFormObject> _elements = new();
+    private readonly SmartDictionary<string, ActionNode> _actions = new();
     private T _container;
     private ILayoutElement _topLevelLayout;
-    private ActionNode _onReadyAction, _onResizeAction;
     
     public LayoutElement(T container = null, Action<T> onReady = null) {
         SetContainer(container);
@@ -40,26 +41,57 @@ public abstract class LayoutElement<T> : Listener, ILayoutElement where T : Cont
             Control container = ((ILayoutElement)elem).GetContainer();
             onReady?.Invoke(container as T);
         });
+        ConnectSignal(Node.SignalName.Ready, true);
     }
     
     public void OnResize(Action<IFormObject> onResize) {
         if (onResize == null) return;
         AddAction(Control.SignalName.Resized, _ => onResize(this));
     }
+    
+    private void ConnectSignal(string signal, bool clearAfterConnect = false) {
+        if (!IsValid()) return;
+        GD.Print($"LayoutElement.ConnectSignal() : Connecting signal '{signal}' on container '{_container.Name}'.");
+        if (!_container.HasSignal(signal)) {
+            GD.PrintErr($"ERROR: LayoutElement.ConnectSignal() : Signal '{signal}' not found on element '{_container.Name}'.");
+            return;
+        }
+        if (!_actions.TryGetValue(signal, out ActionNode action)) {
+            GD.PrintErr($"ERROR: LayoutElement.ConnectSignal() : Action for signal '{signal}' not found.");
+            return;
+        }
+
+        if (_container.IsConnected(signal, action.GetCallable())) {
+            GD.Print($"WARN: LayoutElement.ConnectSignal() : Signal '{signal}' is already connected.");
+            return;
+        }
+        
+        _container.AddChild(action);
+        if (clearAfterConnect) _actions.Remove(signal);
+    }
+
+    public void ConnectSignals() {
+        if (!IsValid()) return;
+        foreach (string signal in _actions.Keys) ConnectSignal(signal);
+    }
 
     [EventListener]
-    protected void OnWindowResize(WindowResizeEvent ev, Vector2 v) => _onResizeAction?.RunActionNoArgs();
+    protected void OnWindowResize(WindowResizeEvent ev, Vector2 v) {
+        foreach (string signal in _actions.Keys.Where(signal => signal == Control.SignalName.Resized)) {
+            _actions[signal].RunActionNoArgs();
+            return;
+        }
+    }
 
-
-    protected void AddAction(string signal, Action<IFormObject> action) {
+    public void AddAction(string signal, Action<IFormObject> action) {
         AddAction(signal, (formObj, _) => action(formObj));
     }
     
-    protected void AddAction(string signal, Action<IFormObject, object[]> action) {
+    public void AddAction(string signal, Action<IFormObject, object[]> action) {
         if (_container == null) GD.PrintErr($"WARN: LayoutElement.AddAction() : No container set, cannot guarantee signal '{signal}' will be connected.");
         else if (!IsValid()) return;
         else if (!_container.HasSignal(signal)) GD.PrintErr($"WARN: LayoutElement.AddAction() : Signal '{signal}' not found on container '{_container.Name}'.");
-        _onReadyAction = new ActionNode(signal, action, this);
+        _actions.Add(signal, new ActionNode(signal, action, this));
     }
 
     public TType Clone<TType>() where TType : LayoutElement<T> {
@@ -104,7 +136,7 @@ public abstract class LayoutElement<T> : Listener, ILayoutElement where T : Cont
         processedLayouts ??= new HashSet<ILayoutElement>();
         processedLayouts.Add(this);
         
-        if (_onReadyAction != null) thisContainer.AddChild(_onReadyAction);
+        ConnectSignals();
         
         PreBuild(thisContainer);
         

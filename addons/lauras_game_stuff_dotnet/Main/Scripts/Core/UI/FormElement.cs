@@ -49,11 +49,11 @@ public abstract class FormElement<T> : Listener, IFormElement where T : Control 
         }
     }
 
-    protected void AddAction(string signal, Action<IFormObject> action) {
+    public void AddAction(string signal, Action<IFormObject> action) {
         AddAction(signal, (formObj, _) => action(formObj));
     }
 
-    protected void AddAction(string signal, Action<IFormObject, object[]> action) {
+    public void AddAction(string signal, Action<IFormObject, object[]> action) {
         if (_element == null) GD.PrintErr($"WARN: FormElement.AddAction() : No element set, cannot guarantee signal '{signal}' will be connected.");
         else if (!IsValid()) return;
         else if (!_element.HasSignal(signal)) GD.PrintErr($"WARN: FormElement.AddAction() : Signal '{signal}' not found on element '{_element.Name}'.");
