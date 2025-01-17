@@ -72,8 +72,20 @@ public class ScrollDisplayList : FormBase {
     
     public void SetKeyboardEnabled(bool value) => _keyboardEnabled = value;
     public bool IsKeyboardEnabled() => _keyboardEnabled;
-    
+
+    protected override void OnDestroy() {
+        UnregisterListeners();
+        foreach (IFormObject displayObject in GetDisplayObjects()) {
+            if (displayObject is FormBase form) {
+                form.Destroy();
+                form.GetMenu().QueueFree();
+            }
+            else displayObject.GetNode().QueueFree();
+        }
+    }
+
     public void MoveFocus(int steps) {
+        if (!IsValid()) return;
         List<IFormObject> listObjects = GetDisplayObjects();
         if (listObjects == null || listObjects.Count == 0) return;
         
@@ -85,11 +97,17 @@ public class ScrollDisplayList : FormBase {
             currentIndex = (currentIndex + steps + listObjects.Count) % listObjects.Count;
             if (currentIndex == originalIndex) return;
         } while (listObjects[currentIndex] is not IFocusable);
-
+        
+        GD.Print($"ScrollDisplayList.MoveFocus() : Moving focus from index {originalIndex} to {currentIndex}. BBBBB");
         ((IFocusable) listObjects[currentIndex]).GrabFocus();
     }
-    public IFormObject GetFocusedElement() => GetDisplayObjects().Find(obj => obj is IFocusable focusable && focusable.HasFocus());
+    public IFormObject GetFocusedElement() {
+        return GetDisplayObjects().Find(obj => obj is IFocusable focusable && focusable.HasFocus());
+    }
+
     public IFormObject FocusElement(int index) {
+        if (!IsValid())
+            return null;
         List<IFormObject> listObjects = GetDisplayObjects();
         if (listObjects == null || listObjects.Count == 0) {
             GD.PrintErr("ERROR: ScrollDisplayList.FocusElement() : No elements to focus.");
@@ -103,8 +121,10 @@ public class ScrollDisplayList : FormBase {
         
         IFormObject toFocus = listObjects[index];
 
-        if (toFocus is IFocusable focusable)
+        if (toFocus is IFocusable focusable) {
+            GD.Print($"ScrollDisplayList.FocusElement() : Focusing element at index {index}. AAAAA");
             focusable.GrabFocus();
+        }
         else {
             GD.PrintErr($"ERROR: ScrollDisplayList.FocusElement() : Element at index {index} does not implement IFocusable.");
             return null;

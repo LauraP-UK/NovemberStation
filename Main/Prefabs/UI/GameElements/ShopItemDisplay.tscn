@@ -97,7 +97,7 @@ grow_vertical = 2
 mouse_filter = 2
 texture = ExtResource("1_t7q2x")
 expand_mode = 2
-stretch_mode = 1
+stretch_mode = 5
 
 [node name="Button" type="Button" parent="."]
 layout_mode = 1

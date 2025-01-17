@@ -8,8 +8,9 @@ public class GameManager {
     private static readonly Scheduler scheduler = new();
     private static GameManager instance;
 
-    private Node _activeScene;
+    private Node _activeScene, _sceneObjects;
     private Player _player;
+    private Node _primaryMenu = null;
     
     private CanvasLayer _uiLayer;
     
@@ -29,10 +30,16 @@ public class GameManager {
     }
     
     public void SetActiveScene(Node scene) => _activeScene = scene;
+    public void SetSceneObjects(Node sceneObjects) => _sceneObjects = sceneObjects;
 
     public Node GetActiveScene() {
         if (_activeScene == null) throw new InvalidOperationException("ERROR: GameManager.GetActiveScene() : Active scene is null. Set the active scene first.");
         return _activeScene;
+    }
+    
+    public Node GetSceneObjects() {
+        if (_sceneObjects == null) throw new InvalidOperationException("ERROR: GameManager.GetSceneObjects() : Scene objects are null. Set the scene objects first.");
+        return _sceneObjects;
     }
     
     public void SetPlayer(Player player) => _player = player;
@@ -57,79 +64,21 @@ public class GameManager {
     /* --- Game Methods --- */
     
     public void PopPauseMenu() {
-        
-        if (_uiLayer.GetChildren().Any(child => child.Name == "PauseMenu"))
+        if (HasMenu("PauseMenu"))
             return;
         
-        Player player = GetPlayer();
-        CanvasLayer uiLayer = GetUILayer();
-
-        Input.MouseMode = Input.MouseModeEnum.Visible;
-        player.GetController().SetLocked(true);
-        
-        /*TestDisplayForm testDisplayForm = new("TestMenu");
-        ScrollDisplayList scrollDisplayList = testDisplayForm.GetScrollDisplay();
-        scrollDisplayList.SetFollowFocus(true);
-        
-        scrollDisplayList.SetOnSelectElement<ButtonElement>(element => element.ForcePressed());
-        testDisplayForm.SetOnReady(form => {
-            for (int i = 0; i < 20; i++) {
-                
-                ColorRectElement colorRectElement = new(new ColorRect());
-                colorRectElement.SetColor(
-                    Randf.Random(0.0f, 1.0f), 
-                    Randf.Random(0.0f, 1.0f),
-                    Randf.Random(0.0f, 1.0f),
-                    1.0f
-                    );
-                colorRectElement.SetSize(new Vector2(0, 150));
-                colorRectElement.SetTopLevelLayout(form.GetTopLevelLayout());
-                form.GetScrollDisplay().AddElement(colorRectElement);
-                
-                TextureRectElement textureRectElement = new("res://Main/Prefabs/UI/FormElements/TextureRectDefault.tscn");
-                textureRectElement.SetTexture("res://Main/Textures/Placeholder/TestBG001.jpg");
-                textureRectElement.SetSize(new Vector2(0, 150));
-                textureRectElement.SetTopLevelLayout(testDisplayForm.GetTopLevelLayout());
-                form.GetScrollDisplay().AddElement(textureRectElement);
-                
-                LabelElement labelElement = new("res://Main/Prefabs/UI/FormElements/LabelDefault.tscn", label => {
-                    GD.Print($"Setting text for label {i}");
-                    label.SetText("Label " + i);
-                });
-                labelElement.SetTopLevelLayout(form.GetTopLevelLayout());
-                form.GetScrollDisplay().AddElement(labelElement);
-                
-                ButtonElement button = new("res://Main/Prefabs/UI/FormElements/ButtonDefault.tscn");
-                button.GetElement().SetText("Button " + i);
-                button.OnPressed(elem => {
-                    Button btn = ((ButtonElement)elem).GetElement();
-                    GD.Print("Button " + btn.Text + " pressed!");
-                });
-                button.SetTopLevelLayout(form.GetTopLevelLayout());
-                form.GetScrollDisplay().AddElement(button);
-            }
-        });
-        
-        uiLayer.AddChild(testDisplayForm.GetMenu());
-
-        Pause(true);
-        return;*/
         BinaryChoiceForm pauseMenu = new("PauseMenu");
-        
         pauseMenu.SetTitle("Pause Menu");
         pauseMenu.SetDescription("Do you want to quit?");
         pauseMenu.SetUpperText("Resume");
-        pauseMenu.SetLowerText(Randf.RandomChanceIn(1, 10) ? "Quip?" : "Quit");
+        pauseMenu.SetLowerText("Quit");
         
         pauseMenu.SetBackgroundType(BinaryChoiceForm.BackgroundType.IMAGE);
         pauseMenu.SetBackgroundAlpha(0.5f);
         
         pauseMenu.OnUpperButton(_ => {
-            uiLayer.RemoveChild(pauseMenu.GetMenu());
-            Input.MouseMode = Input.MouseModeEnum.Captured;
-            player.GetController().SetLocked(false);
             pauseMenu.Destroy();
-            Pause(false);
+            CloseMenu("PauseMenu");
         });
         pauseMenu.OnLowerButton(_ => Quit());
         
@@ -158,11 +107,32 @@ public class GameManager {
             }
         });
 
-        Pause(true);
-        uiLayer.AddChild(pauseMenu.GetMenu());
+        OpenMenu(pauseMenu, true);
     }
 
     public void Quit() => GetActiveScene().GetTree().Quit();
     public Rid GetWorldRid() => GetActiveScene().GetTree().Root.GetWorld3D().Space;
     public void Pause(bool pause) => GetActiveScene().GetTree().Paused = pause;
+    
+    public bool HasMenu(string menuName) => GetUILayer().GetChildren().Any(child => child.Name == menuName);
+    public void CloseMenu(string menuName) {
+        if (GetUILayer().GetChildren().FirstOrDefault(child => child.Name == menuName) is not Control menu) return;
+        
+        if (menu == _primaryMenu) _primaryMenu = null;
+        
+        GetUILayer().RemoveChild(menu);
+        menu.QueueFree();
+        Pause(false);
+        Input.MouseMode = Input.MouseModeEnum.Captured;
+        GetPlayer().GetController().SetLocked(false);
+    }
+    
+    public void OpenMenu(FormBase menu, bool isPrimaryMenu = false) {
+        if (HasMenu(menu.GetMenu().Name) || _primaryMenu != null) return;
+        if (isPrimaryMenu) _primaryMenu = menu.GetMenu();
+        GetUILayer().AddChild(menu.GetMenu());
+        Pause(true);
+        Input.MouseMode = Input.MouseModeEnum.Visible;
+        GetPlayer().GetController().SetLocked(true);
+    }
 }

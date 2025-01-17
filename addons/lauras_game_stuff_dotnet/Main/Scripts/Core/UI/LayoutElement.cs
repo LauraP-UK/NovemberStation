@@ -51,7 +51,6 @@ public abstract class LayoutElement<T> : Listener, ILayoutElement where T : Cont
     
     private void ConnectSignal(string signal, bool clearAfterConnect = false) {
         if (!IsValid()) return;
-        GD.Print($"LayoutElement.ConnectSignal() : Connecting signal '{signal}' on container '{_container.Name}'.");
         if (!_container.HasSignal(signal)) {
             GD.PrintErr($"ERROR: LayoutElement.ConnectSignal() : Signal '{signal}' not found on element '{_container.Name}'.");
             return;
@@ -171,7 +170,7 @@ public abstract class LayoutElement<T> : Listener, ILayoutElement where T : Cont
     public virtual void PreBuild(Control container) { }
     public virtual void PostBuild(Control container) { }
 
-    private bool IsValid() => GodotObject.IsInstanceValid(_container) && !_container.IsQueuedForDeletion();
+    protected bool IsValid() => GodotObject.IsInstanceValid(_container) && !_container.IsQueuedForDeletion();
     
     public override bool Equals(object obj) {
         if (obj == null || GetType() != obj.GetType()) return false;

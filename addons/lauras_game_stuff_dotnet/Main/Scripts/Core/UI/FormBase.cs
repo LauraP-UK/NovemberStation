@@ -25,9 +25,9 @@ public abstract class FormBase : Listener, IFormObject {
 
     public Control GetMenu() => _menu;
     public void Destroy() {
+        if (!IsValid() || _menu.IsQueuedForDeletion()) return;
         OnDestroy();
-        if (_menu.IsQueuedForDeletion()) return;
-        
+
         EventManager eventManager = EventManager.I();
         _menu.QueueFree();
         UnregisterListeners();
@@ -50,4 +50,5 @@ public abstract class FormBase : Listener, IFormObject {
     public ILayoutElement GetTopLevelLayout() => _menuLayout;
     public void SetTopLevelLayout(ILayoutElement layout) {}
     public Control GetNode() => _menu;
+    protected bool IsValid() => GodotObject.IsInstanceValid(_menu) && !_menu.IsQueuedForDeletion();
 }

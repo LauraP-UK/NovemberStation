@@ -41,6 +41,14 @@ public abstract class FormElement<T> : Listener, IFormElement where T : Control 
         AddAction(Control.SignalName.Resized, _ => onResize(this));
     }
 
+    public void Destroy() {
+        if (!IsValid() || _element.IsQueuedForDeletion()) return;
+        EventManager.I().UnregisterByOwner(this);
+        foreach (ActionNode action in _actions.Values) action.QueueFree();
+        _actions.Clear();
+        _element.QueueFree();
+    }
+
     [EventListener]
     protected void OnWindowResize(WindowResizeEvent ev, Vector2 v) {
         foreach (string signal in _actions.Keys.Where(signal => signal == Control.SignalName.Resized)) {
@@ -98,5 +106,5 @@ public abstract class FormElement<T> : Listener, IFormElement where T : Control 
         SetElement(element);
     }
 
-    private bool IsValid() => GodotObject.IsInstanceValid(_element) && !_element.IsQueuedForDeletion();
+    protected bool IsValid() => GodotObject.IsInstanceValid(_element) && !_element.IsQueuedForDeletion();
 }

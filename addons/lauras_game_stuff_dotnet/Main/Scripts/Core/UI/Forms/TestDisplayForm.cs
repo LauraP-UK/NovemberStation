@@ -32,4 +32,11 @@ public class TestDisplayForm : FormBase {
     public ScrollDisplayList GetScrollDisplay() => _scrollDisplay;
     
     public void SetOnReady(Action<TestDisplayForm> onReady) => _onReady = onReady;
+
+    protected override void OnDestroy() {
+        base.OnDestroy();
+        foreach (IFormObject displayObject in _scrollDisplay.GetDisplayObjects())
+            ((ShopItemDisplayButton) displayObject).Destroy();
+        _scrollDisplay.Destroy();
+    }
 }

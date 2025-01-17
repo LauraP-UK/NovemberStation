@@ -1,5 +1,6 @@
 using System;
 using Godot;
+using NovemberStation.Main.Scripts.Items;
 
 public class PlayerController : ControllerBase {
     private const float HOLD_DISTANCE = 2.1f, HOLD_SMOOTHNESS = 15.0f, ROTATION_SMOOTHNESS = 10.0f;
@@ -27,29 +28,29 @@ public class PlayerController : ControllerBase {
         if (IsLocked()) return;
         if (key != Key.V) return;
         
-        GD.Print("INFO: PlayerController.OnOpenShop() : I should open the shop now.");
+        GameManager gameManager = GameManager.I();
+        
+        if (gameManager.HasMenu("TestMenu")) return;
+        
         TestDisplayForm testDisplayForm = new("TestMenu");
         testDisplayForm.GetScrollDisplay().SetKeyboardEnabled(true);
         testDisplayForm.GetScrollDisplay().SetOnSelectElement<ShopItemDisplayButton>(elem => elem.GetButton().ForcePressed());
         testDisplayForm.SetOnReady(form => {
-            for (int i = 0; i < 4; i++) {
-                string name = Randf.Random("Plengle", "Amplic", "Dromp", "Climble", "Clomble", "Weng", "Aftalnic", "Kepron", "Snoof", "Grank");
-                ShopItemDisplayButton item = new(name);
-                item.SetName(name);
-                item.SetCost(Randf.Random(1, 100) * 5);
-                item.SetHeight(125);
-                item.SetTexture(Randf.Random(
-                    "res://Main/Textures/Sandbox/Checkerboard1.png",
-                    "res://Main/Textures/Sandbox/Noise1.png",
-                    "res://Main/Textures/Placeholder/TestBG001.jpg")
-                );
-                item.OnPressed(elem => GD.Print($"INFO: PlayerController.OnOpenShop() : Button pressed! Name: {elem.GetName()}  Cost: {elem.GetCost()}"));
-                item.GetButton().OnButtonDown(btn => item.VisualPress(true));
-                item.GetButton().OnButtonUp(btn => item.VisualPress(false));
-                
-                item.SetTopLevelLayout(form.GetTopLevelLayout());
-                form.GetScrollDisplay().AddElement(item);
-            }
+            Items.GetItemButtons().ForEach(btn => {
+                btn.OnPressed(btn => {
+                    ItemType itemType = btn.GetItemType();
+                    RigidBody3D rigidBody3D = itemType.CreateInstance();
+                    gameManager.GetSceneObjects().AddChild(rigidBody3D);
+                    Vector3 spawn = Raycast.Trace(gameManager.GetPlayer(), 2.0f).GetEnd();
+                    rigidBody3D.SetPosition(spawn);
+                    rigidBody3D.SetRotation(gameManager.GetPlayer().GetModel().GetRotation());
+                    
+                    testDisplayForm.Destroy();
+                    gameManager.CloseMenu("TestMenu");
+                });
+                btn.SetTopLevelLayout(form.GetTopLevelLayout());
+                form.GetScrollDisplay().AddElement(btn);
+            });
         });
         testDisplayForm.GetScrollDisplay().SetKeyboardBehaviour((pressedKey, form, isPressed) => {
             switch (pressedKey) {
@@ -82,14 +83,16 @@ public class PlayerController : ControllerBase {
                     }
                     break;
                 }
+                case Key.Escape: {
+                    form.Destroy();
+                    testDisplayForm.Destroy();
+                    gameManager.CloseMenu("TestMenu");
+                    break;
+                }
             }
         });
         
-        GameManager.I().GetUILayer().AddChild(testDisplayForm.GetMenu());
-        GameManager.I().Pause(true);
-
-        Input.MouseMode = Input.MouseModeEnum.Visible;
-        SetLocked(true);
+        gameManager.OpenMenu(testDisplayForm, true);
     }
     
     [EventListener]

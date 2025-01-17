@@ -19,16 +19,18 @@ public partial class TestScript : Node {
         GD.Print("Start");
         
         EventManager.HookWindowResize(GetViewport());
-        GameManager.I().SetUILayer();
+        GameManager gameManager = GameManager.I();
+        gameManager.SetUILayer();
+        gameManager.SetSceneObjects(GetTree().Root.GetNode<Node3D>("Main/SceneObjects"));
 
         Input.MouseMode = Input.MouseModeEnum.Captured;
 
         Player player = (Player)Characters.PLAYER.CreateActor();
         GetTree().Root.GetNode<Node>("Main/PlayerHolder").AddChild(player.GetModel());
         player.SetPosition(new Vector3(5f, 0.2f, 0f), new Vector3(0.0f, 90.0f, 0.0f));
-        GameManager.I().SetPlayer(player);
+        gameManager.SetPlayer(player);
 
-        foreach (Node child in GetTree().Root.GetNode<Node3D>("Main/SceneObjects").GetChildren()) {
+        foreach (Node child in gameManager.GetSceneObjects().GetChildren()) {
             if (child is not RigidBody3D obj) continue;
             _dynamicObjects.Add(obj, obj.GlobalPosition);
             obj.AngularDamp = 0.5f;
@@ -44,18 +46,26 @@ public partial class TestScript : Node {
 
         if (player.GetModel().Position.Y < -20) player.SetPosition(new Vector3(5f, 0.2f, 0f), new Vector3(0.0f, 90.0f, 0.0f));
 
-        foreach (RigidBody3D physicsObject in _dynamicObjects.Keys.Where(physicsObject => physicsObject.GlobalPosition.Y < -20)) {
-            physicsObject.GlobalPosition = _dynamicObjects[physicsObject];
-            //physicsObject.LinearVelocity = Vector3.Zero;
-            //physicsObject.AngularVelocity = Vector3.Zero;
+        Node sceneObjects = GameManager.I().GetSceneObjects();
+        
+        foreach (Node child in sceneObjects.GetChildren()) {
+            if (child is not RigidBody3D physicsObj) continue;
+            if (!(physicsObj.GlobalPosition.Y < -20)) continue;
+            if (_dynamicObjects.TryGetValue(physicsObj, out Vector3 origPosition)) {
+                physicsObj.GlobalPosition = origPosition;
+                //physicsObj.LinearVelocity = Vector3.Zero;
+                //physicsObj.AngularVelocity = Vector3.Zero;
+            }
+            else
+                physicsObj.QueueFree();
         }
 
         RaycastResult raycastResult = Raycast.Trace(player, 3.0f);
         List<RaycastResult.HitBodyData> hitObjs = raycastResult.GetHitsSortedByDistance().Where(obj => obj.Body is RigidBody3D).ToList();
 
         if (!raycastResult.HasHit()) return;
-        //foreach (RaycastResult.HitBodyData hitObj in hitObjs)
-            //HighlightObject((RigidBody3D)hitObj.Body);
+        foreach (RaycastResult.HitBodyData hitObj in hitObjs)
+            HighlightObject((RigidBody3D)hitObj.Body);
     }
 
     public override void _PhysicsProcess(double delta) {
