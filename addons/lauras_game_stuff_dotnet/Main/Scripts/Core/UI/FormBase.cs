@@ -49,9 +49,12 @@ public abstract class FormBase : IFormObject {
     
     protected T FindNode<T>(string nodePath) where T : Node => _menu.GetNode<T>(nodePath);
     
-    [EventListener(PriorityLevels.TERMINUS)]
-    protected void OnKeyPress(KeyPressEvent ev, Key key) => KeyboardBehaviour(key, true);
-    
+    [EventListener(PriorityLevels.HIGHEST)]
+    protected void OnKeyPress(KeyPressEvent ev, Key key) {
+        if (CaptureInput()) ev.Capture();
+        KeyboardBehaviour(key, true);
+    }
+
     [EventListener(PriorityLevels.TERMINUS)]
     protected void OnKeyRelease(KeyReleaseEvent ev, Key key) => KeyboardBehaviour(key, false);
 
@@ -59,4 +62,5 @@ public abstract class FormBase : IFormObject {
     public void SetTopLevelLayout(IFormObject layout) {}
     public Control GetNode() => _menu;
     protected bool IsValid() => GodotObject.IsInstanceValid(_menu) && !_menu.IsQueuedForDeletion();
+    protected abstract bool CaptureInput();
 }

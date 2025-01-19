@@ -71,7 +71,6 @@ public class ScrollDisplayList : FormBase {
             if (currentIndex == originalIndex) return;
         } while (listObjects[currentIndex] is not IFocusable);
         
-        GD.Print($"ScrollDisplayList.MoveFocus() : Moving focus from index {originalIndex} to {currentIndex}. BBBBB");
         ((IFocusable) listObjects[currentIndex]).GrabFocus();
     }
     public IFormObject GetFocusedElement() {
@@ -94,10 +93,8 @@ public class ScrollDisplayList : FormBase {
         
         IFormObject toFocus = listObjects[index];
 
-        if (toFocus is IFocusable focusable) {
-            GD.Print($"ScrollDisplayList.FocusElement() : Focusing element at index {index}. AAAAA");
+        if (toFocus is IFocusable focusable)
             focusable.GrabFocus();
-        }
         else {
             GD.PrintErr($"ERROR: ScrollDisplayList.FocusElement() : Element at index {index} does not implement IFocusable.");
             return null;
@@ -137,4 +134,5 @@ public class ScrollDisplayList : FormBase {
         }
         DefaultKeyboardBehaviour(key, this, isPressed);
     }
+    protected override bool CaptureInput() => true;
 }

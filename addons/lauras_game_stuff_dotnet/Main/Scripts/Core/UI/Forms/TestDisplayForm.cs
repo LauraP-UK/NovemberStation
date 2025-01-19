@@ -36,4 +36,5 @@ public class TestDisplayForm : FormBase {
         foreach (IFormObject displayObject in _scrollDisplay.GetDisplayObjects())
             ((ShopItemDisplayButton) displayObject).Destroy();
     }
+    protected override bool CaptureInput() => true;
 }

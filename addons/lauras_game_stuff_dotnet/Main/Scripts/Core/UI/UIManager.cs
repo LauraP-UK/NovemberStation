@@ -30,10 +30,9 @@ public static class UIManager {
         
         _menus[menu]?.RemoveFromScene();
         _menus.Remove(menu);
-        
         GameManager.I().GetPlayer().GetController().SetLocked(false);
-        GameManager.I().Pause(false);
         Input.MouseMode = Input.MouseModeEnum.Captured;
+        GameManager.I().Pause(false);
     }
     
     public static void OpenMenu(FormBase menu, bool isPrimaryMenu = false) {

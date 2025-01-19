@@ -55,6 +55,7 @@ public class ShopItemDisplayButton : FormBase, IFocusable {
 
     protected override List<IFormObject> GetAllElements() => new() { _nameLabel, _costLabel, _objTexture, _bgColor, _button };
     protected override void OnDestroy() { }
+    protected override bool CaptureInput() => true;
 
     public LabelElement GetNameLabel() => _nameLabel;
     public LabelElement GetCostLabel() => _costLabel;

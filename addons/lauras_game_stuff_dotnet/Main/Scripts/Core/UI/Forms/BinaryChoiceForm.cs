@@ -46,7 +46,6 @@ public class BinaryChoiceForm : FormBase {
         _backgroundNinePatch = new NinePatchRectElement(backgroundNinePatch);
         
         _menuElement = new ControlElement(_menu, _ => {
-            GD.Print($"BinaryChoiceForm() : {_menu.Name} running OnReady");
             foreach (IFormObject element in GetAllElements())
                 element.SetTopLevelLayout(_menuElement);
         });
@@ -151,4 +150,5 @@ public class BinaryChoiceForm : FormBase {
         }
         DefaultKeyboardBehaviour(key, this, isPressed);
     }
+    protected override bool CaptureInput() => true;
 }

@@ -12,7 +12,7 @@ public class MovementGameAction : GameActionBase {
 
     [EventListener]
     protected void OnMoveKeyPress(KeyPressEvent ev, Key context) {
-        if (!IsValidInput(context)) return;
+        if (!IsValidInput(context) || ev.IsCaptured()) return;
         _isKeyPressed = true;
     }
 
