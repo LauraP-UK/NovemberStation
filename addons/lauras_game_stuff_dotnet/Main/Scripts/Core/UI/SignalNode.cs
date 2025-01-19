@@ -14,10 +14,7 @@ public partial class SignalNode : Node {
         _formObject = formObject;
     }
 
-    public override void _Ready() {
-        GD.Print($"Connecting signal {_signalName} on {_formObject.GetNode().Name}");
-        GetControlNode().Connect(_signalName, GetCallable());
-    }
+    public override void _Ready() => GetControlNode().Connect(_signalName, GetCallable());
 
     public void RunActionNoArgs() {
         try {

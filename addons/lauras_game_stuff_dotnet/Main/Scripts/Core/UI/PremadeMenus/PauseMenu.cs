@@ -15,12 +15,8 @@ public class PauseMenu : PreMadeMenu {
         pauseMenu.SetBackgroundType(BinaryChoiceForm.BackgroundType.IMAGE);
         pauseMenu.SetBackgroundAlpha(0.5f);
         
-        pauseMenu.OnUpperButton(_ => {
-            pauseMenu.Destroy();
-            UIManager.CloseMenu(GetFormName());
-        });
+        pauseMenu.OnUpperButton(_ => UIManager.CloseMenu(GetFormName()));
         pauseMenu.OnLowerButton(_ => {
-            pauseMenu.Destroy();
             UIManager.CloseMenu(GetFormName());
             GameManager.I().Quit();
         });

@@ -20,12 +20,15 @@ public class ShopMenu : PreMadeMenu {
                     rigidBody3D.SetPosition(spawn);
                     rigidBody3D.SetRotation(gameManager.GetPlayer().GetModel().GetRotation());
                     
-                    testDisplayForm.Destroy();
-                    Close();
+                    UIManager.CloseMenu(GetFormName());
                 });
                 btn.SetTopLevelLayout(form.GetTopLevelLayout());
                 form.GetScrollDisplay().AddElement(btn);
             });
+            ShopItemDisplayButton closeButton = Items.GetCloseButton();
+            closeButton.SetTopLevelLayout(form.GetTopLevelLayout());
+            closeButton.OnPressed(btn => UIManager.CloseMenu(GetFormName()));
+            form.GetScrollDisplay().AddElement(closeButton);
         });
         testDisplayForm.GetScrollDisplay().SetKeyboardBehaviour((pressedKey, form, isPressed) => {
             switch (pressedKey) {
@@ -59,9 +62,7 @@ public class ShopMenu : PreMadeMenu {
                     break;
                 }
                 case Key.Escape: {
-                    form.Destroy();
-                    testDisplayForm.Destroy();
-                    Close();
+                    UIManager.CloseMenu(GetFormName());
                     break;
                 }
             }

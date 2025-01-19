@@ -29,4 +29,16 @@ public class Items {
     private static readonly ItemType[] ALL_ITEMS = {GAS_CAN, WORK_DESK, BLUE_CUBE};
     public static List<ItemType> GetItems() => new(ALL_ITEMS);
     public static List<ShopItemDisplayButton> GetItemButtons() => GetItems().Select(item => item.CreateButton()).ToList();
+    
+    
+    
+    public static ShopItemDisplayButton GetCloseButton() {
+        ShopItemDisplayButton closeButton = new("CloseButton");
+        closeButton.SetName("Close");
+        closeButton.SetCost(0);
+        closeButton.SetHeight(100);
+        closeButton.GetButton().OnButtonDown(btn => closeButton.VisualPress(true));
+        closeButton.GetButton().OnButtonUp(btn => closeButton.VisualPress(false));
+        return closeButton;
+    }
 }

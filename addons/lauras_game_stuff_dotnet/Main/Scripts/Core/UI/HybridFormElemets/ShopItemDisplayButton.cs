@@ -89,4 +89,5 @@ public class ShopItemDisplayButton : FormBase, IFocusable {
     public bool HasFocus() => IsValid() && GetButton().GetElement().HasFocus();
     public Control GetFocusableElement() => GetButton().GetElement();
     public void VisualPress(bool pressed) => GetBgColor().SetColor(pressed ? SELECTED_BG_COLOR : FOCUS_BG_COLOR);
+
 }
