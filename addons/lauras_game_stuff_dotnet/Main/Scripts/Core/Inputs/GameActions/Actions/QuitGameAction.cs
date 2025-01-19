@@ -7,7 +7,7 @@ public class QuitGameAction : GameActionBase {
     
     [EventListener]
     private void OnQuitKeyPress(KeyPressEvent ev, Key key) {
-        if (!IsValidInput(key)) return;
+        if (!IsValidInput(key) || ev.IsCaptured()) return;
         GameManager.I().PopPauseMenu();
     }
 }

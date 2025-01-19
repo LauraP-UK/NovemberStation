@@ -47,6 +47,7 @@ public class ItemType {
     public ShopItemDisplayButton CreateButton() {
         ShopItemDisplayButton item = new(this);
         item.SetName(GetItemName());
+        item.SetDescription(GetDescription());
         item.SetCost(GetItemCost());
         item.SetHeight(100);
         item.SetTexture(GetImage());

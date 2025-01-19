@@ -27,7 +27,8 @@ public abstract class ControllerBase : Listener {
     private Vector3? _savedCamGlobalPosition;
 
     protected Vector3 _intendedDirection = Vector3.Zero;
-    protected bool _sprinting = false, _jumping, _crouching, _crouchingLastFrame, _tryUncrouch;
+    protected bool _sprinting = false, _jumping, _crouching, _tryUncrouch;
+    private bool _crouchingLastFrame;
     protected readonly float _actorHeight = -1.0f;
 
     protected ControllerBase(ActorBase actor) {

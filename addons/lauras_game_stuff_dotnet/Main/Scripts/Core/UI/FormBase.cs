@@ -44,6 +44,7 @@ public abstract class FormBase : IFormObject {
             formElement.Destroy();
             formElement.GetNode().QueueFree();
         }
+        _onReadyAction.QueueFree();
         _menu.QueueFree();
     }
     

@@ -30,10 +30,10 @@ public class Items {
     public static List<ItemType> GetItems() => new(ALL_ITEMS);
     public static List<ShopItemDisplayButton> GetItemButtons() => GetItems().Select(item => item.CreateButton()).ToList();
     
-    
-    
     public static ShopItemDisplayButton GetCloseButton() {
         ShopItemDisplayButton closeButton = new("CloseButton");
+        closeButton.GetCostLabel().GetElement().Visible = false;
+        closeButton.GetDescLabel().GetElement().Visible = false;
         closeButton.SetName("Close");
         closeButton.SetCost(0);
         closeButton.SetHeight(100);
