@@ -1,0 +1,111 @@
+[gd_scene load_steps=9 format=3 uid="uid://dib8gdtdmi0dh"]
+
+[ext_resource type="Texture2D" uid="uid://cnafjpoh1lxps" path="res://Main/Textures/Sandbox/Checkerboard1.png" id="1_t7q2x"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_hbhbq"]
+font_size = 15
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_r7k4f"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_qgljl"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_cqioo"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_vxlwv"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_6dfh3"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_gkg40"]
+
+[node name="Control" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_bottom = -523.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="BGContainer" type="Control" parent="."]
+z_index = -10
+z_as_relative = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="BGColour" type="ColorRect" parent="BGContainer"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 1)
+
+[node name="Content" type="Control" parent="."]
+z_as_relative = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="ObjName" type="Label" parent="Content"]
+z_index = 10
+z_as_relative = false
+layout_mode = 1
+offset_left = 130.0
+offset_top = 5.0
+offset_right = 530.0
+offset_bottom = 47.0
+text = "OBJECT_NAME"
+label_settings = SubResource("LabelSettings_hbhbq")
+
+[node name="ObjCost" type="Label" parent="Content"]
+z_index = 10
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -102.0
+offset_top = 5.0
+offset_right = -5.0
+offset_bottom = 47.0
+grow_horizontal = 0
+text = "####C"
+label_settings = SubResource("LabelSettings_hbhbq")
+horizontal_alignment = 2
+
+[node name="ObjImg" type="TextureRect" parent="Content"]
+z_index = 5
+z_as_relative = false
+layout_mode = 1
+offset_right = 125.0
+offset_bottom = 125.0
+mouse_filter = 2
+texture = ExtResource("1_t7q2x")
+expand_mode = 2
+stretch_mode = 5
+
+[node name="Button" type="Button" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/focus = SubResource("StyleBoxEmpty_r7k4f")
+theme_override_styles/disabled = SubResource("StyleBoxEmpty_qgljl")
+theme_override_styles/hover_pressed = SubResource("StyleBoxEmpty_cqioo")
+theme_override_styles/hover = SubResource("StyleBoxEmpty_vxlwv")
+theme_override_styles/pressed = SubResource("StyleBoxEmpty_6dfh3")
+theme_override_styles/normal = SubResource("StyleBoxEmpty_gkg40")
+shortcut_feedback = false
+shortcut_in_tooltip = false

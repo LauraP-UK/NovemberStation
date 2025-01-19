@@ -1,0 +1,146 @@
+[gd_scene load_steps=4 format=3 uid="uid://dw8v1c4nt2tdt"]
+
+[ext_resource type="Texture2D" uid="uid://cnafjpoh1lxps" path="res://Main/Textures/Sandbox/Checkerboard1.png" id="1_s6xek"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_f31vc"]
+font_size = 42
+outline_size = 20
+outline_color = Color(0, 0, 0, 1)
+
+[sub_resource type="LabelSettings" id="LabelSettings_odhqh"]
+font_size = 10
+outline_size = 10
+outline_color = Color(0, 0, 0, 1)
+
+[node name="Control" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+mouse_filter = 2
+
+[node name="Background" type="Control" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="BackgroundTexture" type="TextureRect" parent="Background"]
+texture_filter = 1
+layout_mode = 1
+anchors_preset = -1
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 240.0
+offset_top = 200.0
+offset_right = -240.0
+offset_bottom = -150.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+texture = ExtResource("1_s6xek")
+expand_mode = 3
+stretch_mode = 1
+
+[node name="BackgroundNinePatch" type="NinePatchRect" parent="Background"]
+layout_mode = 1
+anchors_preset = -1
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 240.0
+offset_top = 200.0
+offset_right = -240.0
+offset_bottom = -150.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Content" type="Control" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="CenterContainer" type="CenterContainer" parent="Content"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="Control" type="Control" parent="Content/CenterContainer"]
+layout_mode = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Content/CenterContainer/Control"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -200.0
+offset_top = -100.0
+offset_right = 200.0
+offset_bottom = 127.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Info" type="Control" parent="Content/CenterContainer/Control/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+mouse_filter = 2
+
+[node name="InfoList" type="VBoxContainer" parent="Content/CenterContainer/Control/VBoxContainer/Info"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Title" type="Label" parent="Content/CenterContainer/Control/VBoxContainer/Info/InfoList"]
+layout_mode = 2
+text = "TITLE GOES HERE"
+label_settings = SubResource("LabelSettings_f31vc")
+horizontal_alignment = 1
+
+[node name="DecriptionControl" type="Control" parent="Content/CenterContainer/Control/VBoxContainer/Info/InfoList"]
+layout_mode = 2
+
+[node name="Description" type="Label" parent="Content/CenterContainer/Control/VBoxContainer/Info/InfoList/DecriptionControl"]
+layout_mode = 2
+offset_top = 3.0
+offset_right = 400.0
+offset_bottom = 123.0
+text = "DESCRIPTION GOES HERE"
+label_settings = SubResource("LabelSettings_odhqh")
+
+[node name="Buttons" type="Control" parent="Content/CenterContainer/Control/VBoxContainer"]
+layout_mode = 2
+mouse_filter = 2
+
+[node name="ButtonsList" type="VBoxContainer" parent="Content/CenterContainer/Control/VBoxContainer/Buttons"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Accept_btn" type="Button" parent="Content/CenterContainer/Control/VBoxContainer/Buttons/ButtonsList"]
+layout_mode = 2
+text = "ACCEPT"
+
+[node name="Decline_btn" type="Button" parent="Content/CenterContainer/Control/VBoxContainer/Buttons/ButtonsList"]
+layout_mode = 2
+text = "DECLINE"

@@ -1,8 +1,9 @@
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 
-public class SmartDictionary<TKey, TValue> : Dictionary<TKey, TValue> {
+public class SmartDictionary<TKey, TValue> : ConcurrentDictionary<TKey, TValue> {
     
     public SmartDictionary() { }
     public SmartDictionary(IDictionary<TKey, TValue> dictionary) : base(dictionary) { }
@@ -12,7 +13,7 @@ public class SmartDictionary<TKey, TValue> : Dictionary<TKey, TValue> {
         if (ContainsKey(key))
             this[key] = value;
         else
-            base.Add(key, value);
+            AddOrUpdate(key, value, (_, _) => value);
     }
 
     public void Merge(IDictionary<TKey, TValue> other, bool overwrite = true) {
@@ -70,4 +71,6 @@ public class SmartDictionary<TKey, TValue> : Dictionary<TKey, TValue> {
         if (predicate == null) throw new ArgumentNullException(nameof(predicate));
         foreach (KeyValuePair<TKey, TValue> pair in this.Where(predicate).ToList()) Remove(pair.Key);
     }
+    
+    public bool Remove(TKey key) => TryRemove(key, out TValue _);
 }

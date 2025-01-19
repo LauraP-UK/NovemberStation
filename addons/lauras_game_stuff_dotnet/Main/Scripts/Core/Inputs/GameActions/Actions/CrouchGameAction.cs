@@ -21,7 +21,7 @@ public class CrouchGameAction : GameActionBase {
     }
 
     private void Fire() {
-        ActorCrouchEvent crouchEvent = new(TestScript.I().GetPlayer());
+        ActorCrouchEvent crouchEvent = new(GameManager.I().GetPlayer());
         crouchEvent.SetStartCrouch(IsKeyPressed());
         crouchEvent.Fire();
     }

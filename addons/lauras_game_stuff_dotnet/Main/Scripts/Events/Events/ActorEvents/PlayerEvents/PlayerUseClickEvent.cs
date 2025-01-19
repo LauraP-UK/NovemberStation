@@ -7,7 +7,7 @@ public class PlayerUseClickEvent : ActorEventBase {
     private readonly MouseClickEvent _eventInfo;
     
     public PlayerUseClickEvent(MouseButton mouseButton, bool pressed, Vector2 position) {
-        SetActor(TestScript.I().GetPlayer());
+        SetActor(GameManager.I().GetPlayer());
         _eventInfo = new MouseClickEvent(mouseButton, pressed, position);
     }
     

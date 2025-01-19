@@ -59,5 +59,5 @@ public static class Raycast {
         return raycastResult;
     }
     
-    private static PhysicsDirectSpaceState3D GetWorld() => PhysicsServer3D.SpaceGetDirectState(TestScript.I().GetWorldRid());
+    private static PhysicsDirectSpaceState3D GetWorld() => PhysicsServer3D.SpaceGetDirectState(GameManager.I().GetWorldRid());
 }

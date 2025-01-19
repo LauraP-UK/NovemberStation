@@ -27,6 +27,29 @@ project/assembly_name="NovemberStation"
 
 enabled=PackedStringArray("res://addons/debug_drawing/plugin.cfg")
 
+[input]
+
+ui_accept={
+"deadzone": 0.5,
+"events": []
+}
+ui_select={
+"deadzone": 0.5,
+"events": []
+}
+ui_cancel={
+"deadzone": 0.5,
+"events": []
+}
+ui_focus_next={
+"deadzone": 0.5,
+"events": []
+}
+ui_focus_prev={
+"deadzone": 0.5,
+"events": []
+}
+
 [physics]
 
 3d/default_gravity=12.0

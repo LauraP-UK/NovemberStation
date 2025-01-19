@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using Godot;
 
-public class GameAction {
+public static class GameAction {
     public enum Action {
         MOVE_FORWARD,
         MOVE_BACKWARD,
@@ -15,9 +15,6 @@ public class GameAction {
         QUIT,
         NONE
     }
-    
-    private static GameAction _instance;
-    private static MovementActionTracker _movementActionTracker = new();
     
     public static readonly GameActionBase MOVE_FORWARD = new MovementGameAction(Action.MOVE_FORWARD, Vector3.Forward);
     public static readonly GameActionBase MOVE_BACKWARD = new MovementGameAction(Action.MOVE_BACKWARD, Vector3.Back);
@@ -42,15 +39,7 @@ public class GameAction {
         QUIT
     };
     
-    public GameAction() {
-        if (_instance != null) throw new InvalidOperationException("ERROR: GameAction.<init> : GameAction is a singleton and cannot be instantiated more than once.");
-        _instance = this;
-    }
-    
-    public static GameAction I() {
-        if (_instance == null) throw new InvalidOperationException("ERROR: GameAction.GetInstance : GameAction has not been instantiated yet.");
-        return _instance;
-    }
+    public static void Init() => GetAll(); // Dummy method to ensure static constructor is called
 
     public static List<GameActionBase> GetAll() => new(_all);
     public static GameActionBase GetDefault() => NONE;

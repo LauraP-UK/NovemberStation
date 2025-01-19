@@ -1,5 +1,6 @@
 using System;
 using Godot;
+using NovemberStation.Main.Scripts.Items;
 
 public class PlayerController : ControllerBase {
     private const float HOLD_DISTANCE = 2.1f, HOLD_SMOOTHNESS = 15.0f, ROTATION_SMOOTHNESS = 10.0f;
@@ -23,13 +24,23 @@ public class PlayerController : ControllerBase {
 
     /* --- ---  LISTENERS  --- --- */
     [EventListener]
+    private void OnOpenShop(KeyPressEvent ev, Key key) {
+        if (IsLocked()) return;
+        if (key != Key.V) return;
+        
+        new ShopMenu().Open();
+    }
+    
+    [EventListener]
     private void OnCrouchToggle(KeyPressEvent ev, Key key) {
+        if (IsLocked()) return;
         if (key != Key.C) return;
         _toggleCrouch = !_toggleCrouch;
     }
     
     [EventListener]
     private void OnAltHeld(KeyPressEvent ev, Key key) {
+        if (IsLocked()) return;
         if (key != Key.Alt || _altAction) return;
         _altAction = true;
     }
@@ -42,6 +53,7 @@ public class PlayerController : ControllerBase {
 
     [EventListener]
     private void OnShiftHeld(KeyPressEvent ev, Key key) {
+        if (IsLocked()) return;
         if (key != Key.Shift || _sprinting) return;
         _sprinting = true;
     }
@@ -66,14 +78,14 @@ public class PlayerController : ControllerBase {
 
     [EventListener]
     private void OnMouseScroll(MouseClickEvent ev, Vector2 position) {
-        if (_heldObject == null) return;
+        if (_heldObject == null || IsLocked()) return;
         MouseButton button = ev.GetMouseButton();
         if (button != MouseButton.WheelDown && button != MouseButton.WheelUp) return;
         _holdDistanceModifier = Mathf.Clamp(_holdDistanceModifier + (button == MouseButton.WheelDown ? -0.05f : 0.05f), 0.5f, 1.5f);
         
     }
 
-    [EventListener(PriorityLevels.HIGHEST)]
+    [EventListener(PriorityLevels.NORMAL)]
     private void OnPickUpItem(ActorPickUpEvent ev, ActorBase actor) {
         if (!actor.Equals(GetActor())) return;
         RigidBody3D hitBody = ev.GetItem();
@@ -87,7 +99,7 @@ public class PlayerController : ControllerBase {
         PickupObject(hitBody);
     }
 
-    [EventListener(PriorityLevels.HIGHEST)]
+    [EventListener(PriorityLevels.NORMAL)]
     private void OnPlayerUseClick(PlayerUseClickEvent ev, ActorBase actor) {
         if (!actor.Equals(GetActor()) || !ev.IsPressed() || _heldObject == null) return;
         Vector3 tossDirection = -((Player)GetActor()).GetCamera().GlobalTransform.Basis.Z * 20.0f; // Big push in the direction
