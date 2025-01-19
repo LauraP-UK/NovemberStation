@@ -25,8 +25,7 @@ public class ItemType {
     public Texture2D GetImage() => ResourceLoader.Load<Texture2D>(GetImagePath());
     
     public RigidBody3D CreateInstance() {
-        PackedScene packedScene = ResourceLoader.Load<PackedScene>(GetModelPath());
-        RigidBody3D rigidBody3D = packedScene.Instantiate<RigidBody3D>();
+        RigidBody3D rigidBody3D = Loader.SafeInstantiate<RigidBody3D>(GetModelPath());
         rigidBody3D.SetCollisionLayerValue(3, true);
         rigidBody3D.SetCollisionLayerValue(4, true);
         rigidBody3D.SetCollisionMaskValue(1, true);
@@ -41,7 +40,7 @@ public class ItemType {
         ShopItemDisplayButton item = new(this);
         item.SetName(GetItemName());
         item.SetCost(GetItemCost());
-        item.SetHeight(125);
+        item.SetHeight(100);
         item.SetTexture(GetImage());
         item.OnPressed(elem => GD.Print($"INFO: PlayerController.OnOpenShop() : Button pressed! Name: {GetItemName()}  Cost: {GetItemCost()}"));
         item.GetButton().OnButtonDown(btn => item.VisualPress(true));

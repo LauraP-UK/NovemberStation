@@ -19,8 +19,9 @@ public partial class TestScript : Node {
         GD.Print("Start");
         
         EventManager.HookWindowResize(GetViewport());
+        UIManager.SetUILayer();
+        
         GameManager gameManager = GameManager.I();
-        gameManager.SetUILayer();
         gameManager.SetSceneObjects(GetTree().Root.GetNode<Node3D>("Main/SceneObjects"));
 
         Input.MouseMode = Input.MouseModeEnum.Captured;

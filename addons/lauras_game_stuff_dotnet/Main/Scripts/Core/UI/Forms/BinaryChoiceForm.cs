@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Godot;
+using NovemberStation.addons.lauras_game_stuff_dotnet.Main.Scripts.Core.UI.FormElements.Containers;
 
 public class BinaryChoiceForm : FormBase {
     
@@ -44,14 +45,14 @@ public class BinaryChoiceForm : FormBase {
         _backgroundImg = new TextureRectElement(background);
         _backgroundNinePatch = new NinePatchRectElement(backgroundNinePatch);
         
-        _menuLayout = new ControlLayout(_menu, _ => {
-            foreach (IFormElement element in GetElements<IFormElement>())
-                element.SetTopLevelLayout(_menuLayout);
+        _menuElement = new ControlElement(_menu, _ => {
+            GD.Print($"BinaryChoiceForm() : {_menu.Name} running OnReady");
+            foreach (IFormObject element in GetAllElements())
+                element.SetTopLevelLayout(_menuElement);
         });
-        _menuLayout.Build();
     }
     
-    protected override List<IFormObject> getAllElements() => new(){ _title, _label, _upperButton, _lowerButton, _backgroundImg, _backgroundNinePatch };
+    protected override List<IFormObject> GetAllElements() => new(){ _title, _label, _upperButton, _lowerButton, _backgroundImg, _backgroundNinePatch };
     public List<ButtonElement> GetButtons() => new(){ _upperButton, _lowerButton };
     
     public ButtonElement GetUpperButton() => _upperButton;
@@ -140,6 +141,8 @@ public class BinaryChoiceForm : FormBase {
             }
         }
     }
+
+    protected override void OnDestroy() { }
 
     protected override void KeyboardBehaviour(Key key, bool isPressed) {
         if (_keyboardBehaviour != null) {

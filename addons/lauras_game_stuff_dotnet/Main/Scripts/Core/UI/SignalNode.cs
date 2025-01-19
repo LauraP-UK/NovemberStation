@@ -3,22 +3,25 @@ using Godot;
 using Godot.Collections;
 using Array = Godot.Collections.Array;
 
-public partial class ActionNode : Node {
+public partial class SignalNode : Node {
     private readonly string _signalName;
     private readonly Action<IFormObject, object[]> _callback;
-    private readonly IFormObject _formElement;
+    private readonly IFormObject _formObject;
 
-    public ActionNode(string signalName, Action<IFormObject, object[]> callback, IFormObject formElement) {
+    public SignalNode(string signalName, Action<IFormObject, object[]> callback, IFormObject formObject) {
         _signalName = signalName;
         _callback = callback;
-        _formElement = formElement;
+        _formObject = formObject;
     }
 
-    public override void _Ready() => GetControlNode().Connect(_signalName, GetCallable());
+    public override void _Ready() {
+        GD.Print($"Connecting signal {_signalName} on {_formObject.GetNode().Name}");
+        GetControlNode().Connect(_signalName, GetCallable());
+    }
 
     public void RunActionNoArgs() {
         try {
-            _callback?.Invoke(_formElement, System.Array.Empty<object>());
+            _callback?.Invoke(_formObject, System.Array.Empty<object>());
         }
         catch (Exception e) {
             GD.PrintErr($"Error in ActionNode callback for {_signalName}: {e.Message}\n{e.StackTrace}");
@@ -27,7 +30,7 @@ public partial class ActionNode : Node {
 
     public void RunActionArgs(params object[] args) {
         try {
-            _callback?.Invoke(_formElement, args);
+            _callback?.Invoke(_formObject, args);
         }
         catch (Exception e) {
             GD.PrintErr($"Error in ActionNode callback for {_signalName}: {e.Message}\n{e.StackTrace}");
@@ -51,5 +54,5 @@ public partial class ActionNode : Node {
         return paramsCount == 0 ? Callable.From(RunActionNoArgs) : Callable.From((Action<object[]>)RunActionArgs);
     }
 
-    private Control GetControlNode() => _formElement.GetNode();
+    private Control GetControlNode() => _formObject.GetNode();
 }

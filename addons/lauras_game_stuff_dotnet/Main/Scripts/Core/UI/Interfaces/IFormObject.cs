@@ -1,7 +1,8 @@
 using Godot;
 
 public interface IFormObject {
-    public ILayoutElement GetTopLevelLayout();
-    public void SetTopLevelLayout(ILayoutElement layout);
+    public IFormObject GetTopLevelLayout();
+    public void SetTopLevelLayout(IFormObject layout);
     public Control GetNode();
+    public void Destroy();
 }

@@ -2,11 +2,12 @@
 using System;
 using System.Collections.Generic;
 using Godot;
+using NovemberStation.addons.lauras_game_stuff_dotnet.Main.Scripts.Core.UI.FormElements.Containers;
 
 public class ScrollDisplayList : FormBase {
     
-    private readonly VBoxContainerLayout _displayList;
-    private readonly ScrollContainerLayout _scrollContainer;
+    private readonly VBoxContainerElement _displayList;
+    private readonly ScrollContainerElement _scrollContainer;
     private Action<IFormObject> _onSelectElement;
     private Action<Key, ScrollDisplayList, bool> _keyboardBehaviour;
     private bool _keyboardEnabled = false;
@@ -22,59 +23,31 @@ public class ScrollDisplayList : FormBase {
         
         _keyboardBehaviour = keyboardBehaviour;
         
-        _displayList = new VBoxContainerLayout(displayList);
-        _scrollContainer = new ScrollContainerLayout(scrollContainer);
+        _displayList = new VBoxContainerElement(displayList);
+        _scrollContainer = new ScrollContainerElement(scrollContainer);
         
-        _menuLayout = new ControlLayout(_menu, _ => {
-            foreach (IFormObject element in getAllElements()) {
-                switch (element) {
-                    case IFormElement formElement: {
-                        formElement.SetTopLevelLayout(_menuLayout);
-                        break;
-                    }
-                    case ILayoutElement layoutElement: {
-                        layoutElement.SetTopLevelLayout(_menuLayout);
-                        layoutElement.Build(_menuLayout, new HashSet<ILayoutElement>(), false);
-                        break;
-                    }
-                }
-            }
-            
-            foreach (IFormObject listObject in GetDisplayObjects()) {
-                switch (listObject) {
-                    case IFormElement formElement:
-                        formElement.SetTopLevelLayout(_menuLayout);
-                        break;
-                    case ILayoutElement layoutElement:
-                        layoutElement.SetTopLevelLayout(_menuLayout);
-                        layoutElement.Build(_menuLayout, new HashSet<ILayoutElement>(), false);
-                        break;
-                    case FormBase form:
-                        form.GetTopLevelLayout().Build(_menuLayout, new HashSet<ILayoutElement>(), false);
-                        break;
-                }
-            }
+        _menuElement = new ControlElement(_menu, _ => {
+            foreach (IFormObject element in GetAllElements()) element.SetTopLevelLayout(_menuElement);
+            foreach (IFormObject listObject in GetDisplayObjects()) listObject.SetTopLevelLayout(_menuElement);
         });
-        _menuLayout.Build();
     }
 
-    protected override List<IFormObject> getAllElements() => new() { _displayList, _scrollContainer };
+    protected override List<IFormObject> GetAllElements() => new() { _displayList, _scrollContainer };
     
-    public VBoxContainerLayout GetDisplayList() => _displayList;
-    public ScrollContainerLayout GetScrollContainer() => _scrollContainer;
+    public VBoxContainerElement GetDisplayList() => _displayList;
+    public ScrollContainerElement GetScrollContainer() => _scrollContainer;
     public List<IFormObject> GetDisplayObjects() => _displayList.GetDisplayObjects();
     public void AddElement(IFormObject element) => _displayList.AddChild(element);
     public void SetOnSelectElement<T>(Action<T> onSelectElement) where T : IFormObject => _onSelectElement = obj => onSelectElement((T) obj);
 
     public Action<IFormObject> GetOnSelectElement() => _onSelectElement;
     
-    public void SetFollowFocus(bool value) => GetScrollContainer().GetContainer().SetFollowFocus(value);
+    public void SetFollowFocus(bool value) => GetScrollContainer().GetElement().SetFollowFocus(value);
     
     public void SetKeyboardEnabled(bool value) => _keyboardEnabled = value;
     public bool IsKeyboardEnabled() => _keyboardEnabled;
 
     protected override void OnDestroy() {
-        UnregisterListeners();
         foreach (IFormObject displayObject in GetDisplayObjects()) {
             if (displayObject is FormBase form) {
                 form.Destroy();

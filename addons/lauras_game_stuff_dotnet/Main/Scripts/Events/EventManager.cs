@@ -24,8 +24,6 @@ public class EventManager {
         }));
     }
     
-    
-
     public static EventManager I() {
         if (instance == null) throw new InvalidOperationException("ERROR: EventManager.I() : EventManager has not been initialised, make sure to create it first!");
         return instance;
@@ -50,6 +48,8 @@ public class EventManager {
             I().RegisterListener(eventType, callback, priority, target);
         }
     }
+    
+    public static void UnregisterListeners(object owner) => I().UnregisterByOwner(owner);
 
     public void RegisterListener(Type eventType, Delegate callback, int priority, object owner = null) {
         if (!_listeners.ContainsKey(eventType)) _listeners[eventType] = new SmartSet<EventActionHolder>();

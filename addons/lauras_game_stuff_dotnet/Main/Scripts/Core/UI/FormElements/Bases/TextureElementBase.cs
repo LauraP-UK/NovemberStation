@@ -3,16 +3,18 @@ using System;
 using Godot;
 
 public abstract class TextureElementBase<T> : FormElement<T> where T : Control {
+    
     public TextureElementBase(T element = null, Action<T> onReady = null) : base(element, onReady) { }
     public TextureElementBase(string path, Action<T> onReady = null) : base(path, onReady) { }
+
     public void SetTexture(Texture2D texture) {
         T element = GetElement();
         switch (element) {
             case TextureRect textureRect:
-                textureRect.Texture = texture;
+                textureRect.SetTexture(texture);
                 break;
             case NinePatchRect ninePatchRect:
-                ninePatchRect.Texture = texture;
+                ninePatchRect.SetTexture(texture);
                 break;
             default:
                 throw new NotSupportedException($"TextureElementBase does not support {element.GetType().Name}");

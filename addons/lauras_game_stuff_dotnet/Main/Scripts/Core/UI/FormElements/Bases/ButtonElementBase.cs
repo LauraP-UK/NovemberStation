@@ -15,4 +15,9 @@ public abstract class ButtonElementBase<T> : FormElement<T> where T : BaseButton
     public void ForceButtonDown() => GetElement().EmitSignal(BaseButton.SignalName.ButtonDown);
     public void ForceButtonUp() => GetElement().EmitSignal(BaseButton.SignalName.ButtonUp);
     public void ForceToggled(bool pressed) => GetElement().EmitSignal(BaseButton.SignalName.Toggled, pressed);
+    
+    public void GrabFocus() => GetElement().GrabFocus();
+    public void ReleaseFocus() => GetElement().ReleaseFocus();
+    public bool HasFocus() => GetElement().HasFocus();
+    public Control GetFocusableElement() => GetElement();
 }
