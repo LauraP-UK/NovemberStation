@@ -31,6 +31,23 @@ public partial class TestScript : Node {
         player.SetPosition(new Vector3(5f, 0.2f, 0f), new Vector3(0.0f, 90.0f, 0.0f));
         gameManager.SetPlayer(player);
 
+        Node3D pcNode = GetTree().Root.GetNode<Node3D>("Main/PC");
+        SubViewport subViewport = pcNode.GetNode<SubViewport>("Screen/ScreenViewport");
+        ShopMenu shopMenu = new();
+        shopMenu.ModifyForm(form => {
+            form.SetCaptureInput(false);
+            ScrollDisplayList display = form.GetScrollDisplay();
+            display.SetKeyboardEnabled(false);
+            display.SetCaptureInput(false);
+            EventManager.UnregisterListeners(display);
+            EventManager.UnregisterListeners(form);
+            display.GetDisplayObjects().ForEach(EventManager.UnregisterListeners);
+        });
+        shopMenu.SendToViewport(subViewport);
+        
+
+        GD.Print($"SubViewport found? {subViewport != null}");
+
         foreach (Node child in gameManager.GetSceneObjects().GetChildren()) {
             if (child is not RigidBody3D obj) continue;
             _dynamicObjects.Add(obj, obj.GlobalPosition);

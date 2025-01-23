@@ -6,8 +6,10 @@ using NovemberStation.addons.lauras_game_stuff_dotnet.Main.Scripts.Core.UI.FormE
 public abstract class FormBase : IFormObject {
     protected readonly Control _menu;
     protected ControlElement _menuElement;
+    protected IFormObject _topLevelLayout;
 
     private readonly SignalNode _onReadyAction;
+    protected bool _captureInput = true;
 
     protected FormBase(string formName, string formPath) {
         _menu = Loader.SafeInstantiate<Control>(formPath, true);
@@ -52,16 +54,21 @@ public abstract class FormBase : IFormObject {
     
     [EventListener(PriorityLevels.HIGHEST)]
     protected void OnKeyPress(KeyPressEvent ev, Key key) {
-        if (CaptureInput()) ev.Capture();
+        if (GetTopLevelLayout().CaptureInput()) ev.Capture();
         KeyboardBehaviour(key, true);
     }
 
     [EventListener(PriorityLevels.TERMINUS)]
     protected void OnKeyRelease(KeyReleaseEvent ev, Key key) => KeyboardBehaviour(key, false);
 
-    public IFormObject GetTopLevelLayout() => _menuElement;
-    public void SetTopLevelLayout(IFormObject layout) {}
+    public IFormObject GetTopLevelLayout() {
+        if (_topLevelLayout == null) return this;
+        return Equals(_topLevelLayout) ? this : _topLevelLayout;
+    }
+
+    public void SetTopLevelLayout(IFormObject layout) => _topLevelLayout = layout;
+    public void SetCaptureInput(bool value) => _captureInput = value;
+    public bool CaptureInput() => GetTopLevelLayout().Equals(this) ? _captureInput : GetTopLevelLayout().CaptureInput();
     public Control GetNode() => _menu;
     protected bool IsValid() => GodotObject.IsInstanceValid(_menu) && !_menu.IsQueuedForDeletion();
-    protected abstract bool CaptureInput();
 }

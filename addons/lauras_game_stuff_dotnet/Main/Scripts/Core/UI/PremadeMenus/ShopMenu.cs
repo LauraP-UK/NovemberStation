@@ -3,13 +3,14 @@ using Godot;
 using NovemberStation.addons.lauras_game_stuff_dotnet.Main.Scripts.Core.UI;
 using NovemberStation.Main.Scripts.Items;
 
-public class ShopMenu : PreMadeMenu {
+public class ShopMenu : PreMadeMenu<TestDisplayForm> {
     protected override FormBase Build() {
         GameManager gameManager = GameManager.I();
 
         TestDisplayForm testDisplayForm = new(GetFormName());
-        testDisplayForm.GetScrollDisplay().SetKeyboardEnabled(true);
-        testDisplayForm.GetScrollDisplay().SetOnSelectElement<ShopItemDisplayButton>(elem => elem.GetButton().ForcePressed());
+        ScrollDisplayList scrollDisplay = testDisplayForm.GetScrollDisplay();
+        scrollDisplay.SetKeyboardEnabled(true);
+        scrollDisplay.SetOnSelectElement<ShopItemDisplayButton>(elem => elem.GetButton().ForcePressed());
         testDisplayForm.SetOnReady(form => {
             Items.GetItemButtons().ForEach(btn => {
                 btn.OnPressed(btn => {
@@ -20,17 +21,17 @@ public class ShopMenu : PreMadeMenu {
                     rigidBody3D.SetPosition(spawn);
                     rigidBody3D.SetRotation(gameManager.GetPlayer().GetModel().GetRotation());
                     
-                    UIManager.CloseMenu(GetFormName());
+                    Close();
                 });
                 btn.SetTopLevelLayout(form.GetTopLevelLayout());
                 form.GetScrollDisplay().AddElement(btn);
             });
             ShopItemDisplayButton closeButton = Items.GetCloseButton();
             closeButton.SetTopLevelLayout(form.GetTopLevelLayout());
-            closeButton.OnPressed(btn => UIManager.CloseMenu(GetFormName()));
+            closeButton.OnPressed(_ => Close());
             form.GetScrollDisplay().AddElement(closeButton);
         });
-        testDisplayForm.GetScrollDisplay().SetKeyboardBehaviour((pressedKey, form, isPressed) => {
+        scrollDisplay.SetKeyboardBehaviour((pressedKey, form, isPressed) => {
             switch (pressedKey) {
                 case Key.W: {
                     if (!isPressed) return;
@@ -62,7 +63,7 @@ public class ShopMenu : PreMadeMenu {
                     break;
                 }
                 case Key.Escape: {
-                    UIManager.CloseMenu(GetFormName());
+                    Close();
                     break;
                 }
             }

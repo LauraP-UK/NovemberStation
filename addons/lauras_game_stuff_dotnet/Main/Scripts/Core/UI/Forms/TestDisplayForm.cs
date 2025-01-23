@@ -17,6 +17,8 @@ public class TestDisplayForm : FormBase {
     public TestDisplayForm(string formName) : base(formName, FORM_PATH) {
         Control container = FindNode<Control>(DISPLAY_CONTAINER);
         
+        SetTopLevelLayout(this);
+        
         _container = new ControlElement(container);
         _scrollDisplay = new ScrollDisplayList("ScrollDisplayList");
         
@@ -26,6 +28,9 @@ public class TestDisplayForm : FormBase {
             _container?.GetElement().AddChild(_scrollDisplay.GetMenu());
             _onReady?.Invoke(this);
         });
+        
+        _scrollDisplay.SetTopLevelLayout(GetTopLevelLayout());
+        _captureInput = false;
     }
     protected override List<IFormObject> GetAllElements() => new() {_container, _scrollDisplay};
     public ScrollDisplayList GetScrollDisplay() => _scrollDisplay;
@@ -36,5 +41,4 @@ public class TestDisplayForm : FormBase {
         foreach (IFormObject displayObject in _scrollDisplay.GetDisplayObjects())
             ((ShopItemDisplayButton) displayObject).Destroy();
     }
-    protected override bool CaptureInput() => true;
 }

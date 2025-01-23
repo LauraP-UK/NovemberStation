@@ -1,4 +1,4 @@
-[gd_scene load_steps=25 format=3 uid="uid://bea3c2ji0la15"]
+[gd_scene load_steps=26 format=3 uid="uid://bea3c2ji0la15"]
 
 [ext_resource type="Script" path="res://Main/TestScript.cs" id="1_htyov"]
 [ext_resource type="PackedScene" uid="uid://cqvhghgw72hrv" path="res://Main/Prefabs/Sandbox/Geometry/PhysicsCube.tscn" id="2_y3p7f"]
@@ -6,6 +6,7 @@
 [ext_resource type="Texture2D" uid="uid://cnafjpoh1lxps" path="res://Main/Textures/Sandbox/Checkerboard1.png" id="3_foc71"]
 [ext_resource type="PackedScene" uid="uid://davr0xngcadpq" path="res://Main/Prefabs/Sandbox/GasCanTest.tscn" id="5_y86oe"]
 [ext_resource type="Texture2D" uid="uid://c5q1hp1s028lo" path="res://Main/Textures/Sandbox/Noise1.png" id="6_eukhs"]
+[ext_resource type="PackedScene" uid="uid://vcuoeoep6iag" path="res://Main/Prefabs/StaticObjects/PCTest.tscn" id="7_0u05g"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_vlb6p"]
 sky_horizon_color = Color(0.64625, 0.65575, 0.67075, 1)
@@ -93,17 +94,17 @@ process_mode = 1
 process_mode = 1
 
 [node name="Desk" parent="SceneObjects" instance=ExtResource("3_dkfcn")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.08867, 4.5054)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.521518, 4.5054)
 collision_layer = 12
 collision_mask = 15
 
 [node name="Desk2" parent="SceneObjects" instance=ExtResource("3_dkfcn")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.37726, 2.08867, 4.49939)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.37726, 0.620721, 4.49939)
 collision_layer = 12
 collision_mask = 15
 
 [node name="GasCan" parent="SceneObjects" instance=ExtResource("5_y86oe")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.78371, 1.51406, -4.61508)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.78371, 0.533156, -4.61508)
 collision_layer = 12
 collision_mask = 15
 mass = 5.0
@@ -115,12 +116,12 @@ collision_mask = 15
 mass = 20.0
 
 [node name="Cube 2" parent="SceneObjects" instance=ExtResource("2_y3p7f")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.52183, 4.5, -0.420611)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.52183, 0.649608, -0.420611)
 collision_layer = 12
 collision_mask = 15
 
 [node name="Cube 3" parent="SceneObjects" instance=ExtResource("2_y3p7f")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.43857, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.56345, 0)
 collision_layer = 12
 collision_mask = 15
 mass = 10.0
@@ -276,3 +277,6 @@ shape = SubResource("BoxShape3D_wmdie")
 
 [node name="UILayer" type="CanvasLayer" parent="."]
 process_mode = 3
+
+[node name="PC" parent="." instance=ExtResource("7_0u05g")]
+transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, 13.2965, 0.0417014, -3.90072)

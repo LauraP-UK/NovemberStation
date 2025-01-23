@@ -27,8 +27,8 @@ public class ScrollDisplayList : FormBase {
         _scrollContainer = new ScrollContainerElement(scrollContainer);
         
         _menuElement = new ControlElement(_menu, _ => {
-            foreach (IFormObject element in GetAllElements()) element.SetTopLevelLayout(_menuElement);
-            foreach (IFormObject listObject in GetDisplayObjects()) listObject.SetTopLevelLayout(_menuElement);
+            foreach (IFormObject element in GetAllElements()) element.SetTopLevelLayout(GetTopLevelLayout());
+            foreach (IFormObject listObject in GetDisplayObjects()) listObject.SetTopLevelLayout(GetTopLevelLayout());
         });
     }
 
@@ -37,7 +37,11 @@ public class ScrollDisplayList : FormBase {
     public VBoxContainerElement GetDisplayList() => _displayList;
     public ScrollContainerElement GetScrollContainer() => _scrollContainer;
     public List<IFormObject> GetDisplayObjects() => _displayList.GetDisplayObjects();
-    public void AddElement(IFormObject element) => _displayList.AddChild(element);
+    public void AddElement(IFormObject element) {
+        _displayList.AddChild(element);
+        element.SetTopLevelLayout(GetTopLevelLayout());
+    }
+
     public void SetOnSelectElement<T>(Action<T> onSelectElement) where T : IFormObject => _onSelectElement = obj => onSelectElement((T) obj);
 
     public Action<IFormObject> GetOnSelectElement() => _onSelectElement;
@@ -134,5 +138,4 @@ public class ScrollDisplayList : FormBase {
         }
         DefaultKeyboardBehaviour(key, this, isPressed);
     }
-    protected override bool CaptureInput() => true;
 }

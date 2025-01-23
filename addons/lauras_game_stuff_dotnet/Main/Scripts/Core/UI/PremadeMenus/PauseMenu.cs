@@ -3,7 +3,7 @@ using Godot;
 
 namespace NovemberStation.addons.lauras_game_stuff_dotnet.Main.Scripts.Core.UI.PremadeMenus;
 
-public class PauseMenu : PreMadeMenu {
+public class PauseMenu : PreMadeMenu<BinaryChoiceForm> {
     
     protected override FormBase Build() {
         BinaryChoiceForm pauseMenu = new(GetFormName());
@@ -17,7 +17,7 @@ public class PauseMenu : PreMadeMenu {
         
         pauseMenu.OnUpperButton(_ => UIManager.CloseMenu(GetFormName()));
         pauseMenu.OnLowerButton(_ => {
-            UIManager.CloseMenu(GetFormName());
+            Close();
             GameManager.I().Quit();
         });
         

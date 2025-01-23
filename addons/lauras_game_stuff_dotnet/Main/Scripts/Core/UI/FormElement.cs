@@ -29,6 +29,7 @@ public abstract class FormElement<T> : IFormElement where T : Control {
     Control IFormElement.GetElement() => GetElement();
     public IFormObject GetTopLevelLayout() => _topLevelLayout;
     public void SetTopLevelLayout(IFormObject layout) => _topLevelLayout = layout;
+    public bool CaptureInput() => true;
     public Control GetNode() => GetElement();
 
     /* --- --- SETUP MANAGEMENT --- --- */

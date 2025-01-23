@@ -1,0 +1,62 @@
+[gd_scene load_steps=10 format=3 uid="uid://vcuoeoep6iag"]
+
+[ext_resource type="Texture2D" uid="uid://cnafjpoh1lxps" path="res://Main/Textures/Sandbox/Checkerboard1.png" id="1_jq0md"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_ef6v5"]
+size = Vector3(1, 2.49762, 1)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_rtgki"]
+albedo_texture = ExtResource("1_jq0md")
+
+[sub_resource type="BoxMesh" id="BoxMesh_oibqa"]
+size = Vector3(1, 2.5, 1)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_6clee"]
+albedo_color = Color(0.22, 0.22, 0.22, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_gm8kk"]
+size = Vector3(0.01, 1, 2)
+
+[sub_resource type="ViewportTexture" id="ViewportTexture_tvny1"]
+viewport_path = NodePath("Screen/ScreenViewport")
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_etj36"]
+resource_local_to_scene = true
+transparency = 1
+albedo_texture = SubResource("ViewportTexture_tvny1")
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_0gh07"]
+size = Vector2(2, 0.8)
+
+[node name="PC" type="Node3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
+
+[node name="Body" type="StaticBody3D" parent="."]
+collision_layer = 2
+collision_mask = 7
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Body"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.74881, 0)
+shape = SubResource("BoxShape3D_ef6v5")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Body"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.75, 0)
+material_override = SubResource("StandardMaterial3D_rtgki")
+mesh = SubResource("BoxMesh_oibqa")
+
+[node name="MeshInstance3D2" type="MeshInstance3D" parent="Body"]
+transform = Transform3D(0.8, 0, 0, 0, 0.8, 0, 0, 0, 0.8, 0.5, 1.5, 0)
+material_override = SubResource("StandardMaterial3D_6clee")
+mesh = SubResource("BoxMesh_gm8kk")
+
+[node name="Screen" type="MeshInstance3D" parent="."]
+transform = Transform3D(-4.37114e-08, 1, 0, 4.37114e-08, 1.91069e-15, -1, -1, -4.37114e-08, -4.37114e-08, 0.505, 1.5, 0)
+material_override = SubResource("StandardMaterial3D_etj36")
+mesh = SubResource("PlaneMesh_0gh07")
+
+[node name="ScreenViewport" type="SubViewport" parent="Screen"]
+transparent_bg = true
+size = Vector2i(1080, 640)
+
+[node name="Node3D" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.5, 1.5, 0)

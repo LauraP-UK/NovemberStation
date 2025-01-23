@@ -150,5 +150,4 @@ public class BinaryChoiceForm : FormBase {
         }
         DefaultKeyboardBehaviour(key, this, isPressed);
     }
-    protected override bool CaptureInput() => true;
 }
