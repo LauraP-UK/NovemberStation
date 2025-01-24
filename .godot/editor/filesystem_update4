@@ -11,3 +11,4 @@ res://Main/Prefabs/UI/GameElements/ShopItemDisplay.tscn
 res://Main/Prefabs/Sandbox/GasCanTest.tscn
 res://Main/Prefabs/UI/Forms/TestDisplayForm.tscn
 res://Main/Prefabs/StaticObjects/PCTest.tscn
+res://Main/Prefabs/UI/GameElements/ContextMenu.tscn
