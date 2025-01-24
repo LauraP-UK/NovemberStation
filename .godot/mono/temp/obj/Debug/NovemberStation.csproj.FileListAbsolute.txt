@@ -16,3 +16,21 @@ M:\Program Files (x86)\Godot\Projects\novemberstation\.godot\mono\temp\obj\Debug
 M:\Program Files (x86)\Godot\Projects\novemberstation\.godot\mono\temp\obj\Debug\NovemberStation.genruntimeconfig.cache
 M:\Program Files (x86)\Godot\Projects\novemberstation\.godot\mono\temp\obj\Debug\ref\NovemberStation.dll
 M:\Program Files (x86)\Godot\Projects\novemberstation\.godot\mono\temp\obj\Debug\NovemberStation.sourcelink.json
+C:\Users\robP3\RiderProjects\NovemberStation\.godot\mono\temp\bin\Debug\NovemberStation.deps.json
+C:\Users\robP3\RiderProjects\NovemberStation\.godot\mono\temp\bin\Debug\NovemberStation.runtimeconfig.json
+C:\Users\robP3\RiderProjects\NovemberStation\.godot\mono\temp\bin\Debug\NovemberStation.dll
+C:\Users\robP3\RiderProjects\NovemberStation\.godot\mono\temp\bin\Debug\NovemberStation.pdb
+C:\Users\robP3\RiderProjects\NovemberStation\.godot\mono\temp\bin\Debug\GodotSharp.dll
+C:\Users\robP3\RiderProjects\NovemberStation\.godot\mono\temp\bin\Debug\GodotSharpEditor.dll
+C:\Users\robP3\RiderProjects\NovemberStation\.godot\mono\temp\obj\Debug\NovemberStation.csproj.AssemblyReference.cache
+C:\Users\robP3\RiderProjects\NovemberStation\.godot\mono\temp\obj\Debug\NovemberStation.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\robP3\RiderProjects\NovemberStation\.godot\mono\temp\obj\Debug\NovemberStation.AssemblyInfoInputs.cache
+C:\Users\robP3\RiderProjects\NovemberStation\.godot\mono\temp\obj\Debug\NovemberStation.AssemblyInfo.cs
+C:\Users\robP3\RiderProjects\NovemberStation\.godot\mono\temp\obj\Debug\NovemberStation.csproj.CoreCompileInputs.cache
+C:\Users\robP3\RiderProjects\NovemberStation\.godot\mono\temp\obj\Debug\NovemberStation.sourcelink.json
+C:\Users\robP3\RiderProjects\NovemberStation\.godot\mono\temp\obj\Debug\NovemberStation.csproj.CopyComplete
+C:\Users\robP3\RiderProjects\NovemberStation\.godot\mono\temp\obj\Debug\NovemberStation.dll
+C:\Users\robP3\RiderProjects\NovemberStation\.godot\mono\temp\obj\Debug\refint\NovemberStation.dll
+C:\Users\robP3\RiderProjects\NovemberStation\.godot\mono\temp\obj\Debug\NovemberStation.pdb
+C:\Users\robP3\RiderProjects\NovemberStation\.godot\mono\temp\obj\Debug\NovemberStation.genruntimeconfig.cache
+C:\Users\robP3\RiderProjects\NovemberStation\.godot\mono\temp\obj\Debug\ref\NovemberStation.dll

@@ -1,8 +1,3 @@
-res://Main/Prefabs/Scenes/TestMainScene.tscn
-res://Main/Prefabs/StaticObjects/PCTest.tscn
-res://Main/Prefabs/UI/GameElements/ShopItemDisplay.tscn
-res://Main/Prefabs/Sandbox/GasCanTest.tscn
-res://Main/Prefabs/UI/Forms/TestDisplayForm.tscn
 res://addons/debug_drawing/DebugDraw.cs
 res://Main/TestScript.cs
 res://addons/debug_drawing/demo/DrawDemo.cs
@@ -11,3 +6,8 @@ res://addons/debug_drawing/DebugDrawingPlugin.cs
 res://addons/lauras_game_stuff_dotnet/Main/Scripts/Events/Events/ItemEvents/ItemEvent.cs
 res://addons/debug_drawing/control/DebugDock.cs
 res://addons/debug_drawing/demo/DemoDrawTarget.cs
+res://Main/Prefabs/Scenes/TestMainScene.tscn
+res://Main/Prefabs/UI/GameElements/ShopItemDisplay.tscn
+res://Main/Prefabs/Sandbox/GasCanTest.tscn
+res://Main/Prefabs/UI/Forms/TestDisplayForm.tscn
+res://Main/Prefabs/StaticObjects/PCTest.tscn

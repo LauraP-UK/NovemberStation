@@ -30,7 +30,6 @@ public class TestDisplayForm : FormBase {
         });
         
         _scrollDisplay.SetTopLevelLayout(GetTopLevelLayout());
-        _captureInput = false;
     }
     protected override List<IFormObject> GetAllElements() => new() {_container, _scrollDisplay};
     public ScrollDisplayList GetScrollDisplay() => _scrollDisplay;

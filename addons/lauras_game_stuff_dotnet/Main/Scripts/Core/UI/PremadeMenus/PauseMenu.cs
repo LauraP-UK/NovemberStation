@@ -1,7 +1,6 @@
 using System.Linq;
 using Godot;
-
-namespace NovemberStation.addons.lauras_game_stuff_dotnet.Main.Scripts.Core.UI.PremadeMenus;
+using NovemberStation.addons.lauras_game_stuff_dotnet.Main.Scripts.Core.UI;
 
 public class PauseMenu : PreMadeMenu<BinaryChoiceForm> {
     
@@ -15,7 +14,7 @@ public class PauseMenu : PreMadeMenu<BinaryChoiceForm> {
         pauseMenu.SetBackgroundType(BinaryChoiceForm.BackgroundType.IMAGE);
         pauseMenu.SetBackgroundAlpha(0.5f);
         
-        pauseMenu.OnUpperButton(_ => UIManager.CloseMenu(GetFormName()));
+        pauseMenu.OnUpperButton(_ => Close());
         pauseMenu.OnLowerButton(_ => {
             Close();
             GameManager.I().Quit();
