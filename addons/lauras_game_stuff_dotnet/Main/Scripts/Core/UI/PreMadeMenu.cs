@@ -19,7 +19,7 @@ public abstract class PreMadeMenu<T> where T : FormBase {
         UIManager.CloseMenu(GetFormName());
     }
     
-    public void SendToViewport(SubViewport viewport) {
+    public void DisplayOn(SubViewport viewport) {
         FormBase form = Build();
         _modify?.Invoke((T)form);
         viewport.AddChild(form.GetMenu());

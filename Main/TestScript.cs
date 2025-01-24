@@ -43,7 +43,7 @@ public partial class TestScript : Node {
             EventManager.UnregisterListeners(form);
             display.GetDisplayObjects().ForEach(EventManager.UnregisterListeners);
         });
-        shopMenu.SendToViewport(subViewport);
+        shopMenu.DisplayOn(subViewport);
         
 
         GD.Print($"SubViewport found? {subViewport != null}");

@@ -26,7 +26,7 @@ transparency = 1
 albedo_texture = SubResource("ViewportTexture_tvny1")
 
 [sub_resource type="PlaneMesh" id="PlaneMesh_0gh07"]
-size = Vector2(2, 0.8)
+size = Vector2(1.6, 0.8)
 
 [node name="PC" type="Node3D"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
