@@ -88,26 +88,24 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\Rob-Desktop\\.nuget\\packages\\": {}
+    "C:\\Users\\robP3\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "M:\\Program Files (x86)\\Godot\\Projects\\novemberstation\\NovemberStation.csproj",
+      "projectUniqueName": "C:\\Users\\robP3\\RiderProjects\\NovemberStation\\NovemberStation.csproj",
       "projectName": "NovemberStation",
-      "projectPath": "M:\\Program Files (x86)\\Godot\\Projects\\novemberstation\\NovemberStation.csproj",
-      "packagesPath": "C:\\Users\\Rob-Desktop\\.nuget\\packages\\",
-      "outputPath": "M:\\Program Files (x86)\\Godot\\Projects\\novemberstation\\.godot\\mono\\temp\\obj\\",
+      "projectPath": "C:\\Users\\robP3\\RiderProjects\\NovemberStation\\NovemberStation.csproj",
+      "packagesPath": "C:\\Users\\robP3\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\robP3\\RiderProjects\\NovemberStation\\.godot\\mono\\temp\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
-        "C:\\Users\\Rob-Desktop\\AppData\\Roaming\\NuGet\\NuGet.Config",
-        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+        "C:\\Users\\robP3\\AppData\\Roaming\\NuGet\\NuGet.Config"
       ],
       "originalTargetFrameworks": [
         "net6.0"
       ],
       "sources": {
-        "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
         "https://api.nuget.org/v3/index.json": {}
       },
       "frameworks": {
@@ -150,6 +148,20 @@
         ],
         "assetTargetFallback": true,
         "warn": true,
+        "downloadDependencies": [
+          {
+            "name": "Microsoft.AspNetCore.App.Ref",
+            "version": "[6.0.26, 6.0.26]"
+          },
+          {
+            "name": "Microsoft.NETCore.App.Ref",
+            "version": "[6.0.26, 6.0.26]"
+          },
+          {
+            "name": "Microsoft.WindowsDesktop.App.Ref",
+            "version": "[6.0.26, 6.0.26]"
+          }
+        ],
         "frameworkReferences": {
           "Microsoft.NETCore.App": {
             "privateAssets": "all"
