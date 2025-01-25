@@ -72,48 +72,11 @@ public partial class TestScript : Node {
             else
                 physicsObj.QueueFree();
         }
-
-        RaycastResult raycastResult = Raycast.Trace(player, 3.0f);
-        RaycastResult.HitBodyData firstHit = raycastResult.GetClosestHit();
-        PlayerController playerController = player.GetController<PlayerController>();
-        
-        if (!raycastResult.HasHit()) {
-            playerController.HideContextBox();
-            return;
-        }
-        
-        HighlightObject(firstHit.Body);
-        float firstHitDistance = firstHit.Distance;
-        float distRatio = Mathsf.InverseLerpClamped(3.0f, 0.9f, firstHitDistance);
-        float actionRatio = Mathsf.InverseLerpClamped(3.0f, 2f, firstHitDistance);
-
-        ContextMenuForm contextMenu = playerController.GetContextMenu().GetForm();
-
-        contextMenu.GetMainFrame().SetAlpha(distRatio);
-        contextMenu.GetActionsContainerFrame().SetAlpha(actionRatio);
     }
 
     public override void _PhysicsProcess(double delta) {
         base._PhysicsProcess(delta);
         Player player = GameManager.I().GetPlayer();
         if (!GetTree().Paused) player.GetController().Update((float)delta);
-    }
-
-    private static void HighlightObject(Node3D obj) {
-        CollisionShape3D shape = (CollisionShape3D) obj.FindChild("BBox");
-        PlayerController playerController = GameManager.I().GetPlayer().GetController<PlayerController>();
-        
-        if (shape == null) {
-            playerController.HideContextBox();
-            return;
-        }
-
-        BoundingBox bb = BoundingBox.FromCollisionMesh(shape);
-        Vector2[] inScreenSpace = bb.GetCornersInScreenSpace(GameManager.I().GetPlayer().GetCamera(), shape.GlobalTransform);
-        Vector2[] extremesVector2 = VectorUtils.GetExtremes(inScreenSpace);
-
-        Vector2 minPos = extremesVector2[2];
-        Vector2 maxPos = extremesVector2[0] - minPos;
-        playerController.DrawContextBox(minPos, maxPos);
     }
 }

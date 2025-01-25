@@ -39,6 +39,7 @@ public abstract class ControllerBase : Listener {
     }
 
     protected ActorBase GetActor() => _actor;
+    protected T GetActor<T>() where T : ActorBase => (T) _actor;
     protected float GetSpeed() => _crouching ? CROUCH_SPEED : _sprinting ? SPRINT_SPEED : WALK_SPEED;
     public void SetLocked(bool locked) => _lockedMode = locked;
     public bool IsLocked() => _lockedMode;

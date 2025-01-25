@@ -153,6 +153,18 @@ public class PlayerController : ControllerBase {
 
     protected override void OnUpdate(float delta) {
         if (_heldObject != null) UpdateHeldObjectPosition(delta);
+
+        Player player = GetActor<Player>();
+
+        RaycastResult raycastResult = Raycast.Trace(player, 3.0f);
+        RaycastResult.HitBodyData firstHit = raycastResult.GetClosestHit();
+        
+        if (!raycastResult.HasHit()) {
+            HideContextBox();
+            return;
+        }
+        
+        HandleContextMenu(firstHit.Body, firstHit.Distance);
     }
 
     private void ReleaseHeldObject(Vector3? releaseVelocity = null) {
@@ -254,20 +266,46 @@ public class PlayerController : ControllerBase {
         obj.GlobalTransform = new Transform3D(smoothedBasis, obj.GlobalTransform.Origin);
     }
     
-     /* --- ---  UI  --- --- */
-     public void DrawContextBox(Vector2 minPos, Vector2 maxPos) {
-         if (_contextMenu.GetForm() == null)
-             return;
-         _contextMenu.GetForm().SetNWCorner(minPos);
-         _contextMenu.GetForm().SetSECorner(maxPos);
-         _contextMenu.GetForm().Show();
-     }
-     
-     public void HideContextBox() {
-         if (_contextMenu.GetForm() == null)
-             return;
-         _contextMenu.GetForm().Hide();
-     }
-     
-     public ContextMenu GetContextMenu() => _contextMenu;
+    /* --- ---  INTERACTION  --- --- */
+    
+    private void HandleContextMenu(Node3D forObj, float distanceTo) {
+        CollisionShape3D shape = (CollisionShape3D) forObj.FindChild("BBox");
+        if (shape == null) {
+            HideContextBox();
+            return;
+        }
+
+        BoundingBox bb = BoundingBox.FromCollisionMesh(shape);
+        Vector2[] inScreenSpace = bb.GetCornersInScreenSpace(GameManager.I().GetPlayer().GetCamera(), shape.GlobalTransform);
+        Vector2[] extremesVector2 = VectorUtils.GetExtremes(inScreenSpace);
+
+        Vector2 minPos = extremesVector2[2];
+        Vector2 maxPos = extremesVector2[0] - minPos;
+        
+        float distRatio = Mathsf.InverseLerpClamped(3.0f, 0.9f, distanceTo);
+        float actionRatio = Mathsf.InverseLerpClamped(3.0f, 2f, distanceTo);
+        
+        DrawContextBox(minPos, maxPos, distRatio, actionRatio);
+    }
+    
+    /* --- ---  UI  --- --- */
+    public void DrawContextBox(Vector2 minPos, Vector2 maxPos, float mainAlpha, float actionsAlpha) {
+        ContextMenuForm form = _contextMenu.GetForm();
+        if (form == null) return;
+        form.SetNWCorner(minPos);
+        form.SetSECorner(maxPos);
+        
+        form.GetMainFrame().SetAlpha(mainAlpha);
+        form.GetActionsContainerFrame().SetAlpha(actionsAlpha);
+        
+        form.Show();
+    }
+    
+    public void HideContextBox() {
+        if (_contextMenu.GetForm() == null)
+            return;
+        _contextMenu.GetForm().Hide();
+    }
+    
+    public ContextMenu GetContextMenu() => _contextMenu;
 }
