@@ -1,6 +1,5 @@
 
 using Godot;
-using NovemberStation.Main;
 
 public class TurnCameraGameAction : GameActionBase {
     public TurnCameraGameAction(GameAction.Action action) : base(action) { }

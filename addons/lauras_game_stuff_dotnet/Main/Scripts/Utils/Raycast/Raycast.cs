@@ -1,7 +1,6 @@
 
 using Godot;
 using Godot.Collections;
-using NovemberStation.Main;
 
 public static class Raycast {
     

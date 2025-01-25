@@ -2,8 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace NovemberStation.Main.Scripts.Items;
-
 public class Items {
     
     public static readonly ItemType GAS_CAN = ItemType.Create(

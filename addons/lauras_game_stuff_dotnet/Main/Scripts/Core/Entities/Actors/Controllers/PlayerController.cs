@@ -274,15 +274,14 @@ public class PlayerController : ControllerBase {
             return;
         }
         
-        float distanceTo = firstHit.Distance;
-
         BoundingBox bb = BoundingBox.FromCollisionMesh(shape);
-        Vector2[] inScreenSpace = bb.GetCornersInScreenSpace(GameManager.I().GetPlayer().GetCamera(), shape.GlobalTransform);
-        Vector2[] extremesVector2 = VectorUtils.GetExtremes(inScreenSpace);
+        Vector2[] inScreenSpace = bb.GetCornersInScreenSpace(player.GetCamera(), shape.GlobalTransform);
+        VectorUtils.ExtremesInfo2D vecExtremes = VectorUtils.GetExtremes(inScreenSpace);
 
-        Vector2 minPos = extremesVector2[2];
-        Vector2 maxPos = extremesVector2[0] - minPos;
-        
+        Vector2 minPos = vecExtremes.min;
+        Vector2 maxPos = vecExtremes.max - minPos;
+
+        float distanceTo = firstHit.Distance;
         float distRatio = Mathsf.InverseLerpClamped(3.0f, 0.9f, distanceTo);
         float actionRatio = Mathsf.InverseLerpClamped(3.0f, 2f, distanceTo);
         
@@ -290,7 +289,7 @@ public class PlayerController : ControllerBase {
     }
     
     /* --- ---  UI  --- --- */
-    public void DrawContextBox(Vector2 minPos, Vector2 maxPos, float mainAlpha, float actionsAlpha) {
+    private void DrawContextBox(Vector2 minPos, Vector2 maxPos, float mainAlpha, float actionsAlpha) {
         ContextMenuForm form = _contextMenu.GetForm();
         if (form == null) return;
         form.SetNWCorner(minPos);
@@ -301,12 +300,10 @@ public class PlayerController : ControllerBase {
         
         form.Show();
     }
-    
-    public void HideContextBox() {
+
+    private void HideContextBox() {
         if (_contextMenu.GetForm() == null)
             return;
         _contextMenu.GetForm().Hide();
     }
-    
-    public ContextMenu GetContextMenu() => _contextMenu;
 }

@@ -1,5 +1,4 @@
 using Godot;
-using NovemberStation.Main;
 
 public class CrouchGameAction : GameActionBase {
     

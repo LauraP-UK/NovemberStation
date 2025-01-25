@@ -1,6 +1,5 @@
 
 using Godot;
-using NovemberStation.Main;
 
 public class UseGameAction : GameActionBase {
     public UseGameAction(GameAction.Action action) : base(action) { }

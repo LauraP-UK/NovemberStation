@@ -1,9 +1,5 @@
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using Godot;
-
-namespace NovemberStation.Main;
 
 public partial class TestScript : Node {
     private readonly Dictionary<RigidBody3D, Vector3> _dynamicObjects = new();

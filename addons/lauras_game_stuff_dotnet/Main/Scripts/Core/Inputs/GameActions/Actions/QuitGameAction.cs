@@ -1,6 +1,5 @@
 
 using Godot;
-using NovemberStation.Main;
 
 public class QuitGameAction : GameActionBase {
     public QuitGameAction(GameAction.Action action) : base(action) { }

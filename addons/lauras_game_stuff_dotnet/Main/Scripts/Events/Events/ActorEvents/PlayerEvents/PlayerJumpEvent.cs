@@ -1,6 +1,5 @@
 
 using Godot;
-using NovemberStation.Main;
 
 public class PlayerJumpEvent : ActorMoveEvent {
 

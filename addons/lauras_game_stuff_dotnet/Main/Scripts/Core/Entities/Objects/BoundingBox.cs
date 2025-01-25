@@ -7,6 +7,7 @@ using Godot;
 public class BoundingBox {
     
     private readonly Vector3[] _corners;
+    private readonly Vector3 _min, _max, _centre;
 
     private static readonly int[,] EDGE_MATRIX;
 
@@ -32,10 +33,37 @@ public class BoundingBox {
         _corners[5] = new Vector3(-size.X, size.Y, -size.Z);
         _corners[6] = new Vector3(-size.X, -size.Y, size.Z);
         _corners[7] = new Vector3(-size.X, -size.Y, -size.Z);
+        
+        _min = new Vector3(
+            _corners.Min(corner => corner.X),
+            _corners.Min(corner => corner.Y),
+            _corners.Min(corner => corner.Z)
+        );
+        
+        _max = new Vector3(
+            _corners.Max(corner => corner.X),
+            _corners.Max(corner => corner.Y),
+            _corners.Max(corner => corner.Z)
+        );
+        
+        _centre = (_min + _max) / 2;
     }
     
-    public BoundingBox(Vector3[] corners) => _corners = corners;
-    
+    public BoundingBox(Vector3[] corners) {
+        _corners = corners;
+        _min = new Vector3(
+            _corners.Min(corner => corner.X),
+            _corners.Min(corner => corner.Y),
+            _corners.Min(corner => corner.Z)
+        );
+        _max = new Vector3(
+            _corners.Max(corner => corner.X),
+            _corners.Max(corner => corner.Y),
+            _corners.Max(corner => corner.Z)
+        );
+        _centre = (_min + _max) / 2;
+    }
+
     public Vector3[] GetCorners() => _corners;
     
     public List<KeyValuePair<Vector3, Vector3>> GetEdges() {

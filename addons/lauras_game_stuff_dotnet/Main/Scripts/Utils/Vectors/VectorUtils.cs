@@ -12,24 +12,43 @@ public static class VectorUtils {
             );
     }
 
-    public static Vector2[] GetExtremes(params Vector2[] vectors) {
-        if (vectors.Length == 0) return Array.Empty<Vector2>();
+    public static ExtremesInfo2D GetExtremes(params Vector2[] vectors) {
+        if (vectors.Length == 0) return ExtremesInfo2D.Empty();
 
         float maxX = vectors.Max(v => v.X);
         float minX = vectors.Min(v => v.X);
         float maxY = vectors.Max(v => v.Y);
         float minY = vectors.Min(v => v.Y);
 
-        Vector2 LXLY = new(maxX, maxY); // Largest X, Largest Y
-        Vector2 LXSY = new(maxX, minY); // Largest X, Smallest Y
-        Vector2 SXSY = new(minX, minY); // Smallest X, Smallest Y
-        Vector2 SXLY = new(minX, maxY); // Smallest X, Largest Y
-
-        return new[] { LXLY, LXSY, SXSY, SXLY };
+        return new ExtremesInfo2D(new[] {
+            new Vector2(maxX, maxY), 
+            new Vector2(maxX, minY), 
+            new Vector2(minX, minY), 
+            new Vector2(minX, maxY)
+        });
+    }
+    
+    public class ExtremesInfo2D {
+        public readonly Vector2 
+            LXLY,
+            LXSY,
+            SXSY,
+            SXLY,
+            min, max, centre;
+        public ExtremesInfo2D(Vector2[] corners) {
+            LXLY = corners[0];
+            LXSY = corners[1];
+            SXSY = corners[2];
+            SXLY = corners[3];
+            min = SXSY;
+            max = LXLY;
+            centre = (min + max) / 2;
+        }
+        public static ExtremesInfo2D Empty() => new(new[]{Vector2.Zero, Vector2.Zero, Vector2.Zero, Vector2.Zero});
     }
 
-    public static Vector3[] GetExtremes(params Vector3[] vectors) {
-        if (vectors.Length == 0) return Array.Empty<Vector3>();
+    public static ExtremesInfo3D GetExtremes(params Vector3[] vectors) {
+        if (vectors.Length == 0) return ExtremesInfo3D.Empty();
 
         float maxX = vectors.Max(v => v.X);
         float minX = vectors.Min(v => v.X);
@@ -38,15 +57,42 @@ public static class VectorUtils {
         float maxZ = vectors.Max(v => v.Z);
         float minZ = vectors.Min(v => v.Z);
 
-        Vector3 LXLYLZ = new(maxX, maxY, maxZ); // Largest X, Largest Y, Largest Z
-        Vector3 LXLYSZ = new(maxX, maxY, minZ); // Largest X, Largest Y, Smallest Z
-        Vector3 LXSYLZ = new(maxX, minY, maxZ); // Largest X, Smallest Y, Largest Z
-        Vector3 LXSYSZ = new(maxX, minY, minZ); // Largest X, Smallest Y, Smallest Z
-        Vector3 SXLYLZ = new(minX, maxY, maxZ); // Smallest X, Largest Y, Largest Z
-        Vector3 SXLYSZ = new(minX, maxY, minZ); // Smallest X, Largest Y, Smallest Z
-        Vector3 SXSYLZ = new(minX, minY, maxZ); // Smallest X, Smallest Y, Largest Z
-        Vector3 SXSYSZ = new(minX, minY, minZ); // Smallest X, Smallest Y, Smallest Z
-
-        return new[]{ LXLYLZ, LXLYSZ, LXSYLZ, LXSYSZ, SXLYLZ, SXLYSZ, SXSYLZ, SXSYSZ };
+        return new ExtremesInfo3D(new[] {
+            new Vector3(maxX, maxY, maxZ),
+            new Vector3(maxX, maxY, minZ),
+            new Vector3(maxX, minY, maxZ),
+            new Vector3(maxX, minY, minZ),
+            new Vector3(minX, maxY, maxZ),
+            new Vector3(minX, maxY, minZ),
+            new Vector3(minX, minY, maxZ),
+            new Vector3(minX, minY, minZ)
+        });
+    }
+    
+    public class ExtremesInfo3D {
+        public readonly Vector3 
+            LXLYLZ,
+            LXLYSZ,
+            LXSYLZ,
+            LXSYSZ,
+            SXLYLZ,
+            SXLYSZ,
+            SXSYLZ,
+            SXSYSZ,
+            min, max, centre;
+        public ExtremesInfo3D(Vector3[] corners) {
+            LXLYLZ = corners[0];
+            LXLYSZ = corners[1];
+            LXSYLZ = corners[2];
+            LXSYSZ = corners[3];
+            SXLYLZ = corners[4];
+            SXLYSZ = corners[5];
+            SXSYLZ = corners[6];
+            SXSYSZ = corners[7];
+            min = SXSYSZ;
+            max = LXLYLZ;
+            centre = (min + max) / 2;
+        }
+        public static ExtremesInfo3D Empty() => new(new[]{Vector3.Zero, Vector3.Zero, Vector3.Zero, Vector3.Zero, Vector3.Zero, Vector3.Zero, Vector3.Zero, Vector3.Zero});
     }
 }
