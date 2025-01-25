@@ -32,6 +32,7 @@ public abstract class FormBase : IFormObject {
 
     protected abstract void OnDestroy();
     protected virtual void KeyboardBehaviour(Key key, bool isPressed) {}
+    public virtual bool LockMovement() => true;
 
     public Control GetMenu() => _menu;
     public void Destroy() {

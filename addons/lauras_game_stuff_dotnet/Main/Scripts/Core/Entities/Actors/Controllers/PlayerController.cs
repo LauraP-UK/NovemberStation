@@ -1,6 +1,5 @@
 using System;
 using Godot;
-using NovemberStation.Main.Scripts.Items;
 
 public class PlayerController : ControllerBase {
     private const float HOLD_DISTANCE = 2.1f, HOLD_SMOOTHNESS = 15.0f, ROTATION_SMOOTHNESS = 10.0f;
@@ -18,8 +17,13 @@ public class PlayerController : ControllerBase {
 
     private RigidBody3D _heldObject;
     private Direction _heldObjectDirection;
+    
+    private ContextMenu _contextMenu = new();
 
-    public PlayerController(Player player) : base(player) => GetActor().GetModel().CollisionLayer = PLAYER_LAYER;
+    public PlayerController(Player player) : base(player) {
+        GetActor().GetModel().CollisionLayer = PLAYER_LAYER;
+        _contextMenu.Open();
+    }
 
 
     /* --- ---  LISTENERS  --- --- */
@@ -247,4 +251,19 @@ public class PlayerController : ControllerBase {
         Basis smoothedBasis = new(smoothedRotation);
         obj.GlobalTransform = new Transform3D(smoothedBasis, obj.GlobalTransform.Origin);
     }
+    
+     /* --- ---  UI  --- --- */
+     public void DrawContextBox(Vector2 minPos, Vector2 maxPos) {
+         if (_contextMenu.GetForm() == null)
+             return;
+         _contextMenu.GetForm().SetNWCorner(minPos);
+         _contextMenu.GetForm().SetSECorner(maxPos);
+         _contextMenu.GetForm().Show();
+     }
+     
+     public void HideContextBox() {
+         if (_contextMenu.GetForm() == null)
+             return;
+         _contextMenu.GetForm().Hide();
+     }
 }

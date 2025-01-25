@@ -104,6 +104,11 @@ public static class Mathsf {
         if (values == null || values.Length == 0) throw new ArgumentException("Values array must not be null or empty.");
         return values.OrderBy(v => Math.Abs((dynamic)v - (dynamic)target)).First();
     }
+    
+    public static T Max<T>(params T[] values) where T : IComparable<T> {
+        if (values == null || values.Length == 0) throw new ArgumentException("Values array must not be null or empty.");
+        return values.Max();
+    }
 
     /// <summary>
     /// Computes a quadratic equation given coefficients a, b, and c.

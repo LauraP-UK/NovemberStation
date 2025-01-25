@@ -24,10 +24,18 @@ public class ContextMenuForm : FormBase {
         _actionsContainer = new ControlElement(actionsContainer);
         
         _menuElement = new ControlElement(_menu);
+        SetCaptureInput(false);
     }
     
     
     protected override List<IFormObject> GetAllElements() => new(){_mainFrame, _actionsContainerFrame, _actionsContainer};
 
     protected override void OnDestroy() { }
+    public override bool LockMovement() => false;
+
+    public void SetNWCorner(Vector2 position) => _menuElement.GetElement().SetPosition(position);
+    public void SetSECorner(Vector2 position) => _menuElement.GetElement().SetSize(position);
+    
+    public void Show() => _menuElement.GetElement().Show();
+    public void Hide() => _menuElement.GetElement().Hide();
 }

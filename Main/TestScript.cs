@@ -44,9 +44,6 @@ public partial class TestScript : Node {
             display.GetDisplayObjects().ForEach(EventManager.UnregisterListeners);
         });
         shopMenu.DisplayOn(subViewport);
-        
-
-        GD.Print($"SubViewport found? {subViewport != null}");
 
         foreach (Node child in gameManager.GetSceneObjects().GetChildren()) {
             if (child is not RigidBody3D obj) continue;
@@ -69,21 +66,20 @@ public partial class TestScript : Node {
         foreach (Node child in sceneObjects.GetChildren()) {
             if (child is not RigidBody3D physicsObj) continue;
             if (!(physicsObj.GlobalPosition.Y < -20)) continue;
-            if (_dynamicObjects.TryGetValue(physicsObj, out Vector3 origPosition)) {
+            if (_dynamicObjects.TryGetValue(physicsObj, out Vector3 origPosition))
                 physicsObj.GlobalPosition = origPosition;
-                //physicsObj.LinearVelocity = Vector3.Zero;
-                //physicsObj.AngularVelocity = Vector3.Zero;
-            }
             else
                 physicsObj.QueueFree();
         }
 
         RaycastResult raycastResult = Raycast.Trace(player, 3.0f);
-        List<RaycastResult.HitBodyData> hitObjs = raycastResult.GetHitsSortedByDistance().Where(obj => obj.Body is RigidBody3D).ToList();
-
-        if (!raycastResult.HasHit()) return;
-        foreach (RaycastResult.HitBodyData hitObj in hitObjs)
-            HighlightObject((RigidBody3D)hitObj.Body);
+        RaycastResult.HitBodyData firstHit = raycastResult.GetClosestHit();
+        if (!raycastResult.HasHit() || firstHit.Body is not RigidBody3D rigidBody3D) {
+            PlayerController playerController = player.GetController<PlayerController>();
+            playerController.HideContextBox();
+            return;
+        }
+        HighlightObject(rigidBody3D);
     }
 
     public override void _PhysicsProcess(double delta) {
@@ -93,11 +89,15 @@ public partial class TestScript : Node {
     }
 
     private static void HighlightObject(RigidBody3D obj) {
-        foreach (Direction direction in Directions.GetAdjacent()) {
-            Vector3 globalDirection = obj.GlobalTransform.Basis * direction.Offset;
-            Vector3 endPoint = obj.GlobalPosition + globalDirection;
+        CollisionShape3D shape = obj.GetNode<CollisionShape3D>("BBox");
 
-            DebugDraw.Line(obj.GlobalPosition, endPoint, direction.GetAxisDebugColor());
-        }
+        BoundingBox bb = BoundingBox.FromCollisionMesh(shape);
+        Vector2[] inScreenSpace = bb.GetCornersInScreenSpace(GameManager.I().GetPlayer().GetCamera(), obj.Transform);
+        Vector2[] extremesVector2 = VectorUtils.GetExtremes(inScreenSpace);
+
+        PlayerController playerController = GameManager.I().GetPlayer().GetController<PlayerController>();
+        Vector2 minPos = extremesVector2[2];
+        Vector2 maxPos = extremesVector2[0] - minPos;
+        playerController.DrawContextBox(minPos, maxPos);
     }
 }

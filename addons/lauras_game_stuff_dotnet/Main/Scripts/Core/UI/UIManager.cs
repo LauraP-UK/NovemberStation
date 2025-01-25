@@ -27,12 +27,16 @@ public static class UIManager {
         if (GetUILayer().GetChildren().FirstOrDefault(child => child.Name == menuName) is not Control menu) return;
         
         if (menu == _primaryUIOpen) _primaryUIOpen = null;
-        
-        _menus[menu]?.RemoveFromScene();
+
+        FormBase form = _menus[menu];
         _menus.Remove(menu);
-        GameManager.I().GetPlayer().GetController().SetLocked(false);
-        Input.MouseMode = Input.MouseModeEnum.Captured;
-        GameManager.I().Pause(false);
+        if (form != null && form.LockMovement()) {
+            GameManager.I().GetPlayer().GetController().SetLocked(false);
+            Input.MouseMode = Input.MouseModeEnum.Captured;
+            GameManager.I().Pause(false);
+        }
+
+        form?.RemoveFromScene();
     }
     
     public static void OpenMenu(FormBase menu, bool isPrimaryMenu = false) {
@@ -40,6 +44,8 @@ public static class UIManager {
         if (isPrimaryMenu) _primaryUIOpen = menu.GetMenu();
         menu.AddToScene(GetUILayer());
         _menus.Add(menu.GetMenu(), menu);
+
+        if (!menu.LockMovement()) return;
         GameManager.I().GetPlayer().GetController().SetLocked(true);
         GameManager.I().Pause(true);
         Input.MouseMode = Input.MouseModeEnum.Visible;

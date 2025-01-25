@@ -22,6 +22,7 @@ public abstract class ActorBase : IActor {
     public RayCast3D GetBelowRaycast() => GetModel().GetNode<RayCast3D>("StairsRaycasts/BelowCast");
     public RayCast3D GetFrontRaycast() => GetModel().GetNode<RayCast3D>("StairsRaycasts/FrontCast");
     public ControllerBase GetController() => _controller;
+    public T GetController<T>() where T : ControllerBase => (T) _controller;
     public void SetController(ControllerBase controller) => _controller = controller;
     public void SetName(string name) => _name = name;
     public void SetPosition(Vector3 position, Vector3 rotation = default) {

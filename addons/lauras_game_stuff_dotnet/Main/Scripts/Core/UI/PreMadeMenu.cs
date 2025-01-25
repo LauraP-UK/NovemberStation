@@ -6,12 +6,19 @@ namespace NovemberStation.addons.lauras_game_stuff_dotnet.Main.Scripts.Core.UI;
 public abstract class PreMadeMenu<T> where T : FormBase {
 
     private Action<T> _modify;
+    private T _form;
     
-    public void Open(bool isPrimary = true) {
+    public void Open() {
         if (UIManager.HasMenu(GetFormName())) return;
-        FormBase form = Build();
-        _modify?.Invoke((T)form);
-        UIManager.OpenMenu(form, isPrimary);
+        
+        if (_form != null) {
+            GD.PrintErr($"ERROR: PreMadeMenu.Open() : Form {GetType()} - {GetFormName()} already exists.");
+            return;
+        }
+        
+        _form = (T) Build();
+        _modify?.Invoke(_form);
+        UIManager.OpenMenu(_form, IsPrimary());
     }
 
     public void Close() {
@@ -20,6 +27,10 @@ public abstract class PreMadeMenu<T> where T : FormBase {
     }
     
     public void DisplayOn(SubViewport viewport) {
+        if (_form != null) {
+            GD.PrintErr($"ERROR: PreMadeMenu.DisplayOn() : Form {GetType()} - {GetFormName()} already exists.");
+            return;
+        }
         FormBase form = Build();
         _modify?.Invoke((T)form);
         viewport.AddChild(form.GetMenu());
@@ -27,6 +38,9 @@ public abstract class PreMadeMenu<T> where T : FormBase {
     
     protected abstract FormBase Build();
     protected abstract string GetFormName();
+    protected virtual bool IsPrimary() => true;
 
     public void ModifyForm(Action<T> modify) => _modify = modify;
+    
+    public T GetForm() => _form;
 }
