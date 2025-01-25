@@ -18,11 +18,13 @@ public class PlayerController : ControllerBase {
     private RigidBody3D _heldObject;
     private Direction _heldObjectDirection;
     
-    private ContextMenu _contextMenu = new();
+    private readonly ContextMenu _contextMenu = new();
+    private readonly CrosshairOverlay _crosshair = new();
 
     public PlayerController(Player player) : base(player) {
         GetActor().GetModel().CollisionLayer = PLAYER_LAYER;
         _contextMenu.Open();
+        _crosshair.Open();
     }
 
 
