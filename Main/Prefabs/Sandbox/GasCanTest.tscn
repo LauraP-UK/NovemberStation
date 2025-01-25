@@ -1,4 +1,4 @@
-[gd_scene load_steps=8 format=3 uid="uid://davr0xngcadpq"]
+[gd_scene load_steps=9 format=3 uid="uid://davr0xngcadpq"]
 
 [ext_resource type="Texture2D" uid="uid://c5q1hp1s028lo" path="res://Main/Textures/Sandbox/Noise1.png" id="1_fdpuu"]
 [ext_resource type="ArrayMesh" uid="uid://dr2qj2wsaaw61" path="res://Main/Meshes/Sandbox/GasCanTest.obj" id="2_w552r"]
@@ -20,6 +20,9 @@ size = Vector3(0.316612, 0.391998, 0.17627)
 [sub_resource type="CylinderShape3D" id="CylinderShape3D_66p85"]
 height = 0.186865
 radius = 0.098381
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_fbg4w"]
+size = Vector3(0.323059, 1.09277, 0.92627)
 
 [node name="RigidBody3D" type="RigidBody3D"]
 
@@ -43,3 +46,8 @@ shape = SubResource("BoxShape3D_tucbw")
 [node name="CollisionShape3D4" type="CollisionShape3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 0.707107, -0.707107, 0, 0.707107, 0.707107, 0, 0.461144, 0.378162)
 shape = SubResource("CylinderShape3D_66p85")
+
+[node name="BBox" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0015564, 0.0463867, 0.0480957)
+shape = SubResource("BoxShape3D_fbg4w")
+disabled = true

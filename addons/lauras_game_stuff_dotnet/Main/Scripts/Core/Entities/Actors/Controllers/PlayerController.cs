@@ -225,13 +225,14 @@ public class PlayerController : ControllerBase {
         }
         else {
             float yawOffset = 0.0f;
-            if (_heldObjectDirection.Offset == Vector3.Forward)
+            Vector3 offset = _heldObjectDirection.Offset;
+            if (offset.Equals(Vector3.Forward))
                 yawOffset = 0.0f;
-            else if (_heldObjectDirection.Offset == Vector3.Right)
+            else if (offset.Equals(Vector3.Right))
                 yawOffset = Mathf.DegToRad(90.0f);
-            else if (_heldObjectDirection.Offset == Vector3.Back)
+            else if (offset.Equals(Vector3.Back))
                 yawOffset = Mathf.DegToRad(180.0f);
-            else if (_heldObjectDirection.Offset == Vector3.Left)
+            else if (offset.Equals(Vector3.Left))
                 yawOffset = Mathf.DegToRad(-90.0f);
 
             float targetYaw = playerYaw + yawOffset;

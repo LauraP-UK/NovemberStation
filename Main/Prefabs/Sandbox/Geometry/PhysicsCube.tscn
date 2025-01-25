@@ -1,4 +1,4 @@
-[gd_scene load_steps=12 format=3 uid="uid://cqvhghgw72hrv"]
+[gd_scene load_steps=13 format=3 uid="uid://cqvhghgw72hrv"]
 
 [ext_resource type="Texture2D" uid="uid://c5q1hp1s028lo" path="res://Main/Textures/Sandbox/Noise1.png" id="1_d2xst"]
 [ext_resource type="Texture2D" uid="uid://cnafjpoh1lxps" path="res://Main/Textures/Sandbox/Checkerboard1.png" id="2_mr4fy"]
@@ -31,6 +31,8 @@ size = Vector3(0.2, 0.2, 0.2)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_rv6lb"]
 
+[sub_resource type="BoxShape3D" id="BoxShape3D_tn1aw"]
+
 [node name="RigidBody3D" type="RigidBody3D"]
 collision_layer = 4
 collision_mask = 7
@@ -56,3 +58,7 @@ mesh = SubResource("BoxMesh_yue1b")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="."]
 shape = SubResource("BoxShape3D_rv6lb")
+
+[node name="BBox" type="CollisionShape3D" parent="."]
+shape = SubResource("BoxShape3D_tn1aw")
+disabled = true
