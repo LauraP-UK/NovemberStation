@@ -4,7 +4,7 @@
 [ext_resource type="ArrayMesh" uid="uid://dr2qj2wsaaw61" path="res://Main/Meshes/Sandbox/GasCanTest.obj" id="2_w552r"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_fbg4w"]
-size = Vector3(0.323059, 1.09277, 0.92627)
+size = Vector3(0.323059, 1.06543, 0.866394)
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_dib4p"]
 albedo_color = Color(0.273, 0.42, 0.3024, 1)
@@ -27,7 +27,7 @@ radius = 0.098381
 [node name="RigidBody3D" type="RigidBody3D"]
 
 [node name="BBox" type="CollisionShape3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0015564, 0.0463867, 0.0480957)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0015564, 0.0327157, 0.0232238)
 shape = SubResource("BoxShape3D_fbg4w")
 disabled = true
 

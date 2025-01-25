@@ -153,18 +153,7 @@ public class PlayerController : ControllerBase {
 
     protected override void OnUpdate(float delta) {
         if (_heldObject != null) UpdateHeldObjectPosition(delta);
-
-        Player player = GetActor<Player>();
-
-        RaycastResult raycastResult = Raycast.Trace(player, 3.0f);
-        RaycastResult.HitBodyData firstHit = raycastResult.GetClosestHit();
-        
-        if (!raycastResult.HasHit()) {
-            HideContextBox();
-            return;
-        }
-        
-        HandleContextMenu(firstHit.Body, firstHit.Distance);
+        HandleContextMenu();
     }
 
     private void ReleaseHeldObject(Vector3? releaseVelocity = null) {
@@ -268,12 +257,24 @@ public class PlayerController : ControllerBase {
     
     /* --- ---  INTERACTION  --- --- */
     
-    private void HandleContextMenu(Node3D forObj, float distanceTo) {
-        CollisionShape3D shape = (CollisionShape3D) forObj.FindChild("BBox");
+    private void HandleContextMenu() {
+        Player player = GetActor<Player>();
+
+        RaycastResult raycastResult = Raycast.Trace(player, 3.0f);
+        RaycastResult.HitBodyData firstHit = raycastResult.GetClosestHit();
+        
+        if (!raycastResult.HasHit()) {
+            HideContextBox();
+            return;
+        }
+        
+        CollisionShape3D shape = (CollisionShape3D) firstHit.Body.FindChild("BBox");
         if (shape == null) {
             HideContextBox();
             return;
         }
+        
+        float distanceTo = firstHit.Distance;
 
         BoundingBox bb = BoundingBox.FromCollisionMesh(shape);
         Vector2[] inScreenSpace = bb.GetCornersInScreenSpace(GameManager.I().GetPlayer().GetCamera(), shape.GlobalTransform);
