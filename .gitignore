@@ -1,2 +1,7 @@
 # Godot 4+ specific ignores
 /android/
+.godot/editor/*
+!.godot/editor/project_metadata.cfg
+.godot/mono/temp/
+.godot/mono/metadata/
+.godot/uid_cache.bin
