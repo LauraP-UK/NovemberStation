@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Godot;
@@ -32,7 +33,7 @@ public partial class TestScript : Node {
         gameManager.SetPlayer(player);
 
         Node3D pcNode = GetTree().Root.GetNode<Node3D>("Main/PC");
-        SubViewport subViewport = pcNode.GetNode<SubViewport>("Screen/ScreenViewport");
+        SubViewport subViewport = pcNode.GetNode<SubViewport>("ScreenStatic/Screen/ScreenViewport");
         ShopMenu shopMenu = new();
         shopMenu.ModifyForm(form => {
             form.SetCaptureInput(false);
@@ -74,12 +75,22 @@ public partial class TestScript : Node {
 
         RaycastResult raycastResult = Raycast.Trace(player, 3.0f);
         RaycastResult.HitBodyData firstHit = raycastResult.GetClosestHit();
-        if (!raycastResult.HasHit() || firstHit.Body is not RigidBody3D rigidBody3D) {
-            PlayerController playerController = player.GetController<PlayerController>();
+        PlayerController playerController = player.GetController<PlayerController>();
+        
+        if (!raycastResult.HasHit()) {
             playerController.HideContextBox();
             return;
         }
-        HighlightObject(rigidBody3D);
+        
+        HighlightObject(firstHit.Body);
+        float firstHitDistance = firstHit.Distance;
+        float distRatio = Mathsf.InverseLerpClamped(3.0f, 0.9f, firstHitDistance);
+        float actionRatio = Mathsf.InverseLerpClamped(3.0f, 2f, firstHitDistance);
+
+        ContextMenuForm contextMenu = playerController.GetContextMenu().GetForm();
+
+        contextMenu.GetMainFrame().SetAlpha(distRatio);
+        contextMenu.GetActionsContainerFrame().SetAlpha(actionRatio);
     }
 
     public override void _PhysicsProcess(double delta) {
@@ -88,14 +99,19 @@ public partial class TestScript : Node {
         if (!GetTree().Paused) player.GetController().Update((float)delta);
     }
 
-    private static void HighlightObject(RigidBody3D obj) {
-        CollisionShape3D shape = obj.GetNode<CollisionShape3D>("BBox");
+    private static void HighlightObject(Node3D obj) {
+        CollisionShape3D shape = (CollisionShape3D) obj.FindChild("BBox");
+        PlayerController playerController = GameManager.I().GetPlayer().GetController<PlayerController>();
+        
+        if (shape == null) {
+            playerController.HideContextBox();
+            return;
+        }
 
         BoundingBox bb = BoundingBox.FromCollisionMesh(shape);
-        Vector2[] inScreenSpace = bb.GetCornersInScreenSpace(GameManager.I().GetPlayer().GetCamera(), obj.Transform);
+        Vector2[] inScreenSpace = bb.GetCornersInScreenSpace(GameManager.I().GetPlayer().GetCamera(), shape.GlobalTransform);
         Vector2[] extremesVector2 = VectorUtils.GetExtremes(inScreenSpace);
 
-        PlayerController playerController = GameManager.I().GetPlayer().GetController<PlayerController>();
         Vector2 minPos = extremesVector2[2];
         Vector2 maxPos = extremesVector2[0] - minPos;
         playerController.DrawContextBox(minPos, maxPos);

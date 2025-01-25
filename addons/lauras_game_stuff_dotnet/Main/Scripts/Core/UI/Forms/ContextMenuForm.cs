@@ -32,6 +32,9 @@ public class ContextMenuForm : FormBase {
 
     protected override void OnDestroy() { }
     public override bool LockMovement() => false;
+    
+    public NinePatchRectElement GetMainFrame() => _mainFrame;
+    public NinePatchRectElement GetActionsContainerFrame() => _actionsContainerFrame;
 
     public void SetNWCorner(Vector2 position) => _menuElement.GetElement().SetPosition(position);
     public void SetSECorner(Vector2 position) => _menuElement.GetElement().SetSize(position);

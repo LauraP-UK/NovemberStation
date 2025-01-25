@@ -268,4 +268,6 @@ public class PlayerController : ControllerBase {
              return;
          _contextMenu.GetForm().Hide();
      }
+     
+     public ContextMenu GetContextMenu() => _contextMenu;
 }

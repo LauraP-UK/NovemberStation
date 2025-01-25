@@ -65,13 +65,26 @@ public static class Mathsf {
     /// Performs inverse linear interpolation between two values.
     /// </summary>
     public static double InverseLerp(double start, double end, double value) {
-        if (start == end) throw new ArgumentException("Start and end values must not be the same.");
+        if (start == end) throw new ArgumentException("ERROR: Mathsf.InverseLerp() : Start and end values must not be the same.");
         return (value - start) / (end - start);
     }
 
     public static float InverseLerp(float start, float end, float value) {
-        if (start == end) throw new ArgumentException("Start and end values must not be the same.");
+        if (start == end) throw new ArgumentException("ERROR: Mathsf.InverseLerp() : Start and end values must not be the same.");
         return (value - start) / (end - start);
+    }
+
+    /// <summary>
+    /// Performs inverse linear interpolation between two values, result is clamped between 0 and 1.
+    /// </summary>
+    public static double InverseLerpClamped(double start, double end, double value) {
+        if (start == end) throw new ArgumentException("ERROR: Mathsf.InverseLerpClamped() : Start and end values must not be the same.");
+        return Math.Clamp(InverseLerp(start, end, value), 0.0D, 1.0D);
+    }
+
+    public static float InverseLerpClamped(float start, float end, float value) {
+        if (start == end) throw new ArgumentException("ERROR: Mathsf.InverseLerpClamped() : Start and end values must not be the same.");
+        return Math.Clamp(InverseLerp(start, end, value), 0.0f, 1.0f);
     }
 
     /// <summary>
