@@ -170,7 +170,7 @@ public class PlayerController : ControllerBase {
         _heldObjectDirection = null;
     }
 
-    private void PickupObject(RigidBody3D obj) {
+    public void PickupObject(RigidBody3D obj) {
         _holdDistanceModifier = 1.0f;
         _rotationOffset = Vector2.Zero;
         

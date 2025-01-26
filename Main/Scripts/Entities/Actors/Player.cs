@@ -29,4 +29,5 @@ public class Player : ActorBase, IViewable {
     public Node3D GetCrouchNode() => _crouchNode;
     
     public RaycastResult GetLookingAt(float distance) => Raycast.Trace(this, distance);
+    public ActorBase GetActor() => this;
 }
