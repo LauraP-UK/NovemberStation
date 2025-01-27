@@ -1,7 +1,10 @@
+using System;
 using System.Collections.Generic;
 using Godot;
 
 public abstract class FormBase : IFormObject {
+    private readonly Guid _id = Guid.NewGuid();
+    
     protected readonly Control _menu;
     protected ControlElement _menuElement;
     protected IFormObject _topLevelLayout;
@@ -67,7 +70,22 @@ public abstract class FormBase : IFormObject {
 
     public void SetTopLevelLayout(IFormObject layout) => _topLevelLayout = layout;
     public void SetCaptureInput(bool value) => _captureInput = value;
-    public bool CaptureInput() => GetTopLevelLayout().Equals(this) ? _captureInput : GetTopLevelLayout().CaptureInput();
+    public bool CaptureInput() {
+        if (!IsValid()) return false;
+        return GetTopLevelLayout().Equals(this) ? _captureInput : GetTopLevelLayout().CaptureInput();
+    }
+    public virtual bool RequiresProcess() => false;
+    public virtual void Process(double delta) {}
+
     public Control GetNode() => _menu;
     protected bool IsValid() => GodotObject.IsInstanceValid(_menu) && !_menu.IsQueuedForDeletion();
+
+    public Guid GetId() => _id;
+    
+    public override int GetHashCode() => GetId().GetHashCode();
+
+    public override bool Equals(object obj) {
+        if (obj is not FormBase form) return false;
+        return form.GetId() == GetId();
+    }
 }

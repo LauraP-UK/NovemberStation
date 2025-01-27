@@ -1,11 +1,8 @@
 ﻿
 using Godot;
-using NovemberStation.Main.Scripts.Items.ObjectData;
 
 public class GrabAction : ActionBase {
-    
     public GrabAction(ObjectActions.ActionType actionType, string name, int index) : base(actionType, name, index) { }
-
     private static void Handle(IViewable actor) {
         RaycastResult result = actor.GetLookingAt(3.0f);
         
@@ -39,7 +36,7 @@ public class GrabAction : ActionBase {
         pickUpEvent.Fire();
     }
 
-    public override void Invoke(ActorBase actorBase, IObjectData objectData) {
+    public override void Invoke<T>(ActorBase actorBase, T node, ObjectData objectData) {
         if (actorBase is not IViewable actor) return;
         Handle(actor);
     }

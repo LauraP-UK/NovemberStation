@@ -3,7 +3,7 @@
 [ext_resource type="Texture2D" uid="uid://cnafjpoh1lxps" path="res://Main/Textures/Sandbox/Checkerboard1.png" id="1_jq0md"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_qpqpg"]
-size = Vector3(0.121063, 0.827759, 1.59521)
+size = Vector3(0.0737151, 0.806458, 1.59521)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_xeq23"]
 size = Vector3(0.121, 0.828, 1.595)
@@ -40,9 +40,10 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
 [node name="ScreenStatic" type="StaticBody3D" parent="."]
 collision_layer = 2
 collision_mask = 7
+metadata/behaviour_type = "pc_obj"
 
 [node name="BBox" type="CollisionShape3D" parent="ScreenStatic"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.470871, 1.49249, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.467205, 1.50314, 0)
 shape = SubResource("BoxShape3D_qpqpg")
 disabled = true
 

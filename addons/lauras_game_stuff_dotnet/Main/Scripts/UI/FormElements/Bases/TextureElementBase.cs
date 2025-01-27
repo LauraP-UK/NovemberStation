@@ -35,9 +35,18 @@ public abstract class TextureElementBase<T> : FormElement<T> where T : Control {
                 return;
             case NinePatchRect ninePatchRect:
                 ninePatchRect.SetModulate(color);
-                break;
+                return;
             default:
                 throw new NotSupportedException($"TextureElementBase does not support {element.GetType().Name}");
         }
+    }
+
+    public float GetAlpha() {
+        T element = GetElement();
+        return element switch {
+            TextureRect textureRect => textureRect.Modulate.A,
+            NinePatchRect ninePatchRect => ninePatchRect.Modulate.A,
+            _ => throw new NotSupportedException($"TextureElementBase does not support {element.GetType().Name}")
+        };
     }
 }

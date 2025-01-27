@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using Godot;
 
 public class PlayerController : ControllerBase {
@@ -267,8 +269,15 @@ public class PlayerController : ControllerBase {
             HideContextBox();
             return;
         }
-        
-        CollisionShape3D shape = (CollisionShape3D) firstHit.Body.FindChild("BBox");
+
+        Node3D hitBody = firstHit.Body;
+        ObjectData objectData = null;
+        if (hitBody.HasMeta("behaviour_type")) {
+            string behaviourType = hitBody.GetMeta("behaviour_type").AsString();
+            objectData = ObjectActionRegister.Get(behaviourType);
+        }
+
+        CollisionShape3D shape = (CollisionShape3D) hitBody.FindChild("BBox");
         if (shape == null) {
             HideContextBox();
             return;
@@ -283,21 +292,38 @@ public class PlayerController : ControllerBase {
 
         float distanceTo = firstHit.Distance;
         float distRatio = Mathsf.InverseLerpClamped(3.0f, 0.9f, distanceTo);
-        float actionRatio = Mathsf.InverseLerpClamped(3.0f, 2f, distanceTo);
+        float actionRatio = Mathsf.InverseLerpClamped(3.0f, 2.5f, distanceTo);
         
-        DrawContextBox(minPos, maxPos, distRatio, actionRatio);
+        DrawContextBox(minPos, maxPos, distRatio, actionRatio, objectData);
     }
     
     /* --- ---  UI  --- --- */
-    private void DrawContextBox(Vector2 minPos, Vector2 maxPos, float mainAlpha, float actionsAlpha) {
+    private void DrawContextBox(Vector2 minPos, Vector2 maxPos, float mainAlpha, float actionsAlpha, ObjectData objData) {
         ContextMenuForm form = _contextMenu.GetForm();
         if (form == null) return;
         form.SetNWCorner(minPos);
         form.SetSECorner(maxPos);
+
+        List<ActionBase> actions = objData.GetActions().OrderBy(action => action.GetIndex()).ToList();
+        VBoxContainerElement listContainer = form.GetListContainer();
+
+        foreach (ActionBase action in actions) {
+            ActionDisplayButton button = new(action.GetActionName() + "_btn");
+            button.SetActionName(action.GetActionName());
+            button.SetActionNum(1 + listContainer.GetDisplayObjects().Count + ".");
+            button.GetNode().SetCustomMinimumSize(new Vector2(0, 20));
+            button.SetAlpha(actionsAlpha);
+            listContainer.AddChild(button);
+        }
+
+        int displayItems = listContainer.GetDisplayObjects().Count;
+        Vector2 size = new(100, 20 * displayItems);
+        form.GetActionsContainerFrame().GetNode().SetSize(size);
+        listContainer.GetNode().SetSize(size);
         
-        form.GetMainFrame().SetAlpha(mainAlpha);
-        form.GetActionsContainerFrame().SetAlpha(actionsAlpha);
-        
+        form.SetMainAlpha(mainAlpha);
+        form.SetActionsAlpha(actionsAlpha);
+
         form.Show();
     }
 

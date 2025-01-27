@@ -54,6 +54,7 @@ public partial class TestScript : Node {
     // Called every frame. 'delta' is the elapsed time since the previous frame.
     public override void _Process(double delta) {
         MovementActionTracker.Update();
+        UIManager.Process(delta);
         Player player = GameManager.I().GetPlayer();
 
         if (player.GetModel().Position.Y < -20) player.SetPosition(new Vector3(5f, 0.2f, 0f), new Vector3(0.0f, 90.0f, 0.0f));

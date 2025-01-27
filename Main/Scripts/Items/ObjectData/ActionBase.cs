@@ -1,5 +1,5 @@
 ﻿
-using NovemberStation.Main.Scripts.Items.ObjectData;
+using Godot;
 
 public abstract class ActionBase {
     private ObjectActions.ActionType _actionType;
@@ -13,7 +13,7 @@ public abstract class ActionBase {
         _index = index;
     }
 
-    public abstract void Invoke(ActorBase actorBase, IObjectData objectData);
+    public abstract void Invoke<T>(ActorBase actorBase, T node, ObjectData objectData) where T : Node3D;
     public int GetIndex() => _index;
     public string GetActionName() => _actionName;
 }

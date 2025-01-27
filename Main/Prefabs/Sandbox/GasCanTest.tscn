@@ -25,6 +25,7 @@ height = 0.186865
 radius = 0.098381
 
 [node name="RigidBody3D" type="RigidBody3D"]
+metadata/behaviour_type = "gascan_obj"
 
 [node name="BBox" type="CollisionShape3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0015564, 0.0327157, 0.0232238)

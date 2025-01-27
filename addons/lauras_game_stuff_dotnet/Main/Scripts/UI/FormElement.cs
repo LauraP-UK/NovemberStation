@@ -3,7 +3,7 @@ using System.Linq;
 using Godot;
 
 public abstract class FormElement<T> : IFormElement where T : Control {
-    private readonly Guid _guid;
+    private readonly Guid _guid = Guid.NewGuid();
     private T _element;
     private readonly SmartDictionary<string, SignalNode> _actions = new();
     private IFormObject _topLevelLayout;
@@ -12,14 +12,12 @@ public abstract class FormElement<T> : IFormElement where T : Control {
         SetElement(element);
         SetupOnReady();
         CustomOnReady(onReady);
-        _guid = Guid.NewGuid();
     }
 
     protected FormElement(string path, Action<T> onReady = null) {
         LoadElement(path);
         SetupOnReady();
         CustomOnReady(onReady);
-        _guid = Guid.NewGuid();
     }
 
     /* --- --- GETTERS/SETTER --- --- */
@@ -27,9 +25,11 @@ public abstract class FormElement<T> : IFormElement where T : Control {
     public void SetElement(T element) => _element = element;
     public T GetElement() => _element;
     Control IFormElement.GetElement() => GetElement();
+    public Guid GetId() => _guid;
     public IFormObject GetTopLevelLayout() => _topLevelLayout;
     public void SetTopLevelLayout(IFormObject layout) => _topLevelLayout = layout;
     public bool CaptureInput() => true;
+    public bool RequiresProcess() => false;
     public Control GetNode() => GetElement();
 
     /* --- --- SETUP MANAGEMENT --- --- */
@@ -131,7 +131,7 @@ public abstract class FormElement<T> : IFormElement where T : Control {
     
     public override bool Equals(object obj) {
         if (obj == null || GetType() != obj.GetType()) return false;
-        return _guid == ((FormElement<T>) obj)._guid;
+        return GetId() == ((FormElement<T>) obj).GetId();
     }
-    public override int GetHashCode() => _guid.GetHashCode();
+    public override int GetHashCode() => GetId().GetHashCode();
 }

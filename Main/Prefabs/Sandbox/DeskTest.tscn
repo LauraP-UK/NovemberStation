@@ -23,10 +23,11 @@ size = Vector3(0.302856, 0.0752106, 1)
 size = Vector3(0.27832, 0.0791016, 1)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_vthm3"]
-size = Vector3(2.2043, 1.04102, 1.07983)
+size = Vector3(2.20274, 1.04968, 1.07834)
 
 [node name="RigidBody3D" type="RigidBody3D"]
 mass = 50.0
+metadata/behaviour_type = "desk_obj"
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="."]
 material_override = SubResource("StandardMaterial3D_7a15w")
@@ -53,6 +54,6 @@ transform = Transform3D(0.877707, -0.479197, 0, 0.479197, 0.877707, 0, 0, 0, 1, 
 shape = SubResource("BoxShape3D_v2cyu")
 
 [node name="BBox" type="CollisionShape3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.000395775, 0.0205078, -0.036499)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.000386238, 0.0248402, -0.040849)
 shape = SubResource("BoxShape3D_vthm3")
 disabled = true

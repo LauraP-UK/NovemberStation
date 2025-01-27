@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Linq;
 using Godot;
 
@@ -48,6 +49,13 @@ public static class UIManager {
         GameManager.I().GetPlayer().GetController().SetLocked(true);
         GameManager.I().Pause(true);
         Input.MouseMode = Input.MouseModeEnum.Visible;
+    }
+
+    public static void Process(double delta) {
+        foreach (KeyValuePair<Control,FormBase> pair in _menus) {
+            FormBase form = pair.Value;
+            if (form.RequiresProcess()) form.Process(delta);
+        }
     }
     
 }
