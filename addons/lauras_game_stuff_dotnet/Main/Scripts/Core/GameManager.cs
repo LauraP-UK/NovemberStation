@@ -23,7 +23,6 @@ public class GameManager {
         
         EventManager eventManager = new();
         GameAction.Init();
-        ObjectActionRegister.Init();
     }
     
     public void SetActiveScene(Node scene) => _activeScene = scene;

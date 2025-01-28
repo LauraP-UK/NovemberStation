@@ -2,6 +2,7 @@
 using Godot;
 
 public class UseGameAction : GameActionBase {
+    private bool _downLastFrame = false;
     public UseGameAction(GameAction.Action action) : base(action) { }
 
     [EventListener]
@@ -13,31 +14,34 @@ public class UseGameAction : GameActionBase {
     [EventListener]
     private void OnUseKeyPress(KeyPressEvent ev, Key key) {
         if (!IsValidInput(key)) return;
+        if (_downLastFrame) return;
+        
+        _downLastFrame = true;
         Player player = GameManager.I().GetPlayer();
         
         RaycastResult result = player.GetLookingAt(3.0f);
         
-        if (!result.HasHit()) {
-            FireEmptyEvent();
-            return;
-        }
+        if (!result.HasHit()) return;
 
         RaycastResult.HitBodyData firstHitData = result.GetClosestHit();
         Node3D hitObject = firstHitData.Body;
         Vector3 hitNormal = firstHitData.HitNormal;
         Vector3 hitAtPosition = firstHitData.HitAtPosition;
 
-        if (hitObject is RigidBody3D rigidBody3D) {
-            ActorPickUpEvent pickUpEvent = new();
-            pickUpEvent.SetActor(player);
-            pickUpEvent.SetItem(rigidBody3D);
-            pickUpEvent.SetInteractAt(hitAtPosition);
-            pickUpEvent.SetInteractNormal(hitNormal);
-            pickUpEvent.Fire();
-            return;
-        }
-        
+        if (hitObject is not RigidBody3D rigidBody3D) return;
+        ActorPickUpEvent pickUpEvent = new();
+        pickUpEvent.SetActor(player);
+        pickUpEvent.SetItem(rigidBody3D);
+        pickUpEvent.SetInteractAt(hitAtPosition);
+        pickUpEvent.SetInteractNormal(hitNormal);
+        pickUpEvent.Fire();
+    }
+    
+    [EventListener]
+    private void OnKeyRelease(KeyReleaseEvent ev, Key key) {
+        if (!IsValidInput(key)) return;
         FireEmptyEvent();
+        _downLastFrame = false;
     }
     
     private void FireEmptyEvent() {

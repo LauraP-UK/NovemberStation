@@ -1,12 +1,18 @@
 ﻿
+using System;
 using System.Linq;
 using Godot;
 
-public abstract class ObjectData {
+public class ObjectData {
     private readonly SmartSet<ActionBase> _actions = new();
-    protected ObjectData() => ObjectActionRegister.Register(this);
-    protected void AddAction(ActionBase action) => _actions.Add(action);
-    public void InvokeAction<T>(int index, ActorBase actorBase, T node) where T : Node3D => _actions.First(a => a.GetIndex() == index).Invoke(actorBase, node, this);
+    private readonly string _metaTag;
+    public ObjectData(string metaTag, Action<ObjectData> onInit) {
+        _metaTag = metaTag;
+        onInit?.Invoke(this);
+    }
+
+    public void AddAction(ActionBase action) => _actions.Add(action);
+    public void InvokeAction<T>(string actionName, ActorBase actorBase, T node) where T : Node3D => _actions.First(a => a.GetActionName() == actionName).Invoke(actorBase, node, this);
     public SmartSet<ActionBase> GetActions() => new(_actions);
-    public abstract string GetMetaTag();
+    public string GetMetaTag() => _metaTag;
 }

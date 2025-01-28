@@ -4,9 +4,10 @@
 
 [sub_resource type="LabelSettings" id="LabelSettings_cahwn"]
 font_size = 12
+outline_size = 4
+outline_color = Color(0, 0, 0, 1)
 
-[sub_resource type="LabelSettings" id="LabelSettings_fxrqe"]
-font_size = 12
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_jamdq"]
 
 [node name="Control" type="Control"]
 layout_mode = 3
@@ -55,11 +56,12 @@ offset_left = 25.0
 offset_right = 184.0
 offset_bottom = 23.0
 text = "Test Action"
-label_settings = SubResource("LabelSettings_fxrqe")
+label_settings = SubResource("LabelSettings_cahwn")
 
 [node name="FocusButton" type="Button" parent="."]
 z_index = -5
 layout_mode = 0
 offset_right = 8.0
 offset_bottom = 8.0
+theme_override_styles/focus = SubResource("StyleBoxEmpty_jamdq")
 flat = true

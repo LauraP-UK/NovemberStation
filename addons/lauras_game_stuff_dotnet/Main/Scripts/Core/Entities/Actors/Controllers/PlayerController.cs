@@ -14,12 +14,12 @@ public class PlayerController : ControllerBase {
     private bool _altAction, _toggleCrouch;
     private float _holdDistanceModifier = 1.0f;
     private Vector2 _rotationOffset = Vector2.Zero;
-    
+
     private long _lastJump;
 
     private RigidBody3D _heldObject;
     private Direction _heldObjectDirection;
-    
+
     private readonly ContextMenu _contextMenu = new();
     private readonly CrosshairOverlay _crosshair = new();
 
@@ -35,17 +35,17 @@ public class PlayerController : ControllerBase {
     private void OnOpenShop(KeyPressEvent ev, Key key) {
         if (IsLocked()) return;
         if (key != Key.V) return;
-        
+
         new ShopMenu().Open();
     }
-    
+
     [EventListener]
     private void OnCrouchToggle(KeyPressEvent ev, Key key) {
         if (IsLocked()) return;
         if (key != Key.C) return;
         _toggleCrouch = !_toggleCrouch;
     }
-    
+
     [EventListener]
     private void OnAltHeld(KeyPressEvent ev, Key key) {
         if (IsLocked()) return;
@@ -71,7 +71,7 @@ public class PlayerController : ControllerBase {
         if (key != Key.Shift) return;
         _sprinting = false;
     }
-    
+
     [EventListener(PriorityLevels.TERMINUS)]
     private void OnCrouchEvent(ActorCrouchEvent ev, ActorBase actor) {
         if (!actor.Equals(GetActor())) return;
@@ -81,6 +81,7 @@ public class PlayerController : ControllerBase {
             else _crouching = !_crouching;
             return;
         }
+
         _crouching = ev.IsStartCrouch();
     }
 
@@ -90,7 +91,6 @@ public class PlayerController : ControllerBase {
         MouseButton button = ev.GetMouseButton();
         if (button != MouseButton.WheelDown && button != MouseButton.WheelUp) return;
         _holdDistanceModifier = Mathf.Clamp(_holdDistanceModifier + (button == MouseButton.WheelDown ? -0.05f : 0.05f), 0.5f, 1.5f);
-        
     }
 
     [EventListener(PriorityLevels.NORMAL)]
@@ -135,7 +135,7 @@ public class PlayerController : ControllerBase {
                 _rotationOffset += turnDelta * 0.02f;
                 return;
             }
-            
+
             Camera3D camera3D = player.GetCamera();
 
             Vector3 modelRotation = model.Rotation;
@@ -149,7 +149,7 @@ public class PlayerController : ControllerBase {
     }
 
     /* --- ---  METHODS  --- --- */
-    
+
     private static long GetCurrentTimeMillis() => DateTimeOffset.Now.ToUnixTimeMilliseconds();
     private long TimeSinceLastJump() => GetCurrentTimeMillis() - _lastJump;
 
@@ -172,10 +172,10 @@ public class PlayerController : ControllerBase {
         _heldObjectDirection = null;
     }
 
-    public void PickupObject(RigidBody3D obj) {
+    private void PickupObject(RigidBody3D obj) {
         _holdDistanceModifier = 1.0f;
         _rotationOffset = Vector2.Zero;
-        
+
         _heldObject = obj;
         _heldObject.CollisionMask &= ~PLAYER_LAYER;
         _heldObject.CollisionLayer &= ~OBJECT_LAYER;
@@ -194,11 +194,11 @@ public class PlayerController : ControllerBase {
 
         _heldObject.LinearVelocity = targetVelocity;
         _heldObject.AngularVelocity = Vector3.Zero;
-        
-        RotateFaceToPlayer(_heldObject, (float) delta);
+
+        RotateFaceToPlayer(_heldObject, (float)delta);
     }
 
-    public Direction FindClosestFace(RigidBody3D obj) {
+    private Direction FindClosestFace(RigidBody3D obj) {
         Transform3D globalTransform = obj.GlobalTransform;
         Basis globalBasis = globalTransform.Basis;
         Vector3 playerLookVector = -((Player)GetActor()).GetCamera().GlobalTransform.Basis.Z.Normalized();
@@ -250,39 +250,39 @@ public class PlayerController : ControllerBase {
 
         targetRotation.Y += _rotationOffset.X;
         targetRotation.X += -_rotationOffset.Y;
-        
+
         Quaternion smoothedRotation = currentRotation.Slerp(Quaternion.FromEuler(targetRotation), ROTATION_SMOOTHNESS * delta);
 
         Basis smoothedBasis = new(smoothedRotation);
         obj.GlobalTransform = new Transform3D(smoothedBasis, obj.GlobalTransform.Origin);
     }
-    
+
     /* --- ---  INTERACTION  --- --- */
-    
+
     private void HandleContextMenu() {
         Player player = GetActor<Player>();
+        RaycastResult raycastResult = Raycast.Trace(player, 4.0f);
+        RaycastResult.HitBodyData contextObj = _heldObject != null ? raycastResult.GetViaBody(_heldObject) : raycastResult.GetClosestHit();
 
-        RaycastResult raycastResult = Raycast.Trace(player, 3.0f);
-        RaycastResult.HitBodyData firstHit = raycastResult.GetClosestHit();
-        
-        if (!raycastResult.HasHit()) {
+        if (contextObj == null) {
             HideContextBox();
             return;
         }
 
-        Node3D hitBody = firstHit.Body;
+        Node3D contextNode = contextObj.Body;
+
         ObjectData objectData = null;
-        if (hitBody.HasMeta("behaviour_type")) {
-            string behaviourType = hitBody.GetMeta("behaviour_type").AsString();
-            objectData = ObjectActionRegister.Get(behaviourType);
+        if (contextNode.HasMeta("behaviour_type")) {
+            string behaviourType = contextNode.GetMeta("behaviour_type").AsString();
+            objectData = ObjectDataAtlas.Get(behaviourType);
         }
 
-        CollisionShape3D shape = (CollisionShape3D) hitBody.FindChild("BBox");
+        CollisionShape3D shape = (CollisionShape3D)contextNode.FindChild("BBox");
         if (shape == null) {
             HideContextBox();
             return;
         }
-        
+
         BoundingBox bb = BoundingBox.FromCollisionMesh(shape);
         Vector2[] inScreenSpace = bb.GetCornersInScreenSpace(player.GetCamera(), shape.GlobalTransform);
         VectorUtils.ExtremesInfo2D vecExtremes = VectorUtils.GetExtremes(inScreenSpace);
@@ -290,13 +290,13 @@ public class PlayerController : ControllerBase {
         Vector2 minPos = vecExtremes.min;
         Vector2 maxPos = vecExtremes.max - minPos;
 
-        float distanceTo = firstHit.Distance;
+        float distanceTo = contextObj.Distance;
         float distRatio = Mathsf.InverseLerpClamped(3.0f, 0.9f, distanceTo);
         float actionRatio = Mathsf.InverseLerpClamped(3.0f, 2.5f, distanceTo);
-        
+
         DrawContextBox(minPos, maxPos, distRatio, actionRatio, objectData);
     }
-    
+
     /* --- ---  UI  --- --- */
     private void DrawContextBox(Vector2 minPos, Vector2 maxPos, float mainAlpha, float actionsAlpha, ObjectData objData) {
         ContextMenuForm form = _contextMenu.GetForm();
@@ -314,13 +314,14 @@ public class PlayerController : ControllerBase {
             button.GetNode().SetCustomMinimumSize(new Vector2(0, 20));
             button.SetAlpha(actionsAlpha);
             listContainer.AddChild(button);
+            if (listContainer.GetDisplayObjects().Count == 1) button.GrabFocus();
         }
 
         int displayItems = listContainer.GetDisplayObjects().Count;
         Vector2 size = new(100, 20 * displayItems);
         form.GetActionsContainerFrame().GetNode().SetSize(size);
         listContainer.GetNode().SetSize(size);
-        
+
         form.SetMainAlpha(mainAlpha);
         form.SetActionsAlpha(actionsAlpha);
 

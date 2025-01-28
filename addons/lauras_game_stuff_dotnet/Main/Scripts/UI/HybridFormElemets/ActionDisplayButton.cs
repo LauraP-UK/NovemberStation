@@ -10,8 +10,8 @@ public class ActionDisplayButton : FormBase, IFocusable {
     private readonly ButtonElement _focusButton;
 
     private static readonly Color
-        DEFAULT_BG_COLOR = Colors.Black,
-        FOCUS_BG_COLOR = Colors.DimGray;
+        DEFAULT_BG_COLOR = Colors.DimGray,
+        FOCUS_BG_COLOR = Colors.DarkGoldenrod;
 
     private const string
         FORM_PATH = "res://Main/Prefabs/UI/GameElements/ActionDisplayElement.tscn",

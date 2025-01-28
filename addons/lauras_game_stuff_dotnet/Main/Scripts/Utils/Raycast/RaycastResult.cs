@@ -19,6 +19,7 @@ public class RaycastResult {
 
     public List<HitBodyData> GetHitsSortedByDistance() => _hitBodies.OrderBy(hit => hit.Distance).ToList();
     public HitBodyData GetClosestHit() => _hitBodies.OrderBy(hit => hit.Distance).FirstOrDefault();
+    public HitBodyData GetViaBody(Node3D body) => _hitBodies.FirstOrDefault(hit => hit.Body.Equals(body));
 
     public void AddHitBody(float distance, Node3D body, Vector3 hitAtPosition, Vector3 hitNormal) =>
         _hitBodies.Add(new HitBodyData {
