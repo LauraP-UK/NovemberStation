@@ -78,36 +78,38 @@ public class ContextMenuForm : FormBase {
             float minimumWidth = 0;
             
             foreach (ActionBase action in actions) {
-                ActionDisplayButton button = new(action.GetActionName() + "_btn");
+                ActionDisplayButton button = new(action);
                 button.SetActionName(action.GetActionName());
-                button.SetActionNum(1 + listContainer.GetDisplayObjects().Count + ".");
+                button.SetActionNum(1 + listContainer.GetChildCount() + ".");
                 button.GetNode().SetCustomMinimumSize(new Vector2(0, ACTION_SIZE_Y));
                 button.SetAlpha(actionsAlpha);
                 minimumWidth = button.GetMinimumWidth() > minimumWidth ? button.GetMinimumWidth() : minimumWidth;
                 listContainer.AddChild(button);
             }
 
-            int displayItems = listContainer.GetDisplayObjects().Count;
-            if (displayItems == 0)
+            if (listContainer.IsEmpty())
                 actionsAlpha = 0.0f;
             else {
-                Vector2 size = new(minimumWidth + ACTION_SIZE_X, ACTION_SIZE_Y * displayItems);
+                int displayItems = listContainer.GetChildCount();
+                Vector2 size = new(ACTION_SIZE_X + minimumWidth, ACTION_SIZE_Y * displayItems);
                 GetActionsContainerFrame().GetNode().SetSize(size);
                 listContainer.GetNode().SetSize(size);
-                int index = Mathf.Wrap(actionIndex, 0, listContainer.GetDisplayObjects().Count);
-                ((ActionDisplayButton)listContainer.GetDisplayObjects()[index]).GrabFocus();
             }
         }
-        else if (listContainer.GetDisplayObjects().Count == 0) actionsAlpha = 0.0f;
+        else if (listContainer.IsEmpty()) actionsAlpha = 0.0f;
 
-        if (!listContainer.IsEmpty()) {
-            int index = Mathf.Wrap(actionIndex, 0, listContainer.GetDisplayObjects().Count);
-            ((ActionDisplayButton)listContainer.GetDisplayObjects()[index]).GrabFocus();
-        }
+        if (!listContainer.IsEmpty()) GetAction(actionIndex)?.GrabFocus();
 
         Show();
         
         SetMainAlpha(mainAlpha);
         SetActionsAlpha(actionsAlpha);
+    }
+
+    public ActionDisplayButton GetAction(int index) {
+        VBoxContainerElement listContainer = GetListContainer();
+        if (listContainer.IsEmpty()) return null;
+        int wrappedI = Mathf.Wrap(index, 0, listContainer.GetDisplayObjects().Count);
+        return (ActionDisplayButton) listContainer.GetDisplayObjects()[wrappedI];
     }
 }

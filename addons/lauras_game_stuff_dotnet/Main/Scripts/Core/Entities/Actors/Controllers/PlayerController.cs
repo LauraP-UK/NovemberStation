@@ -13,9 +13,10 @@ public class PlayerController : ControllerBase {
     private float _holdDistanceModifier = 1.0f;
     private Vector2 _rotationOffset = Vector2.Zero;
     private long _lastJump;
-    private int _actionIndex = 2;
-    private ulong _lastActionID = 0;
+    private int _actionIndex;
+    private ulong _lastActionID;
     private string _lastBehaviourType = "";
+    private Node3D _contextObject;
 
     private RigidBody3D _heldObject;
     private Direction _heldObjectDirection;
@@ -158,11 +159,18 @@ public class PlayerController : ControllerBase {
     private static long GetCurrentTimeMillis() => DateTimeOffset.Now.ToUnixTimeMilliseconds();
     private long TimeSinceLastJump() => GetCurrentTimeMillis() - _lastJump;
     private bool IsHoldingObject() => _heldObject != null;
+    
     protected override void OnUpdate(float delta) => HandleContextMenu();
 
     protected override void OnPhysicsUpdate(float delta) {
         if (_heldObject != null) UpdateHeldObjectPosition(delta);
     }
+
+    public ActionBase GetCurrentContextAction() {
+        ActionDisplayButton btn = _contextMenu.GetForm().GetAction(_actionIndex);
+        return btn?.GetAction();
+    }
+    public Node3D GetContextObject() => _contextObject ?? _heldObject;
 
     private void ReleaseHeldObject(Vector3? releaseVelocity = null) {
         if (_heldObject == null) return;
@@ -266,33 +274,34 @@ public class PlayerController : ControllerBase {
     /* --- ---  UI  --- --- */
     private void HandleContextMenu() {
         Player player = GetActor<Player>();
-        RaycastResult raycastResult = Raycast.Trace(player, 4.0f);
-        RaycastResult.HitBodyData contextObj = _heldObject != null ? raycastResult.GetViaBody(_heldObject) : raycastResult.GetClosestHit();
+        RaycastResult raycastResult = player.GetLookingAt(4.0f);
+        RaycastResult.HitBodyData contextObjResult = _heldObject != null ? raycastResult.GetViaBody(_heldObject) : raycastResult.GetClosestHit();
 
-        if (contextObj == null) {
+        if (contextObjResult == null) {
+            _contextObject = null;
             HideContextBox();
             return;
         }
 
-        ObjectData objectData = null;
-        Node3D contextNode = contextObj.Body;
-        ulong instanceId = contextNode.GetInstanceId();
+        _contextObject = contextObjResult.Body;
+        ulong instanceId = _contextObject.GetInstanceId();
 
-        CollisionShape3D shape = (CollisionShape3D)contextNode.FindChild("BBox");
+        CollisionShape3D shape = (CollisionShape3D)_contextObject.FindChild("BBox");
         if (shape == null) {
             HideContextBox();
             return;
         }
 
-        if (contextNode.HasMeta(ObjectDataAtlas.META_TAG) && instanceId != _lastActionID) {
+        ObjectData objectData = null;
+
+        if (ObjectDataAtlas.HasBehaviour(_contextObject) && instanceId != _lastActionID) {
             HideContextBox();
             _lastActionID = instanceId;
-            string behaviourType = contextNode.GetMeta(ObjectDataAtlas.META_TAG).AsString();
-            if (_lastBehaviourType != behaviourType) {
+            objectData = ObjectDataAtlas.Get(_contextObject);
+            if (_lastBehaviourType != objectData.GetMetaTag()) {
                 _actionIndex = 0;
-                _lastBehaviourType = behaviourType;
+                _lastBehaviourType =  objectData.GetMetaTag();
             }
-            objectData = ObjectDataAtlas.Get(behaviourType);
         }
 
         BoundingBox bb = BoundingBox.FromCollisionMesh(shape);
@@ -302,7 +311,7 @@ public class PlayerController : ControllerBase {
         Vector2 minPos = vecExtremes.min;
         Vector2 maxPos = vecExtremes.max - minPos;
 
-        float distanceTo = contextObj.Distance;
+        float distanceTo = contextObjResult.Distance;
         float distRatio = Mathsf.InverseLerpClamped(2.9f, 0.9f, distanceTo);
         float actionRatio = Mathsf.InverseLerpClamped(2.9f, 2.5f, distanceTo);
         

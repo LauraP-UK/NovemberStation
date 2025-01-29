@@ -3,20 +3,24 @@ using Godot;
 
 public class GrabAction : ActionBase {
     public GrabAction(ObjectActions.ActionType actionType, string name, int index) : base(actionType, name, index) { }
-    private static void Handle(IViewable actor) {
+    private static void Handle(IViewable actor, Node3D node, bool pickUp) {
         RaycastResult result = actor.GetLookingAt(3.0f);
         
-        if (!result.HasHit()) {
+        if (!pickUp || !result.HasHit()) {
             FireEmptyEvent();
             return;
         }
 
-        RaycastResult.HitBodyData firstHitData = result.GetClosestHit();
-        Node3D hitObject = firstHitData.Body;
-        Vector3 hitNormal = firstHitData.HitNormal;
-        Vector3 hitAtPosition = firstHitData.HitAtPosition;
+        RaycastResult.HitBodyData hitData = result.GetViaBody(node);
+        if (hitData == null) {
+            GD.PrintErr($"ERROR: GrabAction.Handle() : hitData is null for {node.Name}");
+            FireEmptyEvent();
+            return;
+        }
+        Vector3 hitNormal = hitData.HitNormal;
+        Vector3 hitAtPosition = hitData.HitAtPosition;
 
-        if (hitObject is not RigidBody3D rigidBody3D) {
+        if (node is not RigidBody3D rigidBody3D) {
             FireEmptyEvent();
             return;
         }
@@ -36,8 +40,16 @@ public class GrabAction : ActionBase {
         pickUpEvent.Fire();
     }
 
-    public override void Invoke<T>(ActorBase actorBase, T node, ObjectData objectData) {
+    public override void Invoke<T>(ActorBase actorBase, T node, IEventBase ev) {
         if (actorBase is not IViewable actor) return;
-        Handle(actor);
+        switch (ev) {
+            case MouseInputEvent mouseEv: {
+                Handle(actor, node, mouseEv.IsPressed());
+                break;
+            }
+            default:
+                return;
+        }
     }
+    protected override MouseType GetMouseType() => MouseType.BOTH;
 }

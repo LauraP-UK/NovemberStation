@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Godot;
 
-public abstract class EventBase<TContext> {
+public abstract class EventBase<TContext> : IEventBase {
     private readonly List<LogItem> _log = new();
     public abstract TContext GetAdditionalContext();
     
