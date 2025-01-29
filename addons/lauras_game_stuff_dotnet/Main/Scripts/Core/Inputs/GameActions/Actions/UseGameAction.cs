@@ -8,7 +8,7 @@ public class UseGameAction : GameActionBase {
 
     [EventListener]
     private void OnMouseUsePress(MouseInputEvent ev, Vector2 coords) {
-        if (!IsValidInput(ev.GetMouseButton())) return;
+        if (!IsValidInput(ev.GetMouseButton()) || ev.IsCaptured()) return;
         
         Player player = GameManager.I().GetPlayer();
         PlayerController controller = player.GetController<PlayerController>();

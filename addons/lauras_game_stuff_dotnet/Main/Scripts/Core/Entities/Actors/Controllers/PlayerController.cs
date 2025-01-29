@@ -170,7 +170,7 @@ public class PlayerController : ControllerBase {
         ActionDisplayButton btn = _contextMenu.GetForm().GetAction(_actionIndex);
         return btn?.GetAction();
     }
-    public Node3D GetContextObject() => _contextObject ?? _heldObject;
+    public Node3D GetContextObject() => _heldObject ?? _contextObject;
 
     private void ReleaseHeldObject(Vector3? releaseVelocity = null) {
         if (_heldObject == null) return;
@@ -274,7 +274,7 @@ public class PlayerController : ControllerBase {
     /* --- ---  UI  --- --- */
     private void HandleContextMenu() {
         Player player = GetActor<Player>();
-        RaycastResult raycastResult = player.GetLookingAt(4.0f);
+        RaycastResult raycastResult = player.GetLookingAt(3.0f);
         RaycastResult.HitBodyData contextObjResult = _heldObject != null ? raycastResult.GetViaBody(_heldObject) : raycastResult.GetClosestHit();
 
         if (contextObjResult == null) {

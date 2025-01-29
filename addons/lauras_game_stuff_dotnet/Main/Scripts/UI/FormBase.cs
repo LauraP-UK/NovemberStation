@@ -61,7 +61,15 @@ public abstract class FormBase : IFormObject {
     }
 
     [EventListener(PriorityLevels.TERMINUS)]
-    protected void OnKeyRelease(KeyReleaseEvent ev, Key key) => KeyboardBehaviour(key, false);
+    protected void OnKeyRelease(KeyReleaseEvent ev, Key key) {
+        if (GetTopLevelLayout().CaptureInput()) ev.Capture();
+        KeyboardBehaviour(key, false);
+    }
+
+    [EventListener(PriorityLevels.HIGHEST)]
+    protected void OnMouseEvent(MouseInputEvent ev, Vector2 pos) {
+        if (GetTopLevelLayout().CaptureInput()) ev.Capture();
+    }
 
     public IFormObject GetTopLevelLayout() {
         if (_topLevelLayout == null) return this;
