@@ -96,10 +96,10 @@ public class PlayerController : ControllerBase {
             _holdDistanceModifier = Mathf.Clamp(_holdDistanceModifier + (button == MouseButton.WheelDown ? -0.05f : 0.05f), 0.5f, 1.5f);
             return;
         }
-        _actionIndex += button == MouseButton.WheelDown ? 1 : -1;
+        if (GetContextObject() != null) _actionIndex += button == MouseButton.WheelDown ? 1 : -1;
     }
 
-    [EventListener(PriorityLevels.NORMAL)]
+    [EventListener]
     private void OnPickUpItem(ActorPickUpEvent ev, ActorBase actor) {
         if (!actor.Equals(GetActor())) return;
         RigidBody3D hitBody = ev.GetItem();
@@ -113,7 +113,7 @@ public class PlayerController : ControllerBase {
         PickupObject(hitBody);
     }
 
-    [EventListener(PriorityLevels.NORMAL)]
+    [EventListener]
     private void OnPlayerUseClick(PlayerUseClickEvent ev, ActorBase actor) {
         if (!actor.Equals(GetActor()) || !ev.IsPressed() || _heldObject == null) return;
         Vector3 tossDirection = -((Player)GetActor()).GetCamera().GlobalTransform.Basis.Z * 20.0f; // Big push in the direction
