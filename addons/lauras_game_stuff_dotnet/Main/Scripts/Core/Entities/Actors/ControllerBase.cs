@@ -47,6 +47,11 @@ public abstract class ControllerBase : Listener {
     protected abstract void OnUpdate(float delta);
     public void Update(float delta) {
         OnUpdate(delta);
+    }
+    
+    protected abstract void OnPhysicsUpdate(float delta);
+    public void PhysicsUpdate(float delta) {
+        OnPhysicsUpdate(delta);
         CharacterBody3D model = GetActor().GetModel();
 
         HandleCrouch(delta);

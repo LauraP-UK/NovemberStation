@@ -20,7 +20,10 @@ public class VBoxContainerElement : FormElement<VBoxContainer> {
     }
     
     public void ClearChildren() {
-        foreach (IFormObject displayObject in _displayObjects) displayObject.Destroy();
+        foreach (IFormObject displayObject in _displayObjects) {
+            displayObject.Destroy();
+            displayObject.GetNode().QueueFree();
+        }
         _displayObjects.Clear();
     }
 }

@@ -56,6 +56,7 @@ public partial class TestScript : Node {
         MovementActionTracker.Update();
         UIManager.Process(delta);
         Player player = GameManager.I().GetPlayer();
+        if (!GetTree().Paused) player.GetController().Update((float)delta);
 
         if (player.GetModel().Position.Y < -20) player.SetPosition(new Vector3(5f, 0.2f, 0f), new Vector3(0.0f, 90.0f, 0.0f));
 
@@ -74,6 +75,6 @@ public partial class TestScript : Node {
     public override void _PhysicsProcess(double delta) {
         base._PhysicsProcess(delta);
         Player player = GameManager.I().GetPlayer();
-        if (!GetTree().Paused) player.GetController().Update((float)delta);
+        if (!GetTree().Paused) player.GetController().PhysicsUpdate((float)delta);
     }
 }

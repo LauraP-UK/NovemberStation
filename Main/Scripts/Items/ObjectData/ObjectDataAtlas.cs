@@ -2,6 +2,8 @@
 using System;
 
 public static class ObjectDataAtlas {
+    public const string META_TAG = "behaviour_type";
+    
     private static readonly SmartDictionary<string, ObjectData> _registry = new();
     public static ObjectData Register(string metaTag, Action<ObjectData> onInit) {
         ObjectData data = new(metaTag, onInit);

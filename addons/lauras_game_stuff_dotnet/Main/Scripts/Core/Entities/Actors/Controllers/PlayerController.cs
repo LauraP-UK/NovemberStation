@@ -14,8 +14,9 @@ public class PlayerController : ControllerBase {
     private bool _altAction, _toggleCrouch;
     private float _holdDistanceModifier = 1.0f;
     private Vector2 _rotationOffset = Vector2.Zero;
-
     private long _lastJump;
+    private int _actionIndex = 2;
+    private ulong _lastActionID = 0;
 
     private RigidBody3D _heldObject;
     private Direction _heldObjectDirection;
@@ -154,8 +155,11 @@ public class PlayerController : ControllerBase {
     private long TimeSinceLastJump() => GetCurrentTimeMillis() - _lastJump;
 
     protected override void OnUpdate(float delta) {
-        if (_heldObject != null) UpdateHeldObjectPosition(delta);
         HandleContextMenu();
+    }
+
+    protected override void OnPhysicsUpdate(float delta) {
+        if (_heldObject != null) UpdateHeldObjectPosition(delta);
     }
 
     private void ReleaseHeldObject(Vector3? releaseVelocity = null) {
@@ -256,9 +260,8 @@ public class PlayerController : ControllerBase {
         Basis smoothedBasis = new(smoothedRotation);
         obj.GlobalTransform = new Transform3D(smoothedBasis, obj.GlobalTransform.Origin);
     }
-
-    /* --- ---  INTERACTION  --- --- */
-
+    
+    /* --- ---  UI  --- --- */
     private void HandleContextMenu() {
         Player player = GetActor<Player>();
         RaycastResult raycastResult = Raycast.Trace(player, 4.0f);
@@ -269,18 +272,21 @@ public class PlayerController : ControllerBase {
             return;
         }
 
-        Node3D contextNode = contextObj.Body;
-
         ObjectData objectData = null;
-        if (contextNode.HasMeta("behaviour_type")) {
-            string behaviourType = contextNode.GetMeta("behaviour_type").AsString();
-            objectData = ObjectDataAtlas.Get(behaviourType);
-        }
+        Node3D contextNode = contextObj.Body;
+        ulong instanceId = contextNode.GetInstanceId();
 
         CollisionShape3D shape = (CollisionShape3D)contextNode.FindChild("BBox");
         if (shape == null) {
             HideContextBox();
             return;
+        }
+
+        if (contextNode.HasMeta(ObjectDataAtlas.META_TAG) && instanceId != _lastActionID) {
+            HideContextBox();
+            _lastActionID = instanceId;
+            string behaviourType = contextNode.GetMeta(ObjectDataAtlas.META_TAG).AsString();
+            objectData = ObjectDataAtlas.Get(behaviourType);
         }
 
         BoundingBox bb = BoundingBox.FromCollisionMesh(shape);
@@ -291,44 +297,15 @@ public class PlayerController : ControllerBase {
         Vector2 maxPos = vecExtremes.max - minPos;
 
         float distanceTo = contextObj.Distance;
-        float distRatio = Mathsf.InverseLerpClamped(3.0f, 0.9f, distanceTo);
-        float actionRatio = Mathsf.InverseLerpClamped(3.0f, 2.5f, distanceTo);
+        float distRatio = Mathsf.InverseLerpClamped(2.9f, 0.9f, distanceTo);
+        float actionRatio = Mathsf.InverseLerpClamped(2.9f, 2.5f, distanceTo);
 
-        DrawContextBox(minPos, maxPos, distRatio, actionRatio, objectData);
-    }
-
-    /* --- ---  UI  --- --- */
-    private void DrawContextBox(Vector2 minPos, Vector2 maxPos, float mainAlpha, float actionsAlpha, ObjectData objData) {
         ContextMenuForm form = _contextMenu.GetForm();
-        if (form == null) return;
-        form.SetNWCorner(minPos);
-        form.SetSECorner(maxPos);
-
-        List<ActionBase> actions = objData.GetActions().OrderBy(action => action.GetIndex()).ToList();
-        VBoxContainerElement listContainer = form.GetListContainer();
-
-        foreach (ActionBase action in actions) {
-            ActionDisplayButton button = new(action.GetActionName() + "_btn");
-            button.SetActionName(action.GetActionName());
-            button.SetActionNum(1 + listContainer.GetDisplayObjects().Count + ".");
-            button.GetNode().SetCustomMinimumSize(new Vector2(0, 20));
-            button.SetAlpha(actionsAlpha);
-            listContainer.AddChild(button);
-            if (listContainer.GetDisplayObjects().Count == 1) button.GrabFocus();
-        }
-
-        int displayItems = listContainer.GetDisplayObjects().Count;
-        Vector2 size = new(100, 20 * displayItems);
-        form.GetActionsContainerFrame().GetNode().SetSize(size);
-        listContainer.GetNode().SetSize(size);
-
-        form.SetMainAlpha(mainAlpha);
-        form.SetActionsAlpha(actionsAlpha);
-
-        form.Show();
+        form?.Draw(_actionIndex, minPos, maxPos, distRatio, actionRatio, objectData);
     }
-
+    
     private void HideContextBox() {
+        _lastActionID = 0;
         if (_contextMenu.GetForm() == null)
             return;
         _contextMenu.GetForm().Hide();

@@ -1,11 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using System.Linq;
 using Godot;
 
 public class ContextMenuForm : FormBase {
     private readonly NinePatchRectElement _mainFrame, _actionsContainerFrame;
     private readonly ControlElement _actionsContainer;
     private readonly VBoxContainerElement _listContainer;
+    
+    private const float ACTION_SIZE_X = 45.0f, ACTION_SIZE_Y = 20.0f;
 
     private const string
         FORM_PATH = "res://Main/Prefabs/UI/GameElements/ContextMenu.tscn",
@@ -43,7 +45,7 @@ public class ContextMenuForm : FormBase {
     public NinePatchRectElement GetActionsContainerFrame() => _actionsContainerFrame;
     public VBoxContainerElement GetListContainer() => _listContainer;
 
-    public void SetActionsAlpha(float alpha) {
+    private void SetActionsAlpha(float alpha) {
         GetActionsContainerFrame().SetAlpha(alpha);
         GetListContainer().GetDisplayObjects().ForEach(displayObject => {
             if (displayObject is not ActionDisplayButton button) return;
@@ -51,15 +53,54 @@ public class ContextMenuForm : FormBase {
         });
     }
 
-    public void SetMainAlpha(float alpha) => GetMainFrame().SetAlpha(alpha);
+    private void SetMainAlpha(float alpha) => GetMainFrame().SetAlpha(alpha);
 
-    public void SetNWCorner(Vector2 position) => _menuElement.GetElement().SetPosition(position);
-    public void SetSECorner(Vector2 position) => _menuElement.GetElement().SetSize(position);
+    private void SetNWCorner(Vector2 position) => _menuElement.GetElement().SetPosition(position);
+    private void SetSECorner(Vector2 position) => _menuElement.GetElement().SetSize(position);
 
-    public void Show() => _menuElement.GetElement().Show();
+    private void Show() => _menuElement.GetElement().Show();
 
     public void Hide() {
-        _menuElement.GetElement().Hide();
+        if (!_menuElement.GetElement().Visible) return;
         GetListContainer().ClearChildren();
+        _menuElement.GetElement().Hide();
+    }
+
+    public void Draw(int actionIndex, Vector2 minPos, Vector2 maxPos, float mainAlpha, float actionsAlpha, ObjectData objData = null) {
+        SetNWCorner(minPos);
+        SetSECorner(maxPos);
+        VBoxContainerElement listContainer = GetListContainer();
+
+        if (objData != null) {
+            List<ActionBase> actions = objData.GetActions().OrderBy(action => action.GetIndex()).ToList();
+
+            float minimumWidth = 0;
+            
+            foreach (ActionBase action in actions) {
+                ActionDisplayButton button = new(action.GetActionName() + "_btn");
+                button.SetActionName(action.GetActionName());
+                button.SetActionNum(1 + listContainer.GetDisplayObjects().Count + ".");
+                button.GetNode().SetCustomMinimumSize(new Vector2(0, ACTION_SIZE_Y));
+                button.SetAlpha(actionsAlpha);
+                minimumWidth = button.GetMinimumWidth() > minimumWidth ? button.GetMinimumWidth() : minimumWidth;
+                listContainer.AddChild(button);
+            }
+
+            int displayItems = listContainer.GetDisplayObjects().Count;
+            if (displayItems == 0)
+                actionsAlpha = 0.0f;
+            else {
+                Vector2 size = new(minimumWidth + ACTION_SIZE_X, ACTION_SIZE_Y * displayItems);
+                GetActionsContainerFrame().GetNode().SetSize(size);
+                listContainer.GetNode().SetSize(size);
+                ((ActionDisplayButton)listContainer.GetDisplayObjects()[(actionIndex - 1) % displayItems]).GrabFocus();
+            }
+        }
+        else if (listContainer.GetDisplayObjects().Count == 0) actionsAlpha = 0.0f;
+
+        Show();
+        
+        SetMainAlpha(mainAlpha);
+        SetActionsAlpha(actionsAlpha);
     }
 }

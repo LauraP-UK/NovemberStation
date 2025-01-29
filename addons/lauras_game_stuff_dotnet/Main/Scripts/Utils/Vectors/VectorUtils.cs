@@ -93,6 +93,9 @@ public static class VectorUtils {
             max = LXLYLZ;
             centre = (min + max) / 2;
         }
-        public static ExtremesInfo3D Empty() => new(new[]{Vector3.Zero, Vector3.Zero, Vector3.Zero, Vector3.Zero, Vector3.Zero, Vector3.Zero, Vector3.Zero, Vector3.Zero});
+        public static ExtremesInfo3D Empty() => new(new[] {
+            Vector3.Zero, Vector3.Zero, Vector3.Zero, Vector3.Zero,
+            Vector3.Zero, Vector3.Zero, Vector3.Zero, Vector3.Zero
+        });
     }
 }

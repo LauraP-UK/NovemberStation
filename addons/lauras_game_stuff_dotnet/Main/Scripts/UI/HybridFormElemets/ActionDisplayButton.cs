@@ -42,8 +42,6 @@ public class ActionDisplayButton : FormBase, IFocusable {
         EventManager.UnregisterListeners(this);
     }
 
-    private void SetSize() => GetNode().SetScale(new Vector2(0.1f, 0.1f));
-
     protected override List<IFormObject> GetAllElements() => new() {_nameLabel, _numLabel, _bgColor, _focusButton};
     protected override void OnDestroy() { }
     
@@ -58,6 +56,7 @@ public class ActionDisplayButton : FormBase, IFocusable {
     }
     
     public float GetAlpha() => _bgColor.GetAlpha();
+    public float GetMinimumWidth() => _nameLabel.GetElement().GetMinimumSize().X;
 
     public void GrabFocus() {
         if (!IsValid() || HasFocus()) return;

@@ -5,4 +5,8 @@ public class NPCController : ControllerBase {
     protected override void OnUpdate(float delta) {
         
     }
+
+    protected override void OnPhysicsUpdate(float delta) {
+        
+    }
 }
