@@ -11,7 +11,7 @@ public class InputController {
         else if (@event is InputEventMouseButton eventMouseButton) {
             MouseButton button = eventMouseButton.ButtonIndex;
             bool pressed = eventMouseButton.Pressed;
-            new MouseClickEvent(button, pressed, eventMouseButton.Position).Fire();
+            new MouseInputEvent(button, pressed, eventMouseButton.Position).Fire();
         }
         else if (@event is InputEventMouseMotion eventMouseMotion) {
             new MouseMoveEvent(eventMouseMotion.Position, eventMouseMotion.Relative).Fire();

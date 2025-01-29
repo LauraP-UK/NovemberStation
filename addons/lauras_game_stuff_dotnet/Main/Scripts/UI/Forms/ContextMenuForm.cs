@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Godot;
 
@@ -93,10 +94,16 @@ public class ContextMenuForm : FormBase {
                 Vector2 size = new(minimumWidth + ACTION_SIZE_X, ACTION_SIZE_Y * displayItems);
                 GetActionsContainerFrame().GetNode().SetSize(size);
                 listContainer.GetNode().SetSize(size);
-                ((ActionDisplayButton)listContainer.GetDisplayObjects()[(actionIndex - 1) % displayItems]).GrabFocus();
+                int index = Mathf.Wrap(actionIndex, 0, listContainer.GetDisplayObjects().Count);
+                ((ActionDisplayButton)listContainer.GetDisplayObjects()[index]).GrabFocus();
             }
         }
         else if (listContainer.GetDisplayObjects().Count == 0) actionsAlpha = 0.0f;
+
+        if (!listContainer.IsEmpty()) {
+            int index = Mathf.Wrap(actionIndex, 0, listContainer.GetDisplayObjects().Count);
+            ((ActionDisplayButton)listContainer.GetDisplayObjects()[index]).GrabFocus();
+        }
 
         Show();
         

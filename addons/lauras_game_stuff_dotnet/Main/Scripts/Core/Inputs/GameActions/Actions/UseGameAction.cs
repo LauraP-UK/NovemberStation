@@ -6,7 +6,7 @@ public class UseGameAction : GameActionBase {
     public UseGameAction(GameAction.Action action) : base(action) { }
 
     [EventListener]
-    private void OnMouseUsePress(MouseClickEvent ev, Vector2 coords) {
+    private void OnMouseUsePress(MouseInputEvent ev, Vector2 coords) {
         if (!IsValidInput(ev.GetMouseButton())) return;
         new PlayerUseClickEvent(ev.GetMouseButton(), ev.IsPressed(), coords).Fire();
     }

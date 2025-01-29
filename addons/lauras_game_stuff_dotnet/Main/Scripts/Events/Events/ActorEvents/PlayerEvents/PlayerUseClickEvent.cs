@@ -3,11 +3,11 @@ using Godot;
 
 public class PlayerUseClickEvent : ActorEventBase {
 
-    private readonly MouseClickEvent _eventInfo;
+    private readonly MouseInputEvent _eventInfo;
     
     public PlayerUseClickEvent(MouseButton mouseButton, bool pressed, Vector2 position) {
         SetActor(GameManager.I().GetPlayer());
-        _eventInfo = new MouseClickEvent(mouseButton, pressed, position);
+        _eventInfo = new MouseInputEvent(mouseButton, pressed, position);
     }
     
     public MouseButton GetMouseButton() => _eventInfo.GetMouseButton();

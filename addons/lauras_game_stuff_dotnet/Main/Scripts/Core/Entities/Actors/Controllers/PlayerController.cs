@@ -1,6 +1,4 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using Godot;
 
 public class PlayerController : ControllerBase {
@@ -17,6 +15,7 @@ public class PlayerController : ControllerBase {
     private long _lastJump;
     private int _actionIndex = 2;
     private ulong _lastActionID = 0;
+    private string _lastBehaviourType = "";
 
     private RigidBody3D _heldObject;
     private Direction _heldObjectDirection;
@@ -48,14 +47,14 @@ public class PlayerController : ControllerBase {
     }
 
     [EventListener]
-    private void OnAltHeld(MouseClickEvent ev, Vector2 position) {
+    private void OnAltHeld(MouseInputEvent ev, Vector2 position) {
         if (IsLocked()) return;
         if (_altAction || !(ev.GetMouseButton() == MouseButton.Right && ev.IsPressed())) return;
         _altAction = true;
     }
 
     [EventListener]
-    private void OnAltReleased(MouseClickEvent ev, Vector2 position) {
+    private void OnAltReleased(MouseInputEvent ev, Vector2 position) {
         if (!(ev.GetMouseButton() == MouseButton.Right && !ev.IsPressed())) return;
         _altAction = false;
     }
@@ -87,11 +86,16 @@ public class PlayerController : ControllerBase {
     }
 
     [EventListener]
-    private void OnMouseScroll(MouseClickEvent ev, Vector2 position) {
-        if (_heldObject == null || IsLocked()) return;
+    private void OnMouseScroll(MouseInputEvent ev, Vector2 position) {
+        if (IsLocked() || !ev.IsPressed()) return;
         MouseButton button = ev.GetMouseButton();
         if (button != MouseButton.WheelDown && button != MouseButton.WheelUp) return;
-        _holdDistanceModifier = Mathf.Clamp(_holdDistanceModifier + (button == MouseButton.WheelDown ? -0.05f : 0.05f), 0.5f, 1.5f);
+        
+        if (IsHoldingObject()) {
+            _holdDistanceModifier = Mathf.Clamp(_holdDistanceModifier + (button == MouseButton.WheelDown ? -0.05f : 0.05f), 0.5f, 1.5f);
+            return;
+        }
+        _actionIndex += button == MouseButton.WheelDown ? 1 : -1;
     }
 
     [EventListener(PriorityLevels.NORMAL)]
@@ -153,6 +157,7 @@ public class PlayerController : ControllerBase {
 
     private static long GetCurrentTimeMillis() => DateTimeOffset.Now.ToUnixTimeMilliseconds();
     private long TimeSinceLastJump() => GetCurrentTimeMillis() - _lastJump;
+    private bool IsHoldingObject() => _heldObject != null;
     protected override void OnUpdate(float delta) => HandleContextMenu();
 
     protected override void OnPhysicsUpdate(float delta) {
@@ -283,6 +288,10 @@ public class PlayerController : ControllerBase {
             HideContextBox();
             _lastActionID = instanceId;
             string behaviourType = contextNode.GetMeta(ObjectDataAtlas.META_TAG).AsString();
+            if (_lastBehaviourType != behaviourType) {
+                _actionIndex = 0;
+                _lastBehaviourType = behaviourType;
+            }
             objectData = ObjectDataAtlas.Get(behaviourType);
         }
 
@@ -296,15 +305,14 @@ public class PlayerController : ControllerBase {
         float distanceTo = contextObj.Distance;
         float distRatio = Mathsf.InverseLerpClamped(2.9f, 0.9f, distanceTo);
         float actionRatio = Mathsf.InverseLerpClamped(2.9f, 2.5f, distanceTo);
-
+        
         ContextMenuForm form = _contextMenu.GetForm();
         form?.Draw(_actionIndex, minPos, maxPos, distRatio, actionRatio, objectData);
     }
     
     private void HideContextBox() {
         _lastActionID = 0;
-        if (_contextMenu.GetForm() == null)
-            return;
+        if (_contextMenu.GetForm() == null) return;
         _contextMenu.GetForm().Hide();
     }
 }

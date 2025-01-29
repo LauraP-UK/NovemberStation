@@ -10,6 +10,7 @@ public class VBoxContainerElement : FormElement<VBoxContainer> {
     public void SetAlignment(BoxContainer.AlignmentMode value) => GetElement().SetAlignment(value);
     public void SetUniquesOnly(bool value) => _uniquesOnly = value;
     public List<IFormObject> GetDisplayObjects() => _displayObjects;
+    public bool IsEmpty() => _displayObjects.Count == 0;
     public void AddChild(IFormObject child) {
         if (_uniquesOnly && _displayObjects.Contains(child)) {
             child.GetNode().QueueFree();
