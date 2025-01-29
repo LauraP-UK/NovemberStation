@@ -48,15 +48,15 @@ public class PlayerController : ControllerBase {
     }
 
     [EventListener]
-    private void OnAltHeld(KeyPressEvent ev, Key key) {
+    private void OnAltHeld(MouseClickEvent ev, Vector2 position) {
         if (IsLocked()) return;
-        if (key != Key.Alt || _altAction) return;
+        if (_altAction || !(ev.GetMouseButton() == MouseButton.Right && ev.IsPressed())) return;
         _altAction = true;
     }
 
     [EventListener]
-    private void OnAltReleased(KeyReleaseEvent ev, Key key) {
-        if (key != Key.Alt) return;
+    private void OnAltReleased(MouseClickEvent ev, Vector2 position) {
+        if (!(ev.GetMouseButton() == MouseButton.Right && !ev.IsPressed())) return;
         _altAction = false;
     }
 
@@ -153,10 +153,7 @@ public class PlayerController : ControllerBase {
 
     private static long GetCurrentTimeMillis() => DateTimeOffset.Now.ToUnixTimeMilliseconds();
     private long TimeSinceLastJump() => GetCurrentTimeMillis() - _lastJump;
-
-    protected override void OnUpdate(float delta) {
-        HandleContextMenu();
-    }
+    protected override void OnUpdate(float delta) => HandleContextMenu();
 
     protected override void OnPhysicsUpdate(float delta) {
         if (_heldObject != null) UpdateHeldObjectPosition(delta);
