@@ -51,5 +51,14 @@ public class GameManager {
     public void Quit() => Scheduler.ScheduleOnce(50, _ => GetActiveScene().GetTree().Quit());
 
     public Rid GetWorldRid() => GetActiveScene().GetTree().Root.GetWorld3D().Space;
+    public T GetObjectClass<T>(ulong id) where T : IObjectBase => (T) ((TestScript)GetActiveScene()).GetObjects().GetOrDefault(id, null);
+
+    public void RegisterObject(Node3D node) {
+        TestScript activeScene = (TestScript)GetActiveScene();
+        IObjectBase objBase = ObjectAtlas.CreateObject(node);
+        if (objBase != null)
+            activeScene.GetObjects().Add(node.GetInstanceId(), objBase);
+    }
+    
     public void Pause(bool pause) => GetActiveScene().GetTree().Paused = pause;
 }

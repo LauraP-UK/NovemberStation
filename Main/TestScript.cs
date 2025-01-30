@@ -33,26 +33,8 @@ public partial class TestScript : Node {
         Node3D sceneObjects = GetTree().Root.GetNode<Node3D>("Main/SceneObjects");
         foreach (Node child in sceneObjects.GetChildren()) {
             if (child is not Node3D obj) continue;
-            if (!obj.HasMeta("object_tag")) continue;
-
-            string tag = obj.GetMeta("object_tag").AsString();
-            IObjectBase objBase = ObjectAtlas.CreateObject(tag, obj);
-            if (objBase != null) _objects.Add(obj.GetInstanceId(), objBase);
+            gameManager.RegisterObject(obj);
         }
-
-        Node3D pcNode = GetTree().Root.GetNode<Node3D>("Main/SceneObjects/PC");
-        SubViewport subViewport = pcNode.GetNode<SubViewport>("ScreenStatic/Screen/ScreenViewport");
-        ShopMenu shopMenu = new();
-        shopMenu.ModifyForm(form => {
-            form.SetCaptureInput(false);
-            ScrollDisplayList display = form.GetScrollDisplay();
-            display.SetKeyboardEnabled(false);
-            display.SetCaptureInput(false);
-            EventManager.UnregisterListeners(display);
-            EventManager.UnregisterListeners(form);
-            display.GetDisplayObjects().ForEach(EventManager.UnregisterListeners);
-        });
-        shopMenu.DisplayOn(subViewport);
 
         foreach (Node child in gameManager.GetSceneObjects().GetChildren()) {
             if (child is not RigidBody3D obj) continue;
@@ -89,4 +71,7 @@ public partial class TestScript : Node {
         Player player = GameManager.I().GetPlayer();
         if (!GetTree().Paused) player.GetController().PhysicsUpdate((float)delta);
     }
+    
+    public T GetObjectClass<T>(ulong id) where T : IObjectBase => (T) _objects.GetOrDefault(id, null);
+    public SmartDictionary<ulong, IObjectBase> GetObjects() => _objects;
 }

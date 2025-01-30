@@ -18,6 +18,8 @@ public class ShopMenu : PreMadeMenu<TestDisplayForm> {
                     rigidBody3D.SetPosition(spawn);
                     rigidBody3D.SetRotation(gameManager.GetPlayer().GetModel().GetRotation());
                     
+                    GameManager.I().RegisterObject(rigidBody3D);
+                    
                     Close();
                 });
                 btn.SetTopLevelLayout(form.GetTopLevelLayout());
