@@ -93,6 +93,9 @@ process_mode = 1
 [node name="SceneObjects" type="Node3D" parent="."]
 process_mode = 1
 
+[node name="PC" parent="SceneObjects" instance=ExtResource("7_0u05g")]
+transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, 13.2965, 0.0417014, -3.90072)
+
 [node name="Desk" parent="SceneObjects" instance=ExtResource("3_dkfcn")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.521518, 4.5054)
 collision_layer = 12
@@ -277,6 +280,3 @@ shape = SubResource("BoxShape3D_wmdie")
 
 [node name="UILayer" type="CanvasLayer" parent="."]
 process_mode = 3
-
-[node name="PC" parent="." instance=ExtResource("7_0u05g")]
-transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, 13.2965, 0.0417014, -3.90072)

@@ -3,6 +3,8 @@ using Godot;
 
 public partial class TestScript : Node {
     private readonly Dictionary<RigidBody3D, Vector3> _dynamicObjects = new();
+    
+    private readonly SmartDictionary<ulong, IObjectBase> _objects = new();
 
     public TestScript() {
         GameManager.Init();
@@ -28,7 +30,17 @@ public partial class TestScript : Node {
         player.SetPosition(new Vector3(5f, 0.2f, 0f), new Vector3(0.0f, 90.0f, 0.0f));
         gameManager.SetPlayer(player);
 
-        Node3D pcNode = GetTree().Root.GetNode<Node3D>("Main/PC");
+        Node3D sceneObjects = GetTree().Root.GetNode<Node3D>("Main/SceneObjects");
+        foreach (Node child in sceneObjects.GetChildren()) {
+            if (child is not Node3D obj) continue;
+            if (!obj.HasMeta("object_tag")) continue;
+
+            string tag = obj.GetMeta("object_tag").AsString();
+            IObjectBase objBase = ObjectAtlas.CreateObject(tag, obj);
+            if (objBase != null) _objects.Add(obj.GetInstanceId(), objBase);
+        }
+
+        Node3D pcNode = GetTree().Root.GetNode<Node3D>("Main/SceneObjects/PC");
         SubViewport subViewport = pcNode.GetNode<SubViewport>("ScreenStatic/Screen/ScreenViewport");
         ShopMenu shopMenu = new();
         shopMenu.ModifyForm(form => {

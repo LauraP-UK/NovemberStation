@@ -1,7 +1,5 @@
 ﻿
 using System;
-using System.Linq;
-using Godot;
 
 public class ObjectData {
     private readonly SmartSet<ActionBase> _actions = new();

@@ -288,6 +288,7 @@ public class PlayerController : ControllerBase {
 
         CollisionShape3D shape = (CollisionShape3D)_contextObject.FindChild("BBox");
         if (shape == null) {
+            _contextObject = null;
             HideContextBox();
             return;
         }
