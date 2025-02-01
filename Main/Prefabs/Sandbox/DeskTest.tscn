@@ -28,6 +28,7 @@ size = Vector3(2.20274, 1.04968, 1.07834)
 [node name="RigidBody3D" type="RigidBody3D"]
 mass = 50.0
 metadata/behaviour_type = "desk_obj"
+metadata/object_tag = "desk_obj"
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="."]
 material_override = SubResource("StandardMaterial3D_7a15w")

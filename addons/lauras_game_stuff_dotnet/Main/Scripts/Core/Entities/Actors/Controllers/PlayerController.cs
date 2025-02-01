@@ -166,7 +166,7 @@ public class PlayerController : ControllerBase {
         if (_heldObject != null) UpdateHeldObjectPosition(delta);
     }
 
-    public ActionBase GetCurrentContextAction() {
+    public Type GetCurrentContextAction() {
         ActionDisplayButton btn = _contextMenu.GetForm().GetAction(_actionIndex);
         return btn?.GetAction();
     }
@@ -293,12 +293,10 @@ public class PlayerController : ControllerBase {
             return;
         }
 
-        ObjectData objectData = null;
-
-        if (ObjectDataAtlas.HasBehaviour(_contextObject) && instanceId != _lastActionID) {
+        IObjectBase objectData = GameManager.I().GetObjectClass<IObjectBase>(instanceId);
+        if (objectData != null && instanceId != _lastActionID) {
             HideContextBox();
             _lastActionID = instanceId;
-            objectData = ObjectDataAtlas.Get(_contextObject);
             if (_lastBehaviourType != objectData.GetMetaTag()) {
                 _actionIndex = 0;
                 _lastBehaviourType =  objectData.GetMetaTag();

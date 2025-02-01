@@ -1,8 +1,7 @@
 ﻿
 using Godot;
 
-public class GrabAction : ActionBase {
-    public GrabAction(ObjectActions.ActionType actionType, string name, int index) : base(actionType, name, index) { }
+public class GrabActionDefault : BaseActionDefault {
     private static void Handle(IViewable actor, Node3D node, bool pickUp) {
         RaycastResult result = actor.GetLookingAt(3.0f);
         
@@ -13,7 +12,7 @@ public class GrabAction : ActionBase {
 
         RaycastResult.HitBodyData hitData = result.GetViaBody(node);
         if (hitData == null) {
-            GD.PrintErr($"ERROR: GrabAction.Handle() : hitData is null for {node.Name}");
+            GD.PrintErr($"ERROR: GrabActionDefault.Handle() : hitData is null for {node.Name}");
             FireEmptyEvent();
             return;
         }
@@ -40,7 +39,7 @@ public class GrabAction : ActionBase {
         pickUpEvent.Fire();
     }
 
-    public override void Invoke<T>(ActorBase actorBase, T node, IEventBase ev) {
+    public static void Invoke(ActorBase actorBase, Node3D node, IEventBase ev) {
         if (actorBase is not IViewable actor) return;
         switch (ev) {
             case MouseInputEvent mouseEv: {
@@ -51,5 +50,4 @@ public class GrabAction : ActionBase {
                 return;
         }
     }
-    protected override MouseType GetMouseType() => MouseType.BOTH;
 }

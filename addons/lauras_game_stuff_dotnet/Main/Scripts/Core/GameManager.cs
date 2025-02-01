@@ -23,6 +23,10 @@ public class GameManager {
         
         EventManager eventManager = new();
         GameAction.Init();
+
+        Scheduler.ScheduleRepeating(5000, 5000, _ => {
+            // TODO: Cleanup interactable object nodes and their data classes every 5 seconds
+        });
     }
     
     public void SetActiveScene(Node scene) => _activeScene = scene;
@@ -51,7 +55,8 @@ public class GameManager {
     public void Quit() => Scheduler.ScheduleOnce(50, _ => GetActiveScene().GetTree().Quit());
 
     public Rid GetWorldRid() => GetActiveScene().GetTree().Root.GetWorld3D().Space;
-    public T GetObjectClass<T>(ulong id) where T : IObjectBase => (T) ((TestScript)GetActiveScene()).GetObjects().GetOrDefault(id, null);
+    public T GetObjectClass<T>(ulong id) where T : IObjectBase => (T) GetObjectClass(id);
+    public IObjectBase GetObjectClass(ulong id)  => ((TestScript)GetActiveScene()).GetObjects().GetOrDefault(id, null);
 
     public void RegisterObject(Node3D node) {
         TestScript activeScene = (TestScript)GetActiveScene();

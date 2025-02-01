@@ -1,4 +1,5 @@
 ﻿
+using System;
 using System.Collections.Generic;
 using Godot;
 
@@ -8,7 +9,7 @@ public class ActionDisplayButton : FormBase, IFocusable {
     private readonly ColorRectElement _bgColor;
     private readonly NinePatchRectElement _btnFrame;
     private readonly ButtonElement _focusButton;
-    private readonly ActionBase _action;
+    private readonly Type _action;
 
     private static readonly Color
         DEFAULT_BG_COLOR = Colors.DimGray,
@@ -22,7 +23,7 @@ public class ActionDisplayButton : FormBase, IFocusable {
         BUTTON_FRAME = "BtnFrame",
         FOCUS_BUTTON = "FocusButton";
     
-    public ActionDisplayButton(ActionBase action) : base(action.GetActionName() + "_btn", FORM_PATH) {
+    public ActionDisplayButton(Type action) : base(ActionAtlas.GetActionName(action) + "_btn", FORM_PATH) {
         _action = action;
         
         Label numLabel = FindNode<Label>(ACTION_NUM);
@@ -48,7 +49,7 @@ public class ActionDisplayButton : FormBase, IFocusable {
     protected override List<IFormObject> GetAllElements() => new() {_nameLabel, _numLabel, _bgColor, _focusButton};
     protected override void OnDestroy() { }
     
-    public ActionBase GetAction() => _action;
+    public Type GetAction() => _action;
     
     public void SetActionNum(string num) => _numLabel.GetElement().SetText(num);
     public void SetActionName(string name) => _nameLabel.GetElement().SetText(name);

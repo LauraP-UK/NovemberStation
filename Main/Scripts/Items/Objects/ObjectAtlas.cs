@@ -13,6 +13,16 @@ public static class ObjectAtlas {
         OBJECT_TAG = "object_tag";
     
     static ObjectAtlas() => RegisterAll();
+    
+    private static void RegisterAll() {
+        // Automatically registers all classes that inherit from ObjectBase<>
+        IEnumerable<Type> objectTypes = Assembly.GetExecutingAssembly()
+            .GetTypes()
+            .Where(t => t.IsClass && !t.IsAbstract && typeof(IObjectBase).IsAssignableFrom(t));
+
+        foreach (Type type in objectTypes)
+            Register(type);
+    }
 
     public static void Register([NotNull] Type clazz) {
         ArgumentNullException.ThrowIfNull(clazz);
@@ -20,10 +30,17 @@ public static class ObjectAtlas {
             throw new Exception($"ERROR: ObjectAtlas.Register() : Class '{clazz.Name}' must inherit from ObjectBase<?>.");
         
         GD.Print($"Registering object class: {clazz.Name}");
-        
-        MethodInfo tagMethod = clazz.GetMethod(TAG_METHOD_NAME, BindingFlags.Public | BindingFlags.Static);
-        if (tagMethod == null) throw new Exception($"ERROR: ObjectAtlas.Register() : Object class must have a static method called {TAG_METHOD_NAME}. Class: {clazz.Name}");
-        _registry.Add((string) tagMethod.Invoke(null, null), clazz);
+
+        try {
+            object dummy = Activator.CreateInstance(clazz, new object[] {null});
+            if (dummy is not IObjectBase obj)
+                throw new Exception($"ERROR: ObjectAtlas.Register() : Created object is not of expected type 'IObjectBase'. Got '{dummy?.GetType()}'.");
+            
+            _registry.Add(obj.GetObjectTag(), clazz);
+        }
+        catch (Exception e) {
+            GD.PrintErr($"ERROR: ObjectAtlas.Register() : Failed to create instance of class '{clazz.Name}'. Exception: {e.Message}");
+        }
     }
     public static Type GetObjectClass(string tag) => _registry.GetOrDefault(tag, null);
 
@@ -53,16 +70,5 @@ public static class ObjectAtlas {
         object instance = Activator.CreateInstance(clazz, node);
         if (instance is not T obj) throw new Exception($"ERROR: ObjectAtlas.CreateObject() : Created object is not of expected type '{typeof(T)}'. Got '{instance?.GetType()}'.");
         return obj;
-    }
-    
-    private static void RegisterAll() {
-        // Automatically registers all classes that inherit from ObjectBase<>
-        IEnumerable<Type> objectTypes = Assembly.GetExecutingAssembly()
-            .GetTypes()
-            .Where(t => t.IsClass && !t.IsAbstract && typeof(IObjectBase).IsAssignableFrom(t));
-
-        foreach (Type type in objectTypes) {
-            Register(type);
-        }
     }
 }

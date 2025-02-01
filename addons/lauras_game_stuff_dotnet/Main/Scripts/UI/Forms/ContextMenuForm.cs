@@ -67,25 +67,30 @@ public class ContextMenuForm : FormBase {
         _menuElement.GetElement().Hide();
     }
 
-    public void Draw(int actionIndex, Vector2 minPos, Vector2 maxPos, float mainAlpha, float actionsAlpha, ObjectData objData = null) {
+    public void Draw(int actionIndex, Vector2 minPos, Vector2 maxPos, float mainAlpha, float actionsAlpha, IObjectBase objData = null) {
         SetNWCorner(minPos);
         SetSECorner(maxPos);
         VBoxContainerElement listContainer = GetListContainer();
 
+        Player player = GameManager.I().GetPlayer();
+
         if (objData != null) {
-            List<ActionBase> actions = objData.GetActions().OrderBy(action => action.GetIndex()).ToList();
+            List<Type> validActions = objData.GetValidActions(player, null);
 
             float minimumWidth = 0;
+            List<ActionDisplayButton> buttons = new();
             
-            foreach (ActionBase action in actions) {
+            foreach (Type action in validActions) {
                 ActionDisplayButton button = new(action);
-                button.SetActionName(action.GetActionName());
-                button.SetActionNum(1 + listContainer.GetChildCount() + ".");
+                button.SetActionName(ActionAtlas.GetActionName(action));
+                button.SetActionNum(1 + buttons.Count + ".");
                 button.GetNode().SetCustomMinimumSize(new Vector2(0, ACTION_SIZE_Y));
                 button.SetAlpha(actionsAlpha);
                 minimumWidth = button.GetMinimumWidth() > minimumWidth ? button.GetMinimumWidth() : minimumWidth;
-                listContainer.AddChild(button);
+                buttons.Add(button);
             }
+            
+            listContainer.SetChildren(buttons);
 
             if (listContainer.IsEmpty())
                 actionsAlpha = 0.0f;

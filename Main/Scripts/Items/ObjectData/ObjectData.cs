@@ -1,15 +1,6 @@
 ﻿
-using System;
-
 public class ObjectData {
-    private readonly SmartSet<ActionBase> _actions = new();
     private readonly string _metaTag;
-    public ObjectData(string metaTag, Action<ObjectData> onInit) {
-        _metaTag = metaTag;
-        onInit?.Invoke(this);
-    }
-
-    public void AddAction(ActionBase action) => _actions.Add(action);
-    public SmartSet<ActionBase> GetActions() => new(_actions);
+    public ObjectData(string metaTag) => _metaTag = metaTag;
     public string GetMetaTag() => _metaTag;
 }
