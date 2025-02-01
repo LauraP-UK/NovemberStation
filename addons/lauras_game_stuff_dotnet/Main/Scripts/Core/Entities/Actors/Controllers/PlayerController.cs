@@ -277,13 +277,13 @@ public class PlayerController : ControllerBase {
         RaycastResult raycastResult = player.GetLookingAt(3.0f);
         RaycastResult.HitBodyData contextObjResult = _heldObject != null ? raycastResult.GetViaBody(_heldObject) : raycastResult.GetClosestHit();
 
-        if (contextObjResult == null) {
+        if (contextObjResult == null && _heldObject == null) {
             _contextObject = null;
             HideContextBox();
             return;
         }
 
-        _contextObject = contextObjResult.Body;
+        _contextObject = _heldObject ?? contextObjResult.Body;
         ulong instanceId = _contextObject.GetInstanceId();
 
         CollisionShape3D shape = (CollisionShape3D)_contextObject.FindChild("BBox");
@@ -310,7 +310,7 @@ public class PlayerController : ControllerBase {
         Vector2 minPos = vecExtremes.min;
         Vector2 maxPos = vecExtremes.max - minPos;
 
-        float distanceTo = contextObjResult.Distance;
+        float distanceTo = contextObjResult?.Distance ?? _contextObject.GlobalPosition.DistanceTo(player.GetCamera().GlobalPosition);
         float distRatio = Mathsf.InverseLerpClamped(2.9f, 0.9f, distanceTo);
         float actionRatio = Mathsf.InverseLerpClamped(2.9f, 2.5f, distanceTo);
         
