@@ -19,7 +19,7 @@ public class UseGameAction : GameActionBase {
 
         if (obj == null) return;
         
-        IObjectBase objectClass = GameManager.I().GetObjectClass(obj.GetInstanceId());
+        IObjectBase objectClass = GameManager.I().GetObjectClass(GameUtils.FindSceneRoot(obj).GetInstanceId());
 
         if (actionType == null || objectClass == null) return;
 

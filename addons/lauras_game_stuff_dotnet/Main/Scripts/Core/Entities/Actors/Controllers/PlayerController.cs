@@ -273,8 +273,8 @@ public class PlayerController : ControllerBase {
     
     /* --- ---  UI  --- --- */
     private void HandleContextMenu() {
-        Player player = GetActor<Player>();
-        RaycastResult raycastResult = player.GetLookingAt(3.0f);
+        Camera3D activeCamera = GameManager.I().GetActiveCamera();
+        RaycastResult raycastResult = Raycast.TraceActive(3.0f);
         RaycastResult.HitBodyData contextObjResult = _heldObject != null ? raycastResult.GetViaBody(_heldObject) : raycastResult.GetClosestHit();
 
         if (contextObjResult == null && _heldObject == null) {
@@ -284,7 +284,7 @@ public class PlayerController : ControllerBase {
         }
 
         _contextObject = _heldObject ?? contextObjResult.Body;
-        ulong instanceId = _contextObject.GetInstanceId();
+        ulong instanceId = GameUtils.FindSceneRoot(_contextObject).GetInstanceId();
 
         CollisionShape3D shape = (CollisionShape3D)_contextObject.FindChild("BBox");
         if (shape == null) {
@@ -304,13 +304,13 @@ public class PlayerController : ControllerBase {
         }
 
         BoundingBox bb = BoundingBox.FromCollisionMesh(shape);
-        Vector2[] inScreenSpace = bb.GetCornersInScreenSpace(player.GetCamera(), shape.GlobalTransform);
+        Vector2[] inScreenSpace = bb.GetCornersInScreenSpace(activeCamera, shape.GlobalTransform);
         VectorUtils.ExtremesInfo2D vecExtremes = VectorUtils.GetExtremes(inScreenSpace);
 
         Vector2 minPos = vecExtremes.min;
         Vector2 maxPos = vecExtremes.max - minPos;
 
-        float distanceTo = contextObjResult?.Distance ?? _contextObject.GlobalPosition.DistanceTo(player.GetCamera().GlobalPosition);
+        float distanceTo = contextObjResult?.Distance ?? _contextObject.GlobalPosition.DistanceTo(activeCamera.GlobalPosition);
         float distRatio = Mathsf.InverseLerpClamped(2.9f, 0.9f, distanceTo);
         float actionRatio = Mathsf.InverseLerpClamped(2.9f, 2.5f, distanceTo);
         

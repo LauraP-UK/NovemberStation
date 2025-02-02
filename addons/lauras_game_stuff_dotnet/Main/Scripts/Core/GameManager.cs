@@ -55,14 +55,21 @@ public class GameManager {
     public void Quit() => Scheduler.ScheduleOnce(50, _ => GetActiveScene().GetTree().Quit());
 
     public Rid GetWorldRid() => GetActiveScene().GetTree().Root.GetWorld3D().Space;
+    public Viewport GetViewport() => GetActiveScene().GetTree().Root.GetViewport();
+    public Camera3D GetActiveCamera() => GetViewport().GetCamera3D();
     public T GetObjectClass<T>(ulong id) where T : IObjectBase => (T) GetObjectClass(id);
     public IObjectBase GetObjectClass(ulong id)  => ((TestScript)GetActiveScene()).GetObjects().GetOrDefault(id, null);
 
     public void RegisterObject(Node3D node) {
+        Node root = GameUtils.FindSceneRoot(node);
+        if (root is not Node3D rootNode) {
+            GD.PrintErr($"ERROR: GameManager.RegisterObject() : Failed to find root Node3D for '{node.Name}'.");
+            return;
+        }
         TestScript activeScene = (TestScript)GetActiveScene();
-        IObjectBase objBase = ObjectAtlas.CreateObject(node);
+        IObjectBase objBase = ObjectAtlas.CreateObject(rootNode);
         if (objBase != null)
-            activeScene.GetObjects().Add(node.GetInstanceId(), objBase);
+            activeScene.GetObjects().Add(rootNode.GetInstanceId(), objBase);
     }
     
     public void Pause(bool pause) => GetActiveScene().GetTree().Paused = pause;

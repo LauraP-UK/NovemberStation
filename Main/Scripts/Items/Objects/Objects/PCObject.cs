@@ -40,9 +40,18 @@ public class PCObject : ObjectBase<Node3D>, IUsable {
         });
         shopMenu.DisplayOn(_viewport);
     }
-    private void View() => _camera.SetCurrent(true);
-    private void Release() => GameManager.I().GetPlayer().GetCamera().SetCurrent(true);
+    private void View() {
+        _camera.SetCurrent(true);
+        GameManager.I().GetPlayer().GetController<PlayerController>().SetLocked(true);
+    }
+
+    private void Release() {
+        GameManager.I().GetPlayer().GetCamera().SetCurrent(true);
+        GameManager.I().GetPlayer().GetController<PlayerController>().SetLocked(false);
+    }
+
     public void Use(ActorBase actorBase, IEventBase ev) {
+        if (ev is MouseInputEvent mouseEvent && !mouseEvent.IsPressed()) return;
         if (_camera.IsCurrent()) Release();
         else View();
     }
