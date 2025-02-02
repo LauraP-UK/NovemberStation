@@ -2,8 +2,12 @@
 using Godot;
 
 public class GrabActionDefault : BaseActionDefault {
+    private static readonly ulong RUN_COOLDOWN = 1000;
+    private static ulong _lastRan;
+    private static bool _isHeld;
+
     private static void Handle(IViewable actor, Node3D node, bool pickUp) {
-        RaycastResult result = actor.GetLookingAt(3.0f);
+        RaycastResult result = Raycast.TraceActive(3.0f);
         
         if (!pickUp || !result.HasHit()) {
             FireEmptyEvent();
@@ -30,6 +34,8 @@ public class GrabActionDefault : BaseActionDefault {
         pickUpEvent.SetInteractAt(hitAtPosition);
         pickUpEvent.SetInteractNormal(hitNormal);
         pickUpEvent.Fire();
+        _isHeld = true;
+        _lastRan = Time.GetTicksMsec();
     }
     
     private static void FireEmptyEvent() {
@@ -37,13 +43,27 @@ public class GrabActionDefault : BaseActionDefault {
         pickUpEvent.SetActor(GameManager.I().GetPlayer());
         pickUpEvent.SetItem(null);
         pickUpEvent.Fire();
+        _isHeld = false;
     }
 
     public static void Invoke(ActorBase actorBase, Node3D node, IEventBase ev) {
         if (actorBase is not IViewable actor) return;
         switch (ev) {
             case MouseInputEvent mouseEv: {
-                Handle(actor, node, mouseEv.IsPressed());
+                if (!mouseEv.IsPressed() || !_isHeld) return;
+                FireEmptyEvent();
+                ShoveActionDefault.Invoke(actorBase, node, ev, 20.0f, MouseType.DOWN, KeyType.NONE);
+                break;
+            }
+            case KeyPressEvent keyPress: {
+                if (_isHeld) return;
+                if (Time.GetTicksMsec() - _lastRan < RUN_COOLDOWN) return;
+                Handle(actor, node, true);
+                break;
+            }
+            case KeyReleaseEvent keyRelease: {
+                _lastRan = 0;
+                Handle(actor, node, false);
                 break;
             }
             default:

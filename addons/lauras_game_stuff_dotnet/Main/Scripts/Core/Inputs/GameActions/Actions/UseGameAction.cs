@@ -8,9 +8,24 @@ public class UseGameAction : GameActionBase {
     public UseGameAction(GameAction.Action action) : base(action) { }
 
     [EventListener]
+    private void OnKeyPress(KeyPressEvent ev, Key key) {
+        if (!IsValidInput(key)) return;
+        Handle(ev);
+    }
+    
+    [EventListener]
+    private void OnKeyRelease(KeyReleaseEvent ev, Key key) {
+        if (!IsValidInput(key)) return;
+        Handle(ev);
+    }
+
+    [EventListener]
     private void OnMouseUsePress(MouseInputEvent ev, Vector2 coords) {
         if (!IsValidInput(ev.GetMouseButton()) || ev.IsCaptured()) return;
-        
+        Handle(ev);
+    }
+
+    private void Handle(IEventBase ev) {
         Player player = GameManager.I().GetPlayer();
         PlayerController controller = player.GetController<PlayerController>();
         
@@ -18,9 +33,7 @@ public class UseGameAction : GameActionBase {
         Node3D obj = controller.GetContextObject();
 
         if (obj == null) return;
-        
         IObjectBase objectClass = GameManager.I().GetObjectClass(GameUtils.FindSceneRoot(obj).GetInstanceId());
-
         if (actionType == null || objectClass == null) return;
 
         try {

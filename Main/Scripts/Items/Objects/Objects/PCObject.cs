@@ -10,6 +10,8 @@ public class PCObject : ObjectBase<Node3D>, IUsable {
     private readonly SubViewport _viewport;
     private readonly MeshInstance3D _screen;
     private readonly Camera3D _camera;
+    
+    private readonly GameManager _gameManager = GameManager.I();
 
     public PCObject(Node3D pcNode) : base(pcNode, "pc_obj", "pc_obj") {
         RegisterAction<IUsable>((_,_) => true, Use);
@@ -42,16 +44,18 @@ public class PCObject : ObjectBase<Node3D>, IUsable {
     }
     private void View() {
         _camera.SetCurrent(true);
-        GameManager.I().GetPlayer().GetController<PlayerController>().SetLocked(true);
+        _gameManager.GetPlayer().GetController<PlayerController>().SetLocked(true);
+        _gameManager.SetMouseControl(true);
     }
 
     private void Release() {
-        GameManager.I().GetPlayer().GetCamera().SetCurrent(true);
-        GameManager.I().GetPlayer().GetController<PlayerController>().SetLocked(false);
+        _gameManager.GetPlayer().GetCamera().SetCurrent(true);
+        _gameManager.GetPlayer().GetController<PlayerController>().SetLocked(false);
+        _gameManager.SetMouseControl(false);
     }
 
     public void Use(ActorBase actorBase, IEventBase ev) {
-        if (ev is MouseInputEvent mouseEvent && !mouseEvent.IsPressed()) return;
+        if (ev is not KeyPressEvent) return;
         if (_camera.IsCurrent()) Release();
         else View();
     }

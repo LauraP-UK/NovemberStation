@@ -73,4 +73,5 @@ public class GameManager {
     }
     
     public void Pause(bool pause) => GetActiveScene().GetTree().Paused = pause;
+    public void SetMouseControl(bool mouseAvailable) => Input.MouseMode = mouseAvailable ? Input.MouseModeEnum.Visible : Input.MouseModeEnum.Captured;
 }

@@ -31,9 +31,10 @@ public static class UIManager {
         FormBase form = _menus[menu];
         _menus.Remove(menu);
         if (form != null && form.LockMovement()) {
-            GameManager.I().GetPlayer().GetController().SetLocked(false);
-            Input.MouseMode = Input.MouseModeEnum.Captured;
-            GameManager.I().Pause(false);
+            GameManager gameManager = GameManager.I();
+            gameManager.GetPlayer().GetController().SetLocked(false);
+            gameManager.Pause(false);
+            gameManager.SetMouseControl(false);
         }
 
         form?.RemoveFromScene();
@@ -46,9 +47,10 @@ public static class UIManager {
         _menus.Add(menu.GetMenu(), menu);
 
         if (!menu.LockMovement()) return;
-        GameManager.I().GetPlayer().GetController().SetLocked(true);
-        GameManager.I().Pause(true);
-        Input.MouseMode = Input.MouseModeEnum.Visible;
+        GameManager gameManager = GameManager.I();
+        gameManager.GetPlayer().GetController().SetLocked(true);
+        gameManager.Pause(true);
+        gameManager.SetMouseControl(true);
     }
 
     public static void Process(double delta) {
