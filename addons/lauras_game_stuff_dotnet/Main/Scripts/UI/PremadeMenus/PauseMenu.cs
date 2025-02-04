@@ -12,6 +12,7 @@ public class PauseMenu : PreMadeMenu<BinaryChoiceForm> {
         
         pauseMenu.SetBackgroundType(BinaryChoiceForm.BackgroundType.IMAGE);
         pauseMenu.SetBackgroundAlpha(0.5f);
+        pauseMenu.SetListener(FormListener.Default(pauseMenu));
         
         pauseMenu.OnUpperButton(_ => Close());
         pauseMenu.OnLowerButton(_ => {

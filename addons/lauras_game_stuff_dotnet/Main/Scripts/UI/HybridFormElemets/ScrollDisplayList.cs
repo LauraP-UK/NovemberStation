@@ -66,6 +66,8 @@ public class ScrollDisplayList : FormBase {
         
         int currentIndex = listObjects.FindIndex(obj => obj is IFocusable focusable && focusable.HasFocus());
         
+        GD.Print($"Current Index: {currentIndex}");
+        
         int originalIndex = currentIndex;
 
         do {
@@ -108,6 +110,7 @@ public class ScrollDisplayList : FormBase {
     public void SetKeyboardBehaviour(Action<Key, ScrollDisplayList, bool> keyboardBehaviour) => _keyboardBehaviour = keyboardBehaviour;
     public static void DefaultKeyboardBehaviour(Key key, ScrollDisplayList form, bool isPressed) {
         if (!isPressed) return;
+        GD.Print($"Default behav Key: {key}");
         switch (key) {
             case Key.W: {
                 form.MoveFocus(-1);
@@ -128,12 +131,14 @@ public class ScrollDisplayList : FormBase {
             }
         }
     }
-    protected override void KeyboardBehaviour(Key key, bool isPressed) {
+    public override void KeyboardBehaviour(Key key, bool isPressed) {
         if (!IsKeyboardEnabled()) return;
+        GD.Print($"{GetTopLevelLayout().GetNode().Name}  -  {GetMenu().Name}  -  KeyboardBehaviour: {key}");
         if (_keyboardBehaviour != null) {
             _keyboardBehaviour(key, this, isPressed);
             return;
         }
+        GD.Print("Using default keyboard behaviour.");
         DefaultKeyboardBehaviour(key, this, isPressed);
     }
 }

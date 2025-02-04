@@ -2,7 +2,8 @@
 using Godot;
 
 public class GrabActionDefault : BaseActionDefault {
-    private static readonly ulong RUN_COOLDOWN = 1000;
+    private const ulong RUN_COOLDOWN = 1000;
+    
     private static ulong _lastRan;
     private static bool _isHeld;
 
@@ -52,6 +53,7 @@ public class GrabActionDefault : BaseActionDefault {
             case MouseInputEvent mouseEv: {
                 if (!mouseEv.IsPressed() || !_isHeld) return;
                 FireEmptyEvent();
+                _lastRan = Time.GetTicksMsec();
                 ShoveActionDefault.Invoke(actorBase, node, ev, 20.0f, MouseType.DOWN, KeyType.NONE);
                 break;
             }

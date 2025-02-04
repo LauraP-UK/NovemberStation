@@ -1,5 +1,5 @@
 ﻿
-public abstract class BaseActionDefault : Listener {
+public abstract class BaseActionDefault {
     public enum MouseType {
         DOWN,
         UP,

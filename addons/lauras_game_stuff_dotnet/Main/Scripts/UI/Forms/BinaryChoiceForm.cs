@@ -141,7 +141,7 @@ public class BinaryChoiceForm : FormBase {
 
     protected override void OnDestroy() { }
 
-    protected override void KeyboardBehaviour(Key key, bool isPressed) {
+    public override void KeyboardBehaviour(Key key, bool isPressed) {
         if (_keyboardBehaviour != null) {
             _keyboardBehaviour.Invoke(key, this, isPressed);
             return;

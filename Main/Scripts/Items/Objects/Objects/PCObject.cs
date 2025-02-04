@@ -12,6 +12,7 @@ public class PCObject : ObjectBase<Node3D>, IUsable {
     private readonly Camera3D _camera;
     
     private readonly GameManager _gameManager = GameManager.I();
+    private readonly ShopMenu _shopMenu;
 
     public PCObject(Node3D pcNode) : base(pcNode, "pc_obj", "pc_obj") {
         RegisterAction<IUsable>((_,_) => true, Use);
@@ -30,28 +31,37 @@ public class PCObject : ObjectBase<Node3D>, IUsable {
             return;
         }
         
-        ShopMenu shopMenu = new();
-        shopMenu.ModifyForm(form => {
+        _shopMenu = new();
+        _shopMenu.ModifyForm(form => {
             form.SetCaptureInput(false);
             ScrollDisplayList display = form.GetScrollDisplay();
             display.SetKeyboardEnabled(false);
             display.SetCaptureInput(false);
-            EventManager.UnregisterListeners(display);
-            EventManager.UnregisterListeners(form);
-            display.GetDisplayObjects().ForEach(EventManager.UnregisterListeners);
+            display.SetListener(FormListener.Default(display));
         });
-        shopMenu.DisplayOn(_viewport);
+        _shopMenu.DisplayOn(_viewport);
     }
     private void View() {
         _camera.SetCurrent(true);
         _gameManager.GetPlayer().GetController<PlayerController>().SetLocked(true);
         _gameManager.SetMouseControl(true);
+        TestDisplayForm form = _shopMenu.GetForm();
+        form.SetCaptureInput(true);
+        ScrollDisplayList display = form.GetScrollDisplay();
+        display.SetKeyboardEnabled(true);
+        display.SetCaptureInput(true);
+        display.GetListener().Register();
     }
 
     private void Release() {
         _gameManager.GetPlayer().GetCamera().SetCurrent(true);
         _gameManager.GetPlayer().GetController<PlayerController>().SetLocked(false);
         _gameManager.SetMouseControl(false);
+        TestDisplayForm form = _shopMenu.GetForm();
+        ScrollDisplayList display = form.GetScrollDisplay();
+        form.SetCaptureInput(false);
+        display.SetKeyboardEnabled(false);
+        display.GetListener().Unregister();
     }
 
     public void Use(ActorBase actorBase, IEventBase ev) {

@@ -7,6 +7,7 @@ public abstract class FormElement<T> : IFormElement where T : Control {
     private T _element;
     private readonly SmartDictionary<string, SignalNode> _actions = new();
     private IFormObject _topLevelLayout;
+    private bool _captureInput = true;
 
     protected FormElement(T element = null, Action<T> onReady = null) {
         SetElement(element);
@@ -28,7 +29,11 @@ public abstract class FormElement<T> : IFormElement where T : Control {
     public Guid GetId() => _guid;
     public IFormObject GetTopLevelLayout() => _topLevelLayout;
     public void SetTopLevelLayout(IFormObject layout) => _topLevelLayout = layout;
-    public bool CaptureInput() => true;
+    public bool CaptureInput() => _captureInput;
+    public void SetCaptureInput(bool value) {
+        if (GetTopLevelLayout().Equals(this)) _captureInput = value;
+        else GetTopLevelLayout().SetCaptureInput(value);
+    }
     public bool RequiresProcess() => false;
     public Control GetNode() => GetElement();
 
@@ -37,7 +42,7 @@ public abstract class FormElement<T> : IFormElement where T : Control {
     public void Destroy() {
         if (!IsValid() || _element.IsQueuedForDeletion()) return;
         OnDestroy();
-        EventManager.UnregisterListeners(this);
+        //EventManager.UnregisterListeners(this);
         foreach (SignalNode action in _actions.Values) action.QueueFree();
         _actions.Clear();
         _element.QueueFree();
@@ -55,7 +60,7 @@ public abstract class FormElement<T> : IFormElement where T : Control {
     private void SetupOnReady() {
         AddAction(Node.SignalName.Ready, _ => {
             ConnectSignals();
-            EventManager.RegisterListeners(this);
+            //EventManager.RegisterListeners(this);
         });
         ConnectSignal(Node.SignalName.Ready, true);
     }
@@ -72,7 +77,7 @@ public abstract class FormElement<T> : IFormElement where T : Control {
     
     /* --- --- LISTENER/SIGNAL MANAGEMENT --- --- */
 
-    public void OnResize(Action<IFormObject> onResize) {
+    /*public void OnResize(Action<IFormObject> onResize) {
         if (onResize == null) return;
         AddAction(Control.SignalName.Resized, _ => onResize(this));
     }
@@ -83,7 +88,7 @@ public abstract class FormElement<T> : IFormElement where T : Control {
             _actions[signal].RunActionNoArgs();
             return;
         }
-    }
+    }*/
 
     public void AddAction(string signal, Action<IFormObject> action) => AddAction(signal, (formObj, _) => action(formObj));
 

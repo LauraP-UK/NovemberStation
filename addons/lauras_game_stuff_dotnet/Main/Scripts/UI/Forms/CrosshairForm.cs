@@ -16,7 +16,6 @@ public class CrosshairForm : FormBase {
         SetCaptureInput(false);
         
         _menuElement = new ControlElement(_menu);
-        
     }
     
     protected override List<IFormObject> GetAllElements() => new() { _crosshair };

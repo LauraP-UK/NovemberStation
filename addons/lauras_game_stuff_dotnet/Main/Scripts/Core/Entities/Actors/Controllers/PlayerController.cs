@@ -23,6 +23,7 @@ public class PlayerController : ControllerBase {
 
     private readonly ContextMenu _contextMenu = new();
     private readonly CrosshairOverlay _crosshair = new();
+    private readonly ShopMenu _shopMenu = new();
 
     public PlayerController(Player player) : base(player) {
         GetActor().GetModel().CollisionLayer = PLAYER_LAYER;
@@ -37,7 +38,12 @@ public class PlayerController : ControllerBase {
         if (IsLocked()) return;
         if (key != Key.V) return;
 
-        new ShopMenu().Open();
+        _shopMenu.ModifyForm(form => {
+            ScrollDisplayList scroll = form.GetScrollDisplay();
+            scroll.SetListener(FormListener.Default(scroll));
+        });
+        
+        _shopMenu.Open();
     }
 
     [EventListener]

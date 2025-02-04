@@ -41,6 +41,8 @@ public abstract class ObjectBase<T> : IObjectBase where T : Node3D {
             if (test.Invoke(actorBase, ev)) validActions.Add(key);
         return validActions;
     }
+
+    public Node3D GetBaseNode3D() => GetBaseNode();
     public string GetObjectTag() => _objectTag;
     public string GetMetaTag() => _metaTag;
 }

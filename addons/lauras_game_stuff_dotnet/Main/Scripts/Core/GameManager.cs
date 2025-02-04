@@ -23,10 +23,6 @@ public class GameManager {
         
         EventManager eventManager = new();
         GameAction.Init();
-
-        Scheduler.ScheduleRepeating(5000, 5000, _ => {
-            // TODO: Cleanup interactable object nodes and their data classes every 5 seconds
-        });
     }
     
     public void SetActiveScene(Node scene) => _activeScene = scene;

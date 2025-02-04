@@ -9,13 +9,9 @@ public abstract class PreMadeMenu<T> where T : FormBase {
     public void Open() {
         if (UIManager.HasMenu(GetFormName())) return;
         
-        if (_form != null) {
-            GD.PrintErr($"ERROR: PreMadeMenu.Open() : Form {GetType()} - {GetFormName()} already exists.");
-            return;
-        }
-        
         _form = (T) Build();
         _modify?.Invoke(_form);
+        
         UIManager.OpenMenu(_form, IsPrimary());
     }
 
@@ -29,9 +25,9 @@ public abstract class PreMadeMenu<T> where T : FormBase {
             GD.PrintErr($"ERROR: PreMadeMenu.DisplayOn() : Form {GetType()} - {GetFormName()} already exists.");
             return;
         }
-        FormBase form = Build();
-        _modify?.Invoke((T)form);
-        viewport.AddChild(form.GetMenu());
+        _form = (T) Build();
+        _modify?.Invoke(_form);
+        viewport.AddChild(_form.GetMenu());
     }
     
     protected abstract FormBase Build();
@@ -42,7 +38,7 @@ public abstract class PreMadeMenu<T> where T : FormBase {
     
     public T GetForm() {
         if (_form == null) {
-            GD.PrintErr($"ERROR: PreMadeMenu.GetForm() : Form {GetType()} - {GetFormName()} does not exist. Did you forget to call Open()?");
+            GD.PrintErr($"ERROR: PreMadeMenu.GetForm() : Form {GetType()} - {GetFormName()} does not exist. Did you forget to call Open() or DisplayOn()?");
             return null;
         }
         return _form;

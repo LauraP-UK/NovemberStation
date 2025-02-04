@@ -8,21 +8,30 @@ public abstract class FormBase : IFormObject {
     protected readonly Control _menu;
     protected ControlElement _menuElement;
     protected IFormObject _topLevelLayout;
+    protected FormListener _listener;
 
     private readonly SignalNode _onReadyAction;
-    protected bool _captureInput = true;
+    public bool _captureInput = true;
 
     protected FormBase(string formName, string formPath) {
         _menu = Loader.SafeInstantiate<Control>(formPath, true);
         _menu.Name = formName;
-        _onReadyAction = new SignalNode(Node.SignalName.Ready, (_, _) => EventManager.RegisterListeners(this), this);
+        _onReadyAction = new SignalNode(Node.SignalName.Ready, (_, _) => _listener?.Register(), this);
         GetMenu().AddChild(_onReadyAction);
     }
 
-    public void AddToScene(CanvasLayer uiLayer) => uiLayer.AddChild(GetMenu());
+    public Control GetMenu() => _menu;
+    public Control GetNode() => _menu;
+    public Guid GetId() => _id;
+    public FormListener GetListener() => _listener;
 
+    /* --- UI CONTROL --- */
+    
+    public void AddToScene(CanvasLayer uiLayer) => uiLayer.AddChild(GetMenu());
     public void RemoveFromScene() => Destroy();
 
+    /* --- FORM MANAGEMENT --- */
+    
     protected abstract List<IFormObject> GetAllElements();
     protected List<T> GetElements<T>() where T : IFormObject {
         List<T> elements = new();
@@ -30,19 +39,13 @@ public abstract class FormBase : IFormObject {
             if (element is T tElement) elements.Add(tElement);
         return elements;
     }
-
-    protected abstract void OnDestroy();
-    protected virtual void KeyboardBehaviour(Key key, bool isPressed) {}
-    public virtual bool LockMovement() => true;
-
-    public Control GetMenu() => _menu;
     public void Destroy() {
         if (!IsValid()) return;
         OnDestroy();
 
         if (this is IFocusable thisFocusable) thisFocusable.ReleaseFocus();
         
-        EventManager.UnregisterListeners(this);
+        _listener?.Unregister();
         
         foreach (IFormObject formElement in GetAllElements()) {
             formElement.Destroy();
@@ -51,47 +54,34 @@ public abstract class FormBase : IFormObject {
         _onReadyAction.QueueFree();
         _menu.QueueFree();
     }
-    
     protected T FindNode<T>(string nodePath) where T : Node => _menu.GetNode<T>(nodePath);
-    
-    [EventListener(PriorityLevels.HIGHEST)]
-    protected void OnKeyPress(KeyPressEvent ev, Key key) {
-        if (GetTopLevelLayout().CaptureInput()) ev.Capture();
-        KeyboardBehaviour(key, true);
-    }
-
-    [EventListener(PriorityLevels.TERMINUS)]
-    protected void OnKeyRelease(KeyReleaseEvent ev, Key key) {
-        if (GetTopLevelLayout().CaptureInput()) ev.Capture();
-        KeyboardBehaviour(key, false);
-    }
-
-    [EventListener(PriorityLevels.HIGHEST)]
-    protected void OnMouseEvent(MouseInputEvent ev, Vector2 pos) {
-        if (GetTopLevelLayout().CaptureInput()) ev.Capture();
-    }
-
     public IFormObject GetTopLevelLayout() {
         if (_topLevelLayout == null) return this;
         return Equals(_topLevelLayout) ? this : _topLevelLayout;
     }
-
     public void SetTopLevelLayout(IFormObject layout) => _topLevelLayout = layout;
-    public void SetCaptureInput(bool value) => _captureInput = value;
+    
+    /* --- BEHAVIOUR --- */
+    
+    protected abstract void OnDestroy();
+    public void SetListener(FormListener listener) => _listener = listener;
+    public virtual void KeyboardBehaviour(Key key, bool isPressed) {}
+    public virtual bool LockMovement() => true;
     public bool CaptureInput() {
         if (!IsValid()) return false;
         return GetTopLevelLayout().Equals(this) ? _captureInput : GetTopLevelLayout().CaptureInput();
     }
+    public void SetCaptureInput(bool value) {
+        if (GetTopLevelLayout().Equals(this)) _captureInput = value;
+        else GetTopLevelLayout().SetCaptureInput(value);
+    }
     public virtual bool RequiresProcess() => false;
     public virtual void Process(double delta) {}
-
-    public Control GetNode() => _menu;
-    protected bool IsValid() => GodotObject.IsInstanceValid(_menu) && !_menu.IsQueuedForDeletion();
-
-    public Guid GetId() => _id;
     
+    /* --- VALIDATION --- */
+    
+    protected bool IsValid() => GodotObject.IsInstanceValid(_menu) && !_menu.IsQueuedForDeletion();
     public override int GetHashCode() => GetId().GetHashCode();
-
     public override bool Equals(object obj) {
         if (obj is not FormBase form) return false;
         return form.GetId() == GetId();

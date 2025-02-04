@@ -30,15 +30,18 @@ public class ShopMenu : PreMadeMenu<TestDisplayForm> {
             closeButton.OnPressed(_ => Close());
             form.GetScrollDisplay().AddElement(closeButton);
         });
+        
         scrollDisplay.SetKeyboardBehaviour((pressedKey, form, isPressed) => {
             switch (pressedKey) {
                 case Key.W: {
                     if (!isPressed) return;
+                    GD.Print("Moving focus up.");
                     form.MoveFocus(-1);
                     break;
                 }
                 case Key.S: {
                     if (!isPressed) return;
+                    GD.Print("Moving focus down.");
                     form.MoveFocus(1);
                     break;
                 }
@@ -49,6 +52,8 @@ public class ShopMenu : PreMadeMenu<TestDisplayForm> {
                             break;
                         }
 
+                        GD.Print("Selecting element.");
+                        
                         IFormObject focusedElement = form.GetFocusedElement() ?? form.FocusElement(0);
                         if (focusedElement != null) {
                             form.GetOnSelectElement().Invoke(focusedElement);
@@ -62,6 +67,7 @@ public class ShopMenu : PreMadeMenu<TestDisplayForm> {
                     break;
                 }
                 case Key.Escape: {
+                    GD.Print("Closing form.");
                     Close();
                     break;
                 }

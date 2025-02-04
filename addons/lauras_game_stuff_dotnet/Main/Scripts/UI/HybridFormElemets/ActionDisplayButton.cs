@@ -41,9 +41,8 @@ public class ActionDisplayButton : FormBase, IFocusable {
         _focusButton.AddAction(Control.SignalName.FocusEntered, _ => _bgColor.SetColor(FOCUS_BG_COLOR));
         _focusButton.AddAction(Control.SignalName.FocusExited, _ => _bgColor.SetColor(DEFAULT_BG_COLOR));
         
-        _menuElement = new ControlElement(_menu);
+        _menuElement = new ControlElement(_menu, _ => EventManager.UnregisterListeners(this));
         SetCaptureInput(false);
-        EventManager.UnregisterListeners(this);
     }
 
     protected override List<IFormObject> GetAllElements() => new() {_nameLabel, _numLabel, _bgColor, _focusButton};
@@ -79,6 +78,6 @@ public class ActionDisplayButton : FormBase, IFocusable {
     public override bool Equals(object obj) {
         if (!IsValid()) return false;
         if (obj is not ActionDisplayButton other) return false;
-        return _menu.Name == other._menu.Name;
+        return _action == other._action;
     }
 }
