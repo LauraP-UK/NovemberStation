@@ -94,7 +94,7 @@ process_mode = 1
 process_mode = 1
 
 [node name="PC" parent="SceneObjects" instance=ExtResource("7_0u05g")]
-transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, 13.2965, 0.0417014, -3.90072)
+transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, 13.2965, 0.317834, -3.90072)
 
 [node name="Desk" parent="SceneObjects" instance=ExtResource("3_dkfcn")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.521518, 4.5054)

@@ -6,7 +6,6 @@
     <EnableDynamicLoading>true</EnableDynamicLoading>
   </PropertyGroup>
   <ItemGroup>
-    <Folder Include="addons\lauras_game_stuff_dotnet\Main\Scripts\UI\PremadeMenus\Listeners\" />
     <Folder Include="Main\Scripts\Entities\Actors\NPCTypes\" />
   </ItemGroup>
 </Project>

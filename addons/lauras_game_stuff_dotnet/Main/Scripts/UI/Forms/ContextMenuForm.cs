@@ -31,6 +31,8 @@ public class ContextMenuForm : FormBase {
 
         _menuElement = new ControlElement(_menu);
         SetCaptureInput(false);
+        
+        // TODO: Capture number key input to select actions
     }
 
 

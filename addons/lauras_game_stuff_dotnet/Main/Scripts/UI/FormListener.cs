@@ -7,6 +7,8 @@ public abstract class FormListener {
     
     public void Register() => EventManager.RegisterListeners(this);
     public void Unregister() => EventManager.UnregisterListeners(this);
+    public FormBase GetMenu() => _menu;
+    public T GetMenu<T>() where T : FormBase => (T) _menu;
 
     [EventListener(PriorityLevels.HIGHEST)]
     protected void OnKeyPress(KeyPressEvent ev, Key key) {

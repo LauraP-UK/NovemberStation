@@ -22,6 +22,29 @@ public class BoundingBox {
             { 6, 7 }                      // Edges connected to corner 6
         };
     }
+
+    public BoundingBox(Vector3 start, Vector3 end) {
+        _min = new Vector3(
+            Mathf.Min(start.X, end.X),
+            Mathf.Min(start.Y, end.Y),
+            Mathf.Min(start.Z, end.Z)
+        );
+        _max = new Vector3(
+            Mathf.Max(start.X, end.X),
+            Mathf.Max(start.Y, end.Y),
+            Mathf.Max(start.Z, end.Z)
+        );
+        _corners = new Vector3[8];
+        _corners[0] = new Vector3(_max.X, _max.Y, _max.Z);
+        _corners[1] = new Vector3(_max.X, _max.Y, _min.Z);
+        _corners[2] = new Vector3(_max.X, _min.Y, _max.Z);
+        _corners[3] = new Vector3(_max.X, _min.Y, _min.Z);
+        _corners[4] = new Vector3(_min.X, _max.Y, _max.Z);
+        _corners[5] = new Vector3(_min.X, _max.Y, _min.Z);
+        _corners[6] = new Vector3(_min.X, _min.Y, _max.Z);
+        _corners[7] = new Vector3(_min.X, _min.Y, _min.Z);
+        _centre = (_min + _max) / 2;
+    }
     
     public BoundingBox(Vector3 size) {
         _corners = new Vector3[8];
@@ -107,6 +130,10 @@ public class BoundingBox {
         List<KeyValuePair<Vector3, Vector3>> edges = GetEdgesInWorldSpace(transform3D);
         foreach (KeyValuePair<Vector3, Vector3> edge in edges) DebugDraw.Line(edge.Key, edge.Value, color);
     }
+    
+    public void DrawDebugLines(Transform3D transform3D) {
+        
+    }
 
     public static BoundingBox FromCollisionMesh(CollisionShape3D shape) {
         switch (shape.Shape) {
@@ -123,4 +150,6 @@ public class BoundingBox {
                 throw new NotSupportedException($"ERROR: BoundingBox.FromCollisionMesh() : Collision shape type not supported: {shape.Shape.GetType()}");
         }
     }
+    
+    public static BoundingBox FromAABB(Aabb aabb) => new(aabb.Position, aabb.End);
 }

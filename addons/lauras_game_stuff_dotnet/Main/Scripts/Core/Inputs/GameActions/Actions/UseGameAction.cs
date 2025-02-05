@@ -7,19 +7,19 @@ public class UseGameAction : GameActionBase {
     private Type _lastAction;
     public UseGameAction(GameAction.Action action) : base(action) { }
 
-    [EventListener]
+    [EventListener(PriorityLevels.TERMINUS)]
     private void OnKeyPress(KeyPressEvent ev, Key key) {
-        if (!IsValidInput(key)) return;
+        if (!IsValidInput(key) || ev.IsCaptured()) return;
         Handle(ev);
     }
     
-    [EventListener]
+    [EventListener(PriorityLevels.TERMINUS)]
     private void OnKeyRelease(KeyReleaseEvent ev, Key key) {
-        if (!IsValidInput(key)) return;
+        if (!IsValidInput(key) || ev.IsCaptured()) return;
         Handle(ev);
     }
 
-    [EventListener]
+    [EventListener(PriorityLevels.TERMINUS)]
     private void OnMouseUsePress(MouseInputEvent ev, Vector2 coords) {
         if (!IsValidInput(ev.GetMouseButton()) || ev.IsCaptured()) return;
         Handle(ev);
