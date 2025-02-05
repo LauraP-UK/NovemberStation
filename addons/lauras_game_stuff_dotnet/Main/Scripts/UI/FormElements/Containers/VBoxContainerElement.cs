@@ -22,6 +22,7 @@ public class VBoxContainerElement : FormElement<VBoxContainer> {
     }
     
     public void SetChildren<T>(List<T> children) where T : IFormObject {
+        if (ArrayUtils.ExactMatch(children, _displayObjects)) return;
         ClearChildren();
         foreach (T child in children) AddChild(child);
     }

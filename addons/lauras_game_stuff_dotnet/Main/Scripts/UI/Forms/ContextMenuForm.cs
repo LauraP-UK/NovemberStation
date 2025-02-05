@@ -7,7 +7,7 @@ public class ContextMenuForm : FormBase {
     private readonly NinePatchRectElement _mainFrame, _actionsContainerFrame;
     private readonly ControlElement _actionsContainer;
     private readonly VBoxContainerElement _listContainer;
-    
+
     private const float ACTION_SIZE_X = 45.0f, ACTION_SIZE_Y = 20.0f;
 
     private const string
@@ -75,22 +75,30 @@ public class ContextMenuForm : FormBase {
         Player player = GameManager.I().GetPlayer();
 
         if (objData != null) {
+            List<ActionDisplayButton> currentButtons = listContainer.GetDisplayObjects().Select(obj => (ActionDisplayButton)obj).ToList();
+            
             List<Type> validActions = objData.GetValidActions(player, null);
+            List<Type> currentActions = currentButtons.Select(obj => obj.GetAction()).ToList();
 
             float minimumWidth = 0;
-            List<ActionDisplayButton> buttons = new();
             
-            foreach (Type action in validActions) {
-                ActionDisplayButton button = new(action);
-                button.SetActionName(ActionAtlas.GetActionName(action));
-                button.SetActionNum(1 + buttons.Count + ".");
-                button.GetNode().SetCustomMinimumSize(new Vector2(0, ACTION_SIZE_Y));
-                button.SetAlpha(actionsAlpha);
-                minimumWidth = button.GetMinimumWidth() > minimumWidth ? button.GetMinimumWidth() : minimumWidth;
-                buttons.Add(button);
+            if (!ArrayUtils.ExactMatch<Type>(validActions, currentActions)) {
+                List<ActionDisplayButton> buttons = new();
+
+                foreach (Type action in validActions) {
+                    ActionDisplayButton button = new(action);
+                    button.SetActionName(ActionAtlas.GetActionName(action));
+                    button.SetActionNum(1 + buttons.Count + ".");
+                    button.GetNode().SetCustomMinimumSize(new Vector2(0, ACTION_SIZE_Y));
+                    button.SetAlpha(actionsAlpha);
+                    minimumWidth = Math.Max(minimumWidth, button.GetMinimumWidth());
+                    buttons.Add(button);
+                }
+
+                listContainer.SetChildren(buttons);
             }
-            
-            listContainer.SetChildren(buttons);
+            else
+                minimumWidth = currentButtons.Select(button => button.GetMinimumWidth()).Prepend(minimumWidth).Max();
 
             if (listContainer.IsEmpty())
                 actionsAlpha = 0.0f;
@@ -106,7 +114,7 @@ public class ContextMenuForm : FormBase {
         if (!listContainer.IsEmpty()) GetAction(actionIndex)?.GrabFocus();
 
         Show();
-        
+
         SetMainAlpha(mainAlpha);
         SetActionsAlpha(actionsAlpha);
     }
@@ -115,6 +123,6 @@ public class ContextMenuForm : FormBase {
         VBoxContainerElement listContainer = GetListContainer();
         if (listContainer.IsEmpty()) return null;
         int wrappedI = Mathf.Wrap(index, 0, listContainer.GetDisplayObjects().Count);
-        return (ActionDisplayButton) listContainer.GetDisplayObjects()[wrappedI];
+        return (ActionDisplayButton)listContainer.GetDisplayObjects()[wrappedI];
     }
 }
