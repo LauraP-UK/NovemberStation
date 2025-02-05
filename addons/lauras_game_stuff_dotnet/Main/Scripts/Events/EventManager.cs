@@ -32,8 +32,6 @@ public class EventManager {
     public static void RegisterListeners(object target) {
         MethodInfo[] methods = target.GetType().GetMethods(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
         
-        GD.Print($"-----  ({target})  :  " + Environment.StackTrace);
-        
         foreach (MethodInfo method in methods) {
             EventListenerAttribute attribute = method.GetCustomAttribute<EventListenerAttribute>();
             if (attribute == null) continue;
@@ -68,8 +66,6 @@ public class EventManager {
             return;
         }
         
-        //GD.Print($"INFO: Registering listener for event {eventType.FullName} with Owner {actualOwner} ({toAdd.GetHashCode()}).");
-        
         _listeners[eventType].Add(toAdd);
     }
     
@@ -78,18 +74,8 @@ public class EventManager {
     }
 
     public void UnregisterByOwner(object owner) {
-        //GD.Print($"INFO: Unregistering listeners for Owner {owner}. There are currently {_listeners.Count} event types registered.");
-        int removed = 0;
-        foreach (Type key in _listeners.Keys) {
-            //GD.Print($"INFO: Checking {_listeners[key].Count} {key.FullName} listeners...");
-            removed += _listeners[key].RemoveWhere(listener => {
-                //GD.Print($"INFO: Checking listener for event {key.FullName} with Owner {listener.Owner} ({listener.Owner.GetHashCode()}) against {owner} ({owner.GetHashCode()}).");
-                bool toRemove = ReferenceEquals(listener.Owner, owner) || listener.Owner.Equals(owner);
-                //if (toRemove) GD.Print($"INFO: Unregistered listener for event {key.FullName} with Owner {owner} ({owner.GetHashCode()}).");
-                return toRemove;
-            });
-        }
-        //GD.Print($"INFO: Unregistered {removed} total listeners for Owner {owner}.");
+        foreach (Type key in _listeners.Keys)
+            _listeners[key].RemoveWhere(listener => ReferenceEquals(listener.Owner, owner) || listener.Owner.Equals(owner));
     }
     public void UnregisterListener<TEvent, TContext>(Action<TEvent, object> callback) where TEvent : EventBase<TContext> {
         Type eventID = typeof(TEvent);

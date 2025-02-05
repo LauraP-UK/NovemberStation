@@ -64,7 +64,7 @@ public class ActionDisplayButton : FormBase, IFocusable {
     public float GetMinimumWidth() => _nameLabel.GetElement().GetMinimumSize().X;
 
     public void GrabFocus() {
-        if (!IsValid() || HasFocus()) return;
+        if (!IsValid() || !GameManager.I().IsActiveCameraPlayer() || HasFocus()) return;
         _focusButton.GrabFocus();
     }
 

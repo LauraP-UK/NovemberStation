@@ -53,6 +53,7 @@ public class GameManager {
     public Rid GetWorldRid() => GetActiveScene().GetTree().Root.GetWorld3D().Space;
     public Viewport GetViewport() => GetActiveScene().GetTree().Root.GetViewport();
     public Camera3D GetActiveCamera() => GetViewport().GetCamera3D();
+    public bool IsActiveCameraPlayer() => GetActiveCamera().Equals(GetPlayer().GetCamera());
     public T GetObjectClass<T>(ulong id) where T : IObjectBase => (T) GetObjectClass(id);
     public IObjectBase GetObjectClass(ulong id)  => ((TestScript)GetActiveScene()).GetObjects().GetOrDefault(id, null);
 

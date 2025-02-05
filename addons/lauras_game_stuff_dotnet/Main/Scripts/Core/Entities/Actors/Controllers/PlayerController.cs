@@ -37,12 +37,6 @@ public class PlayerController : ControllerBase {
     private void OnOpenShop(KeyPressEvent ev, Key key) {
         if (IsLocked()) return;
         if (key != Key.V) return;
-
-        _shopMenu.ModifyForm(form => {
-            ScrollDisplayList scroll = form.GetScrollDisplay();
-            scroll.SetListener(FormListener.Default(scroll));
-        });
-        
         _shopMenu.Open();
     }
 

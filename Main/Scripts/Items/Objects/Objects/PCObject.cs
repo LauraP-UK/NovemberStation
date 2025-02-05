@@ -37,7 +37,7 @@ public class PCObject : ObjectBase<Node3D>, IUsable {
             ScrollDisplayList display = form.GetScrollDisplay();
             display.SetKeyboardEnabled(false);
             display.SetCaptureInput(false);
-            display.SetListener(FormListener.Default(display));
+            display.SetRegisterListenerOnReady(false);
         });
         _shopMenu.DisplayOn(_viewport);
     }

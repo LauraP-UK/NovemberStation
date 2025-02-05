@@ -12,11 +12,14 @@ public abstract class FormBase : IFormObject {
 
     private readonly SignalNode _onReadyAction;
     public bool _captureInput = true;
+    private bool _registerListenerOnReady = true;
 
     protected FormBase(string formName, string formPath) {
         _menu = Loader.SafeInstantiate<Control>(formPath, true);
         _menu.Name = formName;
-        _onReadyAction = new SignalNode(Node.SignalName.Ready, (_, _) => _listener?.Register(), this);
+        _onReadyAction = new SignalNode(Node.SignalName.Ready, (_, _) => {
+            if (_registerListenerOnReady) _listener?.Register();
+        }, this);
         GetMenu().AddChild(_onReadyAction);
     }
 
@@ -64,7 +67,12 @@ public abstract class FormBase : IFormObject {
     /* --- BEHAVIOUR --- */
     
     protected abstract void OnDestroy();
-    public void SetListener(FormListener listener) => _listener = listener;
+    public void SetListener(FormListener listener) {
+        _listener?.Unregister();
+        _listener = listener;
+    }
+    public void SetRegisterListenerOnReady(bool value) => _registerListenerOnReady = value;
+
     public virtual void KeyboardBehaviour(Key key, bool isPressed) {}
     public virtual bool LockMovement() => true;
     public bool CaptureInput() {

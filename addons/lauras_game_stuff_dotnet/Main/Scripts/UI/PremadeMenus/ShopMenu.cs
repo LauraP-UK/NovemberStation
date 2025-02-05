@@ -8,6 +8,7 @@ public class ShopMenu : PreMadeMenu<TestDisplayForm> {
         ScrollDisplayList scrollDisplay = testDisplayForm.GetScrollDisplay();
         scrollDisplay.SetKeyboardEnabled(true);
         scrollDisplay.SetOnSelectElement<ShopItemDisplayButton>(elem => elem.GetButton().ForcePressed());
+        scrollDisplay.SetListener(FormListener.Default(scrollDisplay));
         testDisplayForm.SetOnReady(form => {
             Items.GetItemButtons().ForEach(btn => {
                 btn.OnPressed(btn => {
