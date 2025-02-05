@@ -33,19 +33,16 @@ public class BoundingBox {
         _corners[5] = new Vector3(-size.X, size.Y, -size.Z);
         _corners[6] = new Vector3(-size.X, -size.Y, size.Z);
         _corners[7] = new Vector3(-size.X, -size.Y, -size.Z);
-        
         _min = new Vector3(
             _corners.Min(corner => corner.X),
             _corners.Min(corner => corner.Y),
             _corners.Min(corner => corner.Z)
         );
-        
         _max = new Vector3(
             _corners.Max(corner => corner.X),
             _corners.Max(corner => corner.Y),
             _corners.Max(corner => corner.Z)
         );
-        
         _centre = (_min + _max) / 2;
     }
     
@@ -89,14 +86,12 @@ public class BoundingBox {
     
     public List<KeyValuePair<Vector3, Vector3>> GetEdgesInWorldSpace(Transform3D transform) {
         Vector3[] worldCorners = GetCornersInWorldSpace(transform);
-        
         List<KeyValuePair<Vector3, Vector3>> edges = new();
         for (int i = 0; i < EDGE_MATRIX.GetLength(0); i++) {
             int startIdx = EDGE_MATRIX[i, 0];
             int endIdx = EDGE_MATRIX[i, 1];
             edges.Add(new KeyValuePair<Vector3, Vector3>(worldCorners[startIdx], worldCorners[endIdx]));
         }
-
         return edges;
     }
     
@@ -106,7 +101,11 @@ public class BoundingBox {
         for (int i = 0; i < worldCorners.Length; i++)
             screenCorners[i] = camera.UnprojectPosition(worldCorners[i]);
         return screenCorners;
-        
+    }
+    
+    public void DrawDebugLines(Transform3D transform3D, Color color) {
+        List<KeyValuePair<Vector3, Vector3>> edges = GetEdgesInWorldSpace(transform3D);
+        foreach (KeyValuePair<Vector3, Vector3> edge in edges) DebugDraw.Line(edge.Key, edge.Value, color);
     }
 
     public static BoundingBox FromCollisionMesh(CollisionShape3D shape) {

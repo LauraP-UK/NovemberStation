@@ -304,6 +304,7 @@ public class PlayerController : ControllerBase {
         }
 
         BoundingBox bb = BoundingBox.FromCollisionMesh(shape);
+        //bb.DrawDebugLines(shape.GlobalTransform, Colors.Yellow);
         Vector2[] inScreenSpace = bb.GetCornersInScreenSpace(activeCamera, shape.GlobalTransform);
         VectorUtils.ExtremesInfo2D vecExtremes = VectorUtils.GetExtremes(inScreenSpace);
 

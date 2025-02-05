@@ -67,9 +67,10 @@ public abstract class FormBase : IFormObject {
     /* --- BEHAVIOUR --- */
     
     protected abstract void OnDestroy();
-    public void SetListener(FormListener listener) {
+    public void SetListener(FormListener listener, bool registerNow = false) {
         _listener?.Unregister();
         _listener = listener;
+        if (registerNow) _listener.Register();
     }
     public void SetRegisterListenerOnReady(bool value) => _registerListenerOnReady = value;
 

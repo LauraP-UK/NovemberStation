@@ -37,10 +37,8 @@ public abstract class PreMadeMenu<T> where T : FormBase {
     public void ModifyForm(Action<T> modify) => _modify = modify;
     
     public T GetForm() {
-        if (_form == null) {
-            GD.PrintErr($"ERROR: PreMadeMenu.GetForm() : Form {GetType()} - {GetFormName()} does not exist. Did you forget to call Open() or DisplayOn()?");
-            return null;
-        }
-        return _form;
+        if (_form != null) return _form;
+        GD.PrintErr($"ERROR: PreMadeMenu.GetForm() : Form {GetType()} - {GetFormName()} does not exist. Did you forget to call Open() or DisplayOn()?");
+        return null;
     }
 }

@@ -36,13 +36,11 @@ public class ShopMenu : PreMadeMenu<TestDisplayForm> {
             switch (pressedKey) {
                 case Key.W: {
                     if (!isPressed) return;
-                    GD.Print("Moving focus up.");
                     form.MoveFocus(-1);
                     break;
                 }
                 case Key.S: {
                     if (!isPressed) return;
-                    GD.Print("Moving focus down.");
                     form.MoveFocus(1);
                     break;
                 }
@@ -52,8 +50,6 @@ public class ShopMenu : PreMadeMenu<TestDisplayForm> {
                             GD.PrintErr("ERROR: ScrollDisplayList.DefaultKeyboardBehaviour() : No onSelectElement action set.");
                             break;
                         }
-
-                        GD.Print("Selecting element.");
                         
                         IFormObject focusedElement = form.GetFocusedElement() ?? form.FocusElement(0);
                         if (focusedElement != null) {
@@ -68,7 +64,6 @@ public class ShopMenu : PreMadeMenu<TestDisplayForm> {
                     break;
                 }
                 case Key.Escape: {
-                    GD.Print("Closing form.");
                     Close();
                     break;
                 }
