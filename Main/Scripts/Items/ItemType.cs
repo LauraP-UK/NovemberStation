@@ -51,9 +51,9 @@ public class ItemType {
         item.SetCost(GetItemCost());
         item.SetHeight(100);
         item.SetTexture(GetImage());
-        item.OnPressed(elem => GD.Print($"INFO: PlayerController.OnOpenShop() : Button pressed! Name: {GetItemName()}  Cost: {GetItemCost()}"));
-        item.GetButton().OnButtonDown(btn => item.VisualPress(true));
-        item.GetButton().OnButtonUp(btn => item.VisualPress(false));
+        item.OnPressed(_ => GD.Print($"INFO: PlayerController.OnOpenShop() : Button pressed! Name: {GetItemName()}  Cost: {GetItemCost()}"));
+        item.GetButton().OnButtonDown(_ => item.VisualPress(true));
+        item.GetButton().OnButtonUp(_ => item.VisualPress(false));
         return item;
     }
 

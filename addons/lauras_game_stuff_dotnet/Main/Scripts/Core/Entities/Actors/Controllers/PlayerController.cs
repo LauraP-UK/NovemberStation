@@ -9,7 +9,7 @@ public class PlayerController : ControllerBase {
         STATIC_LAYER = 1 << 1, // Layer 2
         OBJECT_LAYER = 1 << 2; // Layer 3
 
-    private bool _altAction, _toggleCrouch;
+    private bool _altAction, _toggleCrouch, _uiVisible = true;
     private float _holdDistanceModifier = 1.0f;
     private Vector2 _rotationOffset = Vector2.Zero;
     private long _lastJump;
@@ -33,6 +33,14 @@ public class PlayerController : ControllerBase {
 
 
     /* --- ---  LISTENERS  --- --- */
+    [EventListener]
+    private void ToggleUI(KeyPressEvent ev, Key key) {
+        if (IsLocked()) return;
+        if (key != Key.F1) return;
+        _uiVisible = !_uiVisible;
+        _crosshair.GetForm().GetMenu().SetVisible(_uiVisible);
+    }
+    
     [EventListener]
     private void OnOpenShop(KeyPressEvent ev, Key key) {
         if (IsLocked()) return;
@@ -274,7 +282,7 @@ public class PlayerController : ControllerBase {
     /* --- ---  UI  --- --- */
     private void HandleContextMenu() {
         Camera3D activeCamera = GameManager.I().GetActiveCamera();
-        RaycastResult raycastResult = Raycast.TraceActive(3.0f);
+        RaycastResult raycastResult = _heldObject != null ? Raycast.TraceActive(_heldObject) : Raycast.TraceActive(3.0f);
         RaycastResult.HitBodyData contextObjResult = _heldObject != null ? raycastResult.GetViaBody(_heldObject) : raycastResult.GetClosestHit();
 
         if (contextObjResult == null && _heldObject == null) {
@@ -284,7 +292,13 @@ public class PlayerController : ControllerBase {
         }
 
         _contextObject = _heldObject ?? contextObjResult.Body;
-        ulong instanceId = GameUtils.FindSceneRoot(_contextObject).GetInstanceId();
+        Node sceneRoot = GameUtils.FindSceneRoot(_contextObject);
+        if (sceneRoot == null) {
+            _contextObject = null;
+            HideContextBox();
+            return;
+        }
+        ulong instanceId = sceneRoot.GetInstanceId();
 
         CollisionShape3D shape = (CollisionShape3D)_contextObject.FindChild("BBox");
         if (shape == null) {
@@ -304,16 +318,21 @@ public class PlayerController : ControllerBase {
         }
 
         BoundingBox bb = BoundingBox.FromCollisionMesh(shape);
-        //bb.DrawDebugLines(shape.GlobalTransform, Colors.Yellow);
+        
         Vector2[] inScreenSpace = bb.GetCornersInScreenSpace(activeCamera, shape.GlobalTransform);
         VectorUtils.ExtremesInfo2D vecExtremes = VectorUtils.GetExtremes(inScreenSpace);
 
         Vector2 minPos = vecExtremes.min;
         Vector2 maxPos = vecExtremes.max - minPos;
 
-        float distanceTo = contextObjResult?.Distance ?? _contextObject.GlobalPosition.DistanceTo(activeCamera.GlobalPosition);
+        float distanceTo = !_uiVisible ? 10f : contextObjResult?.Distance ?? _contextObject.GlobalPosition.DistanceTo(activeCamera.GlobalPosition);
         float distRatio = Mathsf.InverseLerpClamped(2.9f, 0.9f, distanceTo);
         float actionRatio = Mathsf.InverseLerpClamped(2.9f, 2.5f, distanceTo);
+        
+        /*if (!_uiVisible) {
+            distRatio = 0.0f;
+            actionRatio = 0.0f;
+        }*/
         
         ContextMenuForm form = _contextMenu.GetForm();
         form?.Draw(_actionIndex, minPos, maxPos, distRatio, actionRatio, objectData);

@@ -81,6 +81,7 @@ offset_right = 740.0
 offset_bottom = 122.0
 text = "OBJECT_DESC"
 label_settings = SubResource("LabelSettings_0dip1")
+autowrap_mode = 2
 
 [node name="ObjCost" type="Label" parent="Content"]
 z_index = 10

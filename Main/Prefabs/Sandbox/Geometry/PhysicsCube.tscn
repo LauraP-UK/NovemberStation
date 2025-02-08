@@ -1,37 +1,48 @@
-[gd_scene load_steps=13 format=3 uid="uid://cqvhghgw72hrv"]
+[gd_scene load_steps=7 format=4 uid="uid://cqvhghgw72hrv"]
 
-[ext_resource type="Texture2D" uid="uid://c5q1hp1s028lo" path="res://Main/Textures/Sandbox/Noise1.png" id="1_d2xst"]
-[ext_resource type="Texture2D" uid="uid://cnafjpoh1lxps" path="res://Main/Textures/Sandbox/Checkerboard1.png" id="2_mr4fy"]
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_xdcr6"]
-albedo_color = Color(0.273, 0.62335, 0.91, 1)
-albedo_texture = ExtResource("1_d2xst")
-texture_filter = 0
-
-[sub_resource type="BoxMesh" id="BoxMesh_4gm4e"]
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_m44xg"]
-albedo_color = Color(1, 0.51, 0.51, 1)
-albedo_texture = ExtResource("2_mr4fy")
-
-[sub_resource type="BoxMesh" id="BoxMesh_peg27"]
-size = Vector3(0.2, 0.2, 0.2)
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_fubwc"]
-albedo_color = Color(0.06, 0.373334, 1, 1)
-
-[sub_resource type="BoxMesh" id="BoxMesh_idpug"]
-size = Vector3(0.2, 0.2, 0.2)
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_kw5qb"]
-albedo_color = Color(0, 1, 0.116667, 1)
-
-[sub_resource type="BoxMesh" id="BoxMesh_yue1b"]
-size = Vector3(0.2, 0.2, 0.2)
-
-[sub_resource type="BoxShape3D" id="BoxShape3D_rv6lb"]
+[ext_resource type="Texture2D" uid="uid://6lw3yaprl4jf" path="res://Main/Meshes/PhysicsObjects/WoodCrate/textures/crate_baseColor.png" id="1_obiqo"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_tn1aw"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_0758y"]
+resource_name = "crate"
+cull_mode = 2
+albedo_texture = ExtResource("1_obiqo")
+roughness = 0.6
+
+[sub_resource type="ArrayMesh" id="ArrayMesh_qocus"]
+_surfaces = [{
+"aabb": AABB(-0.5, -0.5, -0.5, 1, 1, 1),
+"format": 34896613377,
+"index_count": 36,
+"index_data": PackedByteArray("AAACAAEAAAADAAIAAwAEAAIAAwAFAAQABQAGAAQABQAHAAYABwABAAYABwAAAAEAAQAEAAYAAQACAAQABwADAAAABwAFAAMA"),
+"name": "crate",
+"primitive": 3,
+"uv_scale": Vector4(0, 0, 0, 0),
+"vertex_count": 8,
+"vertex_data": PackedByteArray("AAAAAP//AAD//wAA//8AAP///////wAAAAD/////AAD/////AAAAAAAA//8AAAAA//8AAAAAAAAAAAAAAAAAAA==")
+}]
+blend_shape_mode = 0
+
+[sub_resource type="ArrayMesh" id="ArrayMesh_5jcv2"]
+resource_name = "Sketchfab_Scene_pCube1_crate_0"
+_surfaces = [{
+"aabb": AABB(-0.5, -0.5, -0.5, 1, 1, 1),
+"attribute_data": PackedByteArray("YF8wAmBfMAJ1n7QCdZ+0AnWfFkF1nxZBYF+SQGBfkkBtYJJAbWCSQIKgFkGCoBZBgqB5f4KgeX+WYXl/lmF5fy5h5IAuYeSAGqDkgBqg5IAaoEa/GqBGvy5hRr8uYUa/R2CQwEdgkMAzn5DAM5+QwDOf8/4zn/P+R2Dz/kdg8/51n7QCdZ+0AmHetAJh3rQCYd4WQWHeFkF1nxZBdZ8WQXQgMAJ0IDACYF8wAmBfMAJgX5JAYF+SQHQgkkB0IJJA"),
+"format": 34896613431,
+"index_count": 36,
+"index_data": PackedByteArray("AAACAAEAAAADAAIABAAGAAUABAAHAAYACAAKAAkACAALAAoADAAOAA0ADAAPAA4AEAASABEAEAATABIAFAAWABUAFAAXABYA"),
+"material": SubResource("StandardMaterial3D_0758y"),
+"name": "crate",
+"primitive": 3,
+"uv_scale": Vector4(0, 0, 0, 0),
+"vertex_count": 24,
+"vertex_data": PackedByteArray("AAAAAP//qX///wAA//+pf////////6l/AAD/////qX8AAP//////P/////////8//////wAA/z8AAP//AAD/PwAA//8AAAAA/////wAAAAD//wAAAAAAAAAAAAAAAAAAAAAAAAAA/z///wAAAAD/P///AAD///8/AAAAAP///z///wAA////P///AAAAAP8//////wAA/z//////////PwAAAAAAAP8/AAAAAP///z8AAP//////PwAA//8AAP8//3//f/9//3//f/9//3//f3j/QoDy/oWAeP9CgP///3////9/////f////3////9/AAD/fwAA/38AAP9/AAD/f/9/AAD/fwAA/38AAP9/AAD/f////3////9/////f///")
+}]
+blend_shape_mode = 0
+shadow_mesh = SubResource("ArrayMesh_qocus")
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_tnkw6"]
 
 [node name="RigidBody3D" type="RigidBody3D"]
 collision_layer = 4
@@ -39,28 +50,13 @@ collision_mask = 7
 metadata/behaviour_type = "cube_obj"
 metadata/object_tag = "cube_obj"
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
-material_override = SubResource("StandardMaterial3D_xdcr6")
-mesh = SubResource("BoxMesh_4gm4e")
-
-[node name="XMarker" type="MeshInstance3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.3, 0, 0)
-material_override = SubResource("StandardMaterial3D_m44xg")
-mesh = SubResource("BoxMesh_peg27")
-
-[node name="ZMarker" type="MeshInstance3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0.3)
-material_override = SubResource("StandardMaterial3D_fubwc")
-mesh = SubResource("BoxMesh_idpug")
-
-[node name="YMarker" type="MeshInstance3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.3, 0)
-material_override = SubResource("StandardMaterial3D_kw5qb")
-mesh = SubResource("BoxMesh_yue1b")
-
-[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
-shape = SubResource("BoxShape3D_rv6lb")
-
 [node name="BBox" type="CollisionShape3D" parent="."]
 shape = SubResource("BoxShape3D_tn1aw")
 disabled = true
+
+[node name="pCube1_crate_0" type="MeshInstance3D" parent="."]
+mesh = SubResource("ArrayMesh_5jcv2")
+skeleton = NodePath("")
+
+[node name="CollisionShape3D2" type="CollisionShape3D" parent="."]
+shape = SubResource("BoxShape3D_tnkw6")

@@ -1,12 +1,14 @@
-[gd_scene load_steps=26 format=3 uid="uid://bea3c2ji0la15"]
+[gd_scene load_steps=28 format=3 uid="uid://bea3c2ji0la15"]
 
 [ext_resource type="Script" path="res://Main/TestScript.cs" id="1_htyov"]
+[ext_resource type="PackedScene" uid="uid://cbyboln8qtkr5" path="res://Main/Prefabs/PhysicsObjects/FireExtinguisher.tscn" id="2_s7uom"]
 [ext_resource type="PackedScene" uid="uid://cqvhghgw72hrv" path="res://Main/Prefabs/Sandbox/Geometry/PhysicsCube.tscn" id="2_y3p7f"]
 [ext_resource type="PackedScene" uid="uid://5afg6a1f8nd3" path="res://Main/Prefabs/Sandbox/DeskTest.tscn" id="3_dkfcn"]
 [ext_resource type="Texture2D" uid="uid://cnafjpoh1lxps" path="res://Main/Textures/Sandbox/Checkerboard1.png" id="3_foc71"]
 [ext_resource type="PackedScene" uid="uid://davr0xngcadpq" path="res://Main/Prefabs/Sandbox/GasCanTest.tscn" id="5_y86oe"]
 [ext_resource type="Texture2D" uid="uid://c5q1hp1s028lo" path="res://Main/Textures/Sandbox/Noise1.png" id="6_eukhs"]
 [ext_resource type="PackedScene" uid="uid://vcuoeoep6iag" path="res://Main/Prefabs/StaticObjects/PCTest.tscn" id="7_0u05g"]
+[ext_resource type="PackedScene" uid="uid://bglqvyeeifjom" path="res://Main/Prefabs/PhysicsObjects/Crowbar.tscn" id="8_crd5k"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_vlb6p"]
 sky_horizon_color = Color(0.64625, 0.65575, 0.67075, 1)
@@ -93,6 +95,12 @@ process_mode = 1
 [node name="SceneObjects" type="Node3D" parent="."]
 process_mode = 1
 
+[node name="RigidBody3D" parent="SceneObjects" instance=ExtResource("8_crd5k")]
+transform = Transform3D(-0.026299, 4.59954e-08, -0.999654, -0.999654, 8.6243e-08, 0.026299, 8.74228e-08, 1, 4.37114e-08, -0.244393, 1.42133, 4.56328)
+
+[node name="FireExtinguisher" parent="SceneObjects" instance=ExtResource("2_s7uom")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.05288, -4.63504)
+
 [node name="PC" parent="SceneObjects" instance=ExtResource("7_0u05g")]
 transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, 13.2965, 0.317834, -3.90072)
 
@@ -113,7 +121,7 @@ collision_mask = 15
 mass = 5.0
 
 [node name="Cube 1" parent="SceneObjects" instance=ExtResource("2_y3p7f")]
-transform = Transform3D(-4.37114e-08, 0, 1, 0, 1, 0, -1, 0, -4.37114e-08, 0, 0.796451, 0)
+transform = Transform3D(-4.37114e-08, 0, 1, 0, 1, 0, -1, 0, -4.37114e-08, 0, 1.0772, 0)
 collision_layer = 12
 collision_mask = 15
 mass = 20.0
@@ -142,7 +150,7 @@ material_override = SubResource("StandardMaterial3D_egs0u")
 mesh = SubResource("BoxMesh_ohcx2")
 
 [node name="Floor1" type="StaticBody3D" parent="SceneObjects"]
-collision_layer = 2
+collision_layer = 6
 collision_mask = 7
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="SceneObjects/Floor1"]

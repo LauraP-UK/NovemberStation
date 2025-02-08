@@ -1,0 +1,8 @@
+[gd_scene load_steps=2 format=3 uid="uid://b7m80qgupkd3q"]
+
+[ext_resource type="PackedScene" uid="uid://cwnrcgsg37rf6" path="res://Main/Meshes/PhysicsObjects/WoodCrate/scene.gltf" id="1_dvt6n"]
+
+[node name="Sketchfab_Scene" instance=ExtResource("1_dvt6n")]
+
+[node name="pCube1" parent="Sketchfab_model/9cad7d4ffaf243f18f5d001ae8587c59_fbx/RootNode" index="0"]
+transform = Transform3D(40.4438, 0, 0, 0, 40.4438, 0, 0, 0, 40.4438, 0, 2.88014, 4.87301e-15)

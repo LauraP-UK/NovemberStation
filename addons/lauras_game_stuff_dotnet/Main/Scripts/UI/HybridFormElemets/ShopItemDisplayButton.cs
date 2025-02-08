@@ -12,7 +12,7 @@ public class ShopItemDisplayButton : FormBase, IFocusable {
     private readonly ItemType _itemType;
     
     private static readonly Color
-        DEFAULT_BG_COLOR = Colors.Black,
+        DEFAULT_BG_COLOR = new(0.1f,0.1f,0.1f),
         FOCUS_BG_COLOR = Colors.DimGray,
         SELECTED_BG_COLOR = Colors.Gold;
     
@@ -46,6 +46,8 @@ public class ShopItemDisplayButton : FormBase, IFocusable {
         _objTexture = new TextureRectElement(textureRect);
         _bgColor = new ColorRectElement(bgColor);
         _button = new ButtonElement(button);
+        
+        _bgColor.SetColor(DEFAULT_BG_COLOR);
         
         _button.AddAction(Control.SignalName.FocusEntered, _ => _bgColor.SetColor(FOCUS_BG_COLOR));
         _button.AddAction(Control.SignalName.FocusExited, _ => _bgColor.SetColor(DEFAULT_BG_COLOR));

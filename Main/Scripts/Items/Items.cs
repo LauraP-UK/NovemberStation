@@ -16,15 +16,27 @@ public class Items {
         "res://Main/Prefabs/Sandbox/DeskTest.tscn",
         "A work desk.",
         250);
-    public static readonly ItemType BLUE_CUBE = ItemType.Create(
-        "Blue Cube",
-        "res://Main/Textures/Items/BlueCube.png",
+    public static readonly ItemType STORAGE_CRATE = ItemType.Create(
+        "Storage Crate",
+        "res://Main/Textures/Items/StorageCrate.png",
         "res://Main/Prefabs/Sandbox/Geometry/PhysicsCube.tscn",
-        "A mysterious blue cube.",
+        "A wooden storage crate.",
         130,
         cube => cube.Mass = Math.Max(Randf.Random(0, 10) * 5, 1));
+    public static readonly ItemType CROWBAR = ItemType.Create(
+        "Crowbar",
+        "res://Main/Textures/Items/Crowbar.png",
+        "res://Main/Prefabs/PhysicsObjects/Crowbar.tscn",
+        "Gordon Freeman, for someone who proclaims to be a doctor, you should know that not every peepee time is a poopoo time. But every peepee-poo- fuck.",
+        300);
+    public static readonly ItemType FIRE_EXTINGUISHER = ItemType.Create(
+        "Fire Extinguisher",
+        "res://Main/Textures/Items/FireExtinguisher.png",
+        "res://Main/Prefabs/PhysicsObjects/FireExtinguisher.tscn",
+        "Halt yer burninatoring.",
+        150);
     
-    private static readonly ItemType[] ALL_ITEMS = {GAS_CAN, WORK_DESK, BLUE_CUBE};
+    private static readonly ItemType[] ALL_ITEMS = {GAS_CAN, WORK_DESK, STORAGE_CRATE, CROWBAR, FIRE_EXTINGUISHER};
     public static List<ItemType> GetItems() => new(ALL_ITEMS);
     public static List<ShopItemDisplayButton> GetItemButtons() => GetItems().Select(item => item.CreateButton()).ToList();
     

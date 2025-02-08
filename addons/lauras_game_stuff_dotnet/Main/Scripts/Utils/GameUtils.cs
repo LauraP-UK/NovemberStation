@@ -1,4 +1,5 @@
 ﻿
+using System;
 using Godot;
 
 public static class GameUtils {
@@ -18,9 +19,17 @@ public static class GameUtils {
         while (current != null) {
             if (current.SceneFilePath != "")
                 return current;
-            current = current.GetParent();
+            Node parent = current.GetParent();
+            if (parent == null) return current;
+            current = parent;
         }
         return null;
+    }
+    
+    public static T FindSceneRoot<T>(Node node) where T : Node {
+        Node rootNode = FindSceneRoot(node);
+        if (rootNode is not T typedNode) throw new InvalidOperationException($"ERROR: GameUtils.FindSceneRoot<{typeof(T)}> : Root node is not of type {typeof(T)}. Got '{rootNode?.GetType()}'.");
+        return typedNode;
     }
     
 }

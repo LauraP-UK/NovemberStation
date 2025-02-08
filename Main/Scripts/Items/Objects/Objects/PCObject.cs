@@ -37,9 +37,10 @@ public class PCObject : ObjectBase<Node3D>, IUsable {
             return;
         }
         
-        _shopMenu = new();
+        _shopMenu = new ShopMenu();
         _shopMenu.ModifyForm(form => {
             form.SetCaptureInput(false);
+            form.GetScrollDisplay().SetFollowFocus(true);
             
             form.SetOnReady(form => {
                 Items.GetItemButtons().ForEach(btn => {
@@ -48,14 +49,19 @@ public class PCObject : ObjectBase<Node3D>, IUsable {
                         ItemType itemType = btn.GetItemType();
                         RigidBody3D rigidBody3D = itemType.CreateInstance();
                         gameManager.GetSceneObjects().AddChild(rigidBody3D);
-                        rigidBody3D.SetPosition(_spawnPoint.GlobalPosition);
+                        rigidBody3D.SetPosition(_spawnPoint.GlobalPosition + new Vector3(0,0.5f,0));
                     
                         gameManager.RegisterObject(rigidBody3D);
-                    
-                        _shopMenu.Close();
                     });
+                    GD.Print($"PRE ADD: Button {btn.GetItemType().GetItemName()} size is {btn.GetNode().Size}");
+
                     btn.SetTopLevelLayout(form.GetTopLevelLayout());
                     form.GetScrollDisplay().AddElement(btn);
+
+                    Vector2 size = btn.GetNode().Size;
+                    Vector2 curSize = btn.GetDescLabel().GetElement().GetSize();
+                    btn.GetDescLabel().GetElement().SetSize(new Vector2(size.X * 0.7f, curSize.Y));
+                    GD.Print($"POST ADD: Button {btn.GetItemType().GetItemName()} size is now {btn.GetNode().Size}");
                 });
             });
             

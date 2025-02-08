@@ -1,0 +1,8 @@
+Model Information:
+* title:	Crowbar V2
+* source:	https://sketchfab.com/3d-models/crowbar-v2-dfb5981c576d4fd9b3fa6870d745abe3
+* author:	SketchyBot (https://sketchfab.com/SketchyB0t_3D_Fabrication)
+
+Model License:
+* license type:	SKETCHFAB Standard (https://sketchfab.com/licenses)
+* requirements:	Under basic restrictions, use worldwide, on all types of media, commercially or not, and in all types of derivative works

@@ -3,7 +3,6 @@ using Godot;
 using Godot.Collections;
 
 public static class Raycast {
-
     public static RaycastResult TraceActive(float distance) {
         Camera3D camera3D = GameManager.I().GetActiveCamera();
         Vector3 origin = camera3D.GetGlobalTransform().Origin;
@@ -11,6 +10,12 @@ public static class Raycast {
         Vector3 target = origin + forward * distance;
         
         return Trace(origin, target);
+    }
+    
+    public static RaycastResult TraceActive(Node3D to) {
+        Camera3D camera3D = GameManager.I().GetActiveCamera();
+        Vector3 origin = camera3D.GetGlobalTransform().Origin;
+        return Trace(origin, to.GlobalPosition);
     }
     
     public static RaycastResult TraceActive(Vector3 end) {
@@ -42,7 +47,8 @@ public static class Raycast {
         PhysicsRayQueryParameters3D parameters = new() {
             From = start,
             To = end,
-            CollisionMask = uint.MaxValue
+            CollisionMask = uint.MaxValue,
+            CollideWithAreas = true
         };
 
         RaycastResult raycastResult = new(start, end);
@@ -58,12 +64,18 @@ public static class Raycast {
             if (result.Count == 0) break; // No more hits
 
             GodotObject hitObject = (GodotObject) result["collider"];
-            Vector3 hitPosition = (Vector3)result["position"];
-            Vector3 hitNormal = (Vector3)result["normal"];
-            Rid hitRid = (Rid)result["rid"];
+            Vector3 hitPosition = (Vector3) result["position"];
+            Vector3 hitNormal = (Vector3) result["normal"];
+            Rid hitRid = (Rid) result["rid"];
             float distance = start.DistanceTo(hitPosition);
 
-            raycastResult.AddHitBody(distance, hitObject as Node3D, hitPosition, hitNormal);
+            Node sceneRoot = GameUtils.FindSceneRoot(hitObject as Node);
+
+            Node hitNode = sceneRoot is not Node3D ? hitObject as Node : sceneRoot;
+            if (hitNode == null) GD.PrintErr($"ERROR: Raycast.Trace() : Failed to find root Node3D for hit object '{hitObject}'.");
+            if (hitNode is not Node3D) GD.PrintErr($"ERROR: Raycast.Trace() : Hit object '{hitNode}' is not a Node3D. Got '{(hitNode == null ? "NULL" : hitNode.GetType())}'.");
+
+            raycastResult.AddHitBody(distance, hitNode as Node3D, hitPosition, hitNormal);
             excludedObjects.Add(hitRid);
 
             currentStart = hitPosition + (end - start).Normalized() * 0.01f;

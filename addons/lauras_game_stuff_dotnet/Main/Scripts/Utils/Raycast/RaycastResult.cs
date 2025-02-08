@@ -14,12 +14,12 @@ public class RaycastResult {
     public Vector3 GetStart() => _start;
     public Vector3 GetEnd() => _end;
 
-    public bool HasHit() => _hitBodies.Count > 0;
+    public bool HasHit() => HitCount() > 0;
     public int HitCount() => _hitBodies.Count;
 
     public List<HitBodyData> GetHitsSortedByDistance() => _hitBodies.OrderBy(hit => hit.Distance).ToList();
     public HitBodyData GetClosestHit() => _hitBodies.OrderBy(hit => hit.Distance).FirstOrDefault();
-    public HitBodyData GetViaBody(Node3D body) => _hitBodies.FirstOrDefault(hit => hit.Body.Equals(body));
+    public HitBodyData GetViaBody(Node3D body) => _hitBodies.FirstOrDefault(hit => /*hit.Body != null && */hit.Body.Equals(body));
 
     public void AddHitBody(float distance, Node3D body, Vector3 hitAtPosition, Vector3 hitNormal) =>
         _hitBodies.Add(new HitBodyData {
