@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using Godot;
 
 public class PCObject : ObjectBase<Node3D>, IUsable {
@@ -53,7 +51,6 @@ public class PCObject : ObjectBase<Node3D>, IUsable {
                     
                         gameManager.RegisterObject(rigidBody3D);
                     });
-                    GD.Print($"PRE ADD: Button {btn.GetItemType().GetItemName()} size is {btn.GetNode().Size}");
 
                     btn.SetTopLevelLayout(form.GetTopLevelLayout());
                     form.GetScrollDisplay().AddElement(btn);
@@ -61,7 +58,6 @@ public class PCObject : ObjectBase<Node3D>, IUsable {
                     Vector2 size = btn.GetNode().Size;
                     Vector2 curSize = btn.GetDescLabel().GetElement().GetSize();
                     btn.GetDescLabel().GetElement().SetSize(new Vector2(size.X * 0.7f, curSize.Y));
-                    GD.Print($"POST ADD: Button {btn.GetItemType().GetItemName()} size is now {btn.GetNode().Size}");
                 });
             });
             

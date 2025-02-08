@@ -9,7 +9,6 @@ public static class ObjectAtlas {
     private static readonly SmartDictionary<string, Type> _registry = new();
 
     private const string
-        TAG_METHOD_NAME = "GetObjectTag",
         OBJECT_TAG = "object_tag";
     
     static ObjectAtlas() => RegisterAll();
@@ -29,7 +28,7 @@ public static class ObjectAtlas {
         if (!typeof(IObjectBase).IsAssignableFrom(clazz)) 
             throw new Exception($"ERROR: ObjectAtlas.Register() : Class '{clazz.Name}' must inherit from ObjectBase<?>.");
         
-        GD.Print($"Registering object class: {clazz.Name}");
+        GD.Print($"INFO: ObjectAtlas.Register() : Registering object class: {clazz.Name}...");
 
         try {
             object dummy = Activator.CreateInstance(clazz, new object[] {null});

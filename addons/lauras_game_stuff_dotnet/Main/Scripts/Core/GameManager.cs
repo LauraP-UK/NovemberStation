@@ -60,7 +60,7 @@ public class GameManager {
     public void RegisterObject(Node3D node) {
         Node root = GameUtils.FindSceneRoot(node);
         if (root is not Node3D rootNode) {
-            GD.PrintErr($"ERROR: GameManager.RegisterObject() : Failed to find root Node3D for '{node.Name}'.");
+            GD.PrintErr($"WARN: GameManager.RegisterObject() : Failed to find root Node3D for '{node.Name}'. Got '{root.GetType().Name}' instead.");
             return;
         }
         TestScript activeScene = (TestScript)GetActiveScene();
