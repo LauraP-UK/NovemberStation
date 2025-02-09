@@ -1,10 +1,11 @@
-[gd_scene load_steps=28 format=3 uid="uid://bea3c2ji0la15"]
+[gd_scene load_steps=29 format=3 uid="uid://bea3c2ji0la15"]
 
 [ext_resource type="Script" path="res://Main/TestScript.cs" id="1_htyov"]
 [ext_resource type="PackedScene" uid="uid://cbyboln8qtkr5" path="res://Main/Prefabs/PhysicsObjects/FireExtinguisher.tscn" id="2_s7uom"]
 [ext_resource type="PackedScene" uid="uid://cqvhghgw72hrv" path="res://Main/Prefabs/Sandbox/Geometry/PhysicsCube.tscn" id="2_y3p7f"]
 [ext_resource type="PackedScene" uid="uid://5afg6a1f8nd3" path="res://Main/Prefabs/Sandbox/DeskTest.tscn" id="3_dkfcn"]
 [ext_resource type="Texture2D" uid="uid://cnafjpoh1lxps" path="res://Main/Textures/Sandbox/Checkerboard1.png" id="3_foc71"]
+[ext_resource type="PackedScene" uid="uid://dex27cawpv17k" path="res://Main/Prefabs/StaticObjects/PCTest2.tscn" id="5_cpa2d"]
 [ext_resource type="PackedScene" uid="uid://davr0xngcadpq" path="res://Main/Prefabs/Sandbox/GasCanTest.tscn" id="5_y86oe"]
 [ext_resource type="Texture2D" uid="uid://c5q1hp1s028lo" path="res://Main/Textures/Sandbox/Noise1.png" id="6_eukhs"]
 [ext_resource type="PackedScene" uid="uid://vcuoeoep6iag" path="res://Main/Prefabs/StaticObjects/PCTest.tscn" id="7_0u05g"]
@@ -103,6 +104,9 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.05288, -4.63504)
 
 [node name="PC" parent="SceneObjects" instance=ExtResource("7_0u05g")]
 transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, 13.2965, 0.317834, -3.90072)
+
+[node name="PC2" parent="SceneObjects" instance=ExtResource("5_cpa2d")]
+transform = Transform3D(0.0014586, 0, 0.0599823, 0, 0.06, 0, -0.0599823, 0, 0.0014586, 6.16559, 0, -11.2916)
 
 [node name="Desk" parent="SceneObjects" instance=ExtResource("3_dkfcn")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.521518, 4.5054)

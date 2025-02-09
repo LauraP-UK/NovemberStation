@@ -1,6 +1,9 @@
-[gd_scene load_steps=10 format=3 uid="uid://dib8gdtdmi0dh"]
+[gd_scene load_steps=11 format=3 uid="uid://dib8gdtdmi0dh"]
 
 [ext_resource type="Texture2D" uid="uid://cnafjpoh1lxps" path="res://Main/Textures/Sandbox/Checkerboard1.png" id="1_t7q2x"]
+
+[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_a733g"]
+load_path = "res://.godot/imported/ContextNinePatch.png-1956a95d8fe2d1cd3bd043c483a8f7ae.ctex"
 
 [sub_resource type="LabelSettings" id="LabelSettings_hbhbq"]
 font_size = 15
@@ -49,6 +52,20 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 color = Color(0, 0, 0, 1)
+
+[node name="NinePatchRect" type="NinePatchRect" parent="BGContainer"]
+z_index = 20
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = SubResource("CompressedTexture2D_a733g")
+patch_margin_left = 7
+patch_margin_top = 7
+patch_margin_right = 7
+patch_margin_bottom = 7
 
 [node name="Content" type="Control" parent="."]
 z_as_relative = false

@@ -1,0 +1,8 @@
+Model Information:
+* title:	Low Poly 80's Computer V3
+* source:	https://sketchfab.com/3d-models/low-poly-80s-computer-v3-daf8d397f771445496844216d900c0f8
+* author:	SketchyBot (https://sketchfab.com/SketchyB0t_3D_Fabrication)
+
+Model License:
+* license type:	SKETCHFAB Standard (https://sketchfab.com/licenses)
+* requirements:	Under basic restrictions, use worldwide, on all types of media, commercially or not, and in all types of derivative works

@@ -38,6 +38,8 @@ public class ActionDisplayButton : FormBase, IFocusable {
         _btnFrame = new NinePatchRectElement(btnFrame);
         _focusButton = new ButtonElement(focusButton);
         
+        _bgColor.SetColor(DEFAULT_BG_COLOR);
+        
         _focusButton.AddAction(Control.SignalName.FocusEntered, _ => _bgColor.SetColor(FOCUS_BG_COLOR));
         _focusButton.AddAction(Control.SignalName.FocusExited, _ => _bgColor.SetColor(DEFAULT_BG_COLOR));
         

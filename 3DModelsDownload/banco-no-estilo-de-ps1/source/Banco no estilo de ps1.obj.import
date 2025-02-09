@@ -1,0 +1,22 @@
+[remap]
+
+importer="wavefront_obj"
+importer_version=1
+type="Mesh"
+uid="uid://77llsv5tv0tv"
+path="res://.godot/imported/Banco no estilo de ps1.obj-ca2c98a1b81075e2b55e534478513d72.mesh"
+
+[deps]
+
+files=["res://.godot/imported/Banco no estilo de ps1.obj-ca2c98a1b81075e2b55e534478513d72.mesh"]
+
+source_file="res://3DModelsDownload/banco-no-estilo-de-ps1/source/Banco no estilo de ps1.obj"
+dest_files=["res://.godot/imported/Banco no estilo de ps1.obj-ca2c98a1b81075e2b55e534478513d72.mesh", "res://.godot/imported/Banco no estilo de ps1.obj-ca2c98a1b81075e2b55e534478513d72.mesh"]
+
+[params]
+
+generate_tangents=true
+scale_mesh=Vector3(1, 1, 1)
+offset_mesh=Vector3(0, 0, 0)
+optimize_mesh=true
+force_disable_mesh_compression=false

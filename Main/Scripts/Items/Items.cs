@@ -27,13 +27,13 @@ public class Items {
         "Crowbar",
         "res://Main/Textures/Items/Crowbar.png",
         "res://Main/Prefabs/PhysicsObjects/Crowbar.tscn",
-        "Gordon Freeman, for someone who proclaims to be a doctor, you should know that not every peepee time is a poopoo time. But every peepee-poo- fuck.",
+        "Gordon Freeman, for someone who proclaims to be a doctor, you should know that not every peepee time is a poopoo time. But every peepee-poo-pu- every... fuck.",
         300);
     public static readonly ItemType FIRE_EXTINGUISHER = ItemType.Create(
         "Fire Extinguisher",
         "res://Main/Textures/Items/FireExtinguisher.png",
         "res://Main/Prefabs/PhysicsObjects/FireExtinguisher.tscn",
-        "Halt yer burninatoring.",
+        "Set things on unfire.",
         150);
     
     private static readonly ItemType[] ALL_ITEMS = {GAS_CAN, WORK_DESK, STORAGE_CRATE, CROWBAR, FIRE_EXTINGUISHER};
