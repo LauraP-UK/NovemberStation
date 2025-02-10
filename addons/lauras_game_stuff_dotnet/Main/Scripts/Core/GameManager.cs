@@ -43,6 +43,19 @@ public class GameManager {
         if (_player == null) throw new InvalidOperationException("ERROR: GameManager.GetPlayer() : Player is null. Set the player first.");
         return _player;
     }
+    
+    /* --- System Methods --- */
+    
+    public void Process(double delta) {
+        Scheduler.Update();
+        MovementActionTracker.Process();
+        UIManager.Process(delta);
+        if (!GetTree().Paused) GetPlayer().GetController().Update((float)delta);
+    }
+    
+    public void PhysicsProcess(double delta) {
+        if (!GetTree().Paused) GetPlayer().GetController().PhysicsUpdate((float)delta);
+    }
 
     /* --- Game Methods --- */
     
@@ -51,6 +64,7 @@ public class GameManager {
     public void Quit() => Scheduler.ScheduleOnce(50, _ => GetActiveScene().GetTree().Quit());
 
     public Rid GetWorldRid() => GetActiveScene().GetTree().Root.GetWorld3D().Space;
+    public SceneTree GetTree() => GetActiveScene().GetTree();
     public Viewport GetViewport() => GetActiveScene().GetTree().Root.GetViewport();
     public Camera3D GetActiveCamera() => GetViewport().GetCamera3D();
     public bool IsActiveCameraPlayer() => GetActiveCamera().Equals(GetPlayer().GetCamera());

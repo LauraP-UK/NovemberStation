@@ -1,37 +1,27 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using Timer = System.Timers.Timer;
+using Godot;
 
 public class Scheduler {
-    private static readonly HashSet<SchedulerTask> _tasks = new();
+    private static readonly SmartSet<SchedulerTask> _tasks = new();
+    private static ulong _lastUpdateTime = Time.GetTicksMsec(); // Start tracking time
 
-    private static readonly Stopwatch _stopwatch = Stopwatch.StartNew();
-    private static long _lastUpdateTime;
-
-    static Scheduler() {
-        Timer timer = new(1);
-        timer.Elapsed += (_, _) => Update();
-        timer.AutoReset = true;
-        timer.Start();
-    }
-
-    private static void Update() {
-        long currentTime = _stopwatch.ElapsedMilliseconds;
-        long deltaMillis = currentTime - _lastUpdateTime;
+    public static void Update() {
+        ulong currentTime = Time.GetTicksMsec();
+        ulong deltaMillis = currentTime - _lastUpdateTime;
         _lastUpdateTime = currentTime;
-        
+
         List<SchedulerTask> toRemove = new();
         foreach (SchedulerTask schedulerTask in _tasks) {
-            schedulerTask.Update(deltaMillis);
-
+            schedulerTask.Update((long) deltaMillis);
             if (schedulerTask.IsComplete()) toRemove.Add(schedulerTask);
         }
-        foreach (SchedulerTask schedulerTask in toRemove) _tasks.Remove(schedulerTask);
+        
+        _tasks.RemoveAll(toRemove);
     }
 
     public static SchedulerTask ScheduleOnce(long delayMillis, Action<SchedulerTask> action) {
-        SchedulerTask task = new(delayMillis, action);
+        SchedulerTask task = new(delayMillis, action, 0L, 1);
         _tasks.Add(task);
         return task;
     }

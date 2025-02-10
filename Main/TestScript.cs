@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using Godot;
 
 public partial class TestScript : Node {
-    private readonly Dictionary<RigidBody3D, Vector3> _dynamicObjects = new();
+    private readonly Dictionary<RigidBody3D, Vector3> _objSpawns = new();
     
     private readonly SmartDictionary<ulong, IObjectBase> _objects = new();
 
@@ -38,20 +38,27 @@ public partial class TestScript : Node {
 
         foreach (Node child in gameManager.GetSceneObjects().GetChildren()) {
             if (child is not RigidBody3D obj) continue;
-            _dynamicObjects.Add(obj, obj.GlobalPosition);
+            _objSpawns.Add(obj, obj.GlobalPosition);
             obj.AngularDamp = 0.5f;
         }
 
-        GD.Print($"Dynamic Objects: {_dynamicObjects.Count}");
+        GD.Print($"Dynamic Objects: {_objSpawns.Count}");
+        
+        Scheduler.ScheduleRepeating(0L, 1000L, _ => {
+            List<ulong> toRemove = new();
+            foreach ((ulong instanceID, IObjectBase obj) in _objects) {
+                Node3D node3D = obj.GetBaseNode3D();
+                if (node3D == null || !IsInstanceValid(node3D) || node3D.IsQueuedForDeletion()) toRemove.Add(instanceID);
+            }
+            _objects.RemoveAll(toRemove);
+        });
     }
 
     // Called every frame. 'delta' is the elapsed time since the previous frame.
     public override void _Process(double delta) {
-        MovementActionTracker.Update();
-        UIManager.Process(delta);
+        GameManager.I().Process(delta);
+        
         Player player = GameManager.I().GetPlayer();
-        if (!GetTree().Paused) player.GetController().Update((float)delta);
-
         if (player.GetModel().Position.Y < -20) player.SetPosition(new Vector3(5f, 0.2f, 0f), new Vector3(0.0f, 90.0f, 0.0f));
 
         Node sceneObjects = GameManager.I().GetSceneObjects();
@@ -59,7 +66,7 @@ public partial class TestScript : Node {
         foreach (Node child in sceneObjects.GetChildren()) {
             if (child is not RigidBody3D physicsObj) continue;
             if (!(physicsObj.GlobalPosition.Y < -20)) continue;
-            if (_dynamicObjects.TryGetValue(physicsObj, out Vector3 origPosition))
+            if (_objSpawns.TryGetValue(physicsObj, out Vector3 origPosition))
                 physicsObj.GlobalPosition = origPosition;
             else
                 physicsObj.QueueFree();
@@ -68,8 +75,7 @@ public partial class TestScript : Node {
 
     public override void _PhysicsProcess(double delta) {
         base._PhysicsProcess(delta);
-        Player player = GameManager.I().GetPlayer();
-        if (!GetTree().Paused) player.GetController().PhysicsUpdate((float)delta);
+        GameManager.I().PhysicsProcess(delta);
     }
     
     public T GetObjectClass<T>(ulong id) where T : IObjectBase => (T) _objects.GetOrDefault(id, null);

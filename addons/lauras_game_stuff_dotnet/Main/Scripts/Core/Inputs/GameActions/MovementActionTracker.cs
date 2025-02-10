@@ -15,7 +15,7 @@ public static class MovementActionTracker {
         _movementActions.Add(movementAction);
     }
 
-    public static void Update() {
+    public static void Process() {
         Vector3 movement = _movementActions.Where(action => action.IsKeyPressed()).Aggregate(Vector3.Zero, (current, action) => current + action.GetOffset());
         if (!movement.Equals(Vector3.Zero)) {
             movement = movement.Normalized();

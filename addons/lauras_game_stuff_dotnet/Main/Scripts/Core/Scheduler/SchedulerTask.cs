@@ -3,6 +3,8 @@ using System;
 public class SchedulerTask {
     private const long MINIMUM_TIME = 20L;
 
+    private readonly Guid _id = Guid.NewGuid();
+    
     private readonly Action<SchedulerTask> _action;
     private readonly long _repeatInterval;
     private readonly int _repeatLimit;
@@ -36,24 +38,17 @@ public class SchedulerTask {
         if (_repeatInterval > 0 && (_repeatLimit == -1 || _repeatCount < _repeatLimit)) {
             _delayRemaining = _repeatInterval;
             _repeatCount++;
-        } else {
-            _isCancelled = true;
-        }
+        } else _isCancelled = true;
     }
 
-    public void Cancel() {
-        _isCancelled = true;
-    }
+    public void Cancel() => _isCancelled = true;
+    public int GetRepeatCount() => _repeatCount;
+    public int GetRepeatLimit() => _repeatLimit;
+    public bool IsCancelled() => _isCancelled;
 
-    public int GetRepeatCount() {
-        return _repeatCount;
+    public override bool Equals(object obj) {
+        if (obj == null || GetType() != obj.GetType()) return false;
+        return _id.Equals(((SchedulerTask)obj)._id);
     }
-
-    public int GetRepeatLimit() {
-        return _repeatLimit;
-    }
-
-    public bool IsCancelled() {
-        return _isCancelled;
-    }
+    public override int GetHashCode() => _id.GetHashCode();
 }
