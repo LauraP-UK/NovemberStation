@@ -2,9 +2,9 @@ using System;
 using System.Collections.Generic;
 using Godot;
 
-public class Scheduler {
+public static class Scheduler {
     private static readonly SmartSet<SchedulerTask> _tasks = new();
-    private static ulong _lastUpdateTime = Time.GetTicksMsec(); // Start tracking time
+    private static ulong _lastUpdateTime = Time.GetTicksMsec();
 
     public static void Update() {
         ulong currentTime = Time.GetTicksMsec();

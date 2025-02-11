@@ -4,7 +4,6 @@ using Godot;
 
 public class GameManager {
     
-    private static readonly Scheduler scheduler = new();
     private static GameManager instance;
 
     private Node _activeScene, _sceneObjects;
