@@ -31,5 +31,6 @@ public static class GameUtils {
         if (rootNode is not T typedNode) throw new InvalidOperationException($"ERROR: GameUtils.FindSceneRoot<{typeof(T)}> : Root node is not of type {typeof(T)}. Got '{rootNode?.GetType()}'.");
         return typedNode;
     }
-    
+
+    public static bool IsNodeInvalid(Node node) => node == null || !GodotObject.IsInstanceValid(node) || node.IsQueuedForDeletion();
 }

@@ -1,0 +1,77 @@
+[gd_scene load_steps=4 format=3 uid="uid://cwravmdkjck75"]
+
+[ext_resource type="Texture2D" uid="uid://4h4eirvj24su" path="res://Main/Textures/UI/Symbols/WarningIcon.png" id="1_yrd72"]
+[ext_resource type="Texture2D" uid="uid://dtssjmv605wsg" path="res://Main/Textures/UI/ContextNinePatch.png" id="2_yar6e"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_hbfcc"]
+outline_size = 5
+outline_color = Color(0, 0, 0, 1)
+
+[node name="Control" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_bottom = -623.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="BGColour" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.3003, 0.37206, 0.39, 1)
+
+[node name="HBoxContainer" type="HBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_bottom = 25.0
+grow_horizontal = 2
+theme_override_constants/separation = 5
+
+[node name="Control" type="Control" parent="HBoxContainer"]
+custom_minimum_size = Vector2(25, 25)
+layout_mode = 2
+
+[node name="Icon" type="TextureRect" parent="HBoxContainer/Control"]
+custom_minimum_size = Vector2(25, 25)
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -9.5
+offset_top = -9.5
+offset_right = 15.5
+offset_bottom = 15.5
+grow_horizontal = 2
+grow_vertical = 2
+scale = Vector2(0.75, 0.75)
+texture = ExtResource("1_yrd72")
+expand_mode = 5
+
+[node name="Text" type="Label" parent="HBoxContainer"]
+custom_minimum_size = Vector2(250, 25)
+layout_mode = 2
+text = "Text info goes here..."
+label_settings = SubResource("LabelSettings_hbfcc")
+vertical_alignment = 1
+autowrap_mode = 2
+
+[node name="BoarderNinePatch" type="NinePatchRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("2_yar6e")
+patch_margin_left = 7
+patch_margin_top = 7
+patch_margin_right = 7
+patch_margin_bottom = 7

@@ -44,14 +44,7 @@ public partial class TestScript : Node {
 
 		GD.Print($"Dynamic Objects: {_objSpawns.Count}");
 		
-		Scheduler.ScheduleRepeating(0L, 1000L, _ => {
-			List<ulong> toRemove = new();
-			foreach ((ulong instanceID, IObjectBase obj) in _objects) {
-				Node3D node3D = obj.GetBaseNode3D();
-				if (node3D == null || !IsInstanceValid(node3D) || node3D.IsQueuedForDeletion()) toRemove.Add(instanceID);
-			}
-			_objects.RemoveAll(toRemove);
-		});
+		Scheduler.ScheduleRepeating(0L, 1000L, _ => _objects.RemoveWhere(pair => GameUtils.IsNodeInvalid(pair.Value.GetBaseNode3D())));
 	}
 
 	// Called every frame. 'delta' is the elapsed time since the previous frame.
