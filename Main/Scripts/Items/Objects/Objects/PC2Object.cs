@@ -113,12 +113,14 @@ public class PC2Object : ObjectBase<Node3D>, IUsable {
     public SubViewport GetViewport() => _viewport;
     public MeshInstance3D GetScreen() => _screen;
     public Camera3D GetCamera() => _camera;
+    public ShopMenu GetShopMenu() => _shopMenu;
     
     
     private void View() {
         _camera.SetCurrent(true);
         _gameManager.GetPlayer().GetController<PlayerController>().SetLocked(true);
         _gameManager.SetMouseControl(true);
+        _gameManager.SetMouseVisible(false);
         TestDisplayForm form = _shopMenu.GetForm();
         ScrollDisplayList display = form.GetScrollDisplay();
         display.SetKeyboardEnabled(true);

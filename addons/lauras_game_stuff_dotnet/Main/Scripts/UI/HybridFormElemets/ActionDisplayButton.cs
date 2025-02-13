@@ -43,7 +43,7 @@ public class ActionDisplayButton : FormBase, IFocusable {
         _focusButton.AddAction(Control.SignalName.FocusEntered, _ => _bgColor.SetColor(FOCUS_BG_COLOR));
         _focusButton.AddAction(Control.SignalName.FocusExited, _ => _bgColor.SetColor(DEFAULT_BG_COLOR));
         
-        _menuElement = new ControlElement(_menu, _ => EventManager.UnregisterListeners(this));
+        _menuElement = new ControlElement(_menu);
         SetCaptureInput(false);
     }
 

@@ -9,7 +9,7 @@ public class ShopScreenListener : FormListener {
         UIManager.SubViewportClick(_pcObjectOwner.GetViewport(), _pcObjectOwner.GetCamera(), _pcObjectOwner.GetScreen(), ev);
     }
     [EventListener(PriorityLevels.HIGH)]
-    private void OnMouseMove(MouseMoveEvent ev, Vector2 pos) {
+    private void OnMouseMove(MouseMoveEvent ev, Vector2 delta) {
         UIManager.SubViewportMouseMove(_pcObjectOwner.GetViewport(), _pcObjectOwner.GetCamera(), _pcObjectOwner.GetScreen(), ev);
     }
 }

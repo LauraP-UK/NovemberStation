@@ -27,12 +27,17 @@ public abstract class PreMadeMenu<T> where T : FormBase {
         }
         _form = (T) Build();
         _modify?.Invoke(_form);
+        if (AddCursor()) {
+            
+            _form.SetDefaultCursor();
+        }
         viewport.AddChild(_form.GetMenu());
     }
     
     protected abstract FormBase Build();
     protected abstract string GetFormName();
     protected virtual bool IsPrimary() => true;
+    protected virtual bool AddCursor() => false;
 
     public void ModifyForm(Action<T> modify) => _modify = modify;
     

@@ -1,14 +1,11 @@
 using System.Collections.Generic;
-using System.Drawing;
 using System.Linq;
 using Godot;
-using Color = Godot.Color;
 
 public static class UIManager {
     private static Control _primaryUIOpen;
     private static CanvasLayer _uiLayer;
 
-    private static readonly RayCast3D _rayCast3D = new();
     private static readonly SmartDictionary<Control, FormBase> _menus = new();
 
     public static void SetUILayer(CanvasLayer uiLayer = null) {
@@ -16,7 +13,6 @@ public static class UIManager {
             _uiLayer = uiLayer;
             return;
         }
-
         _uiLayer = GameManager.I().GetActiveScene().GetTree().Root.GetNodeOrNull<CanvasLayer>("Main/UILayer");
     }
 
@@ -73,26 +69,26 @@ public static class UIManager {
     public static void SubViewportClick(SubViewport viewport, Camera3D camera3D, MeshInstance3D mesh, MouseInputEvent ev) {
         Vector2 uiPos = GetSubViewportUIPos(viewport, camera3D, mesh);
 
-        InputEvent godotEvent = new InputEventMouseButton {
+        InputEvent mouseButton = new InputEventMouseButton {
             Position = uiPos,
             GlobalPosition = uiPos,
             ButtonIndex = ev.GetMouseButton(),
             Pressed = ev.IsPressed()
         };
         
-        viewport.PushInput(godotEvent);
+        viewport.PushInput(mouseButton);
     }
     
     public static void SubViewportMouseMove(SubViewport viewport, Camera3D camera3D, MeshInstance3D mesh, MouseMoveEvent ev) {
         Vector2 uiPos = GetSubViewportUIPos(viewport, camera3D, mesh);
 
-        InputEvent godotEvent = new InputEventMouseMotion {
+        InputEvent mouseMotion = new InputEventMouseMotion {
             Position = uiPos,
             GlobalPosition = uiPos,
             Relative = ev.GetDelta()
         };
         
-        viewport.PushInput(godotEvent);
+        viewport.PushInput(mouseMotion);
     }
 
     public static Vector3 GetMouseHitCoords(Camera3D camera) {

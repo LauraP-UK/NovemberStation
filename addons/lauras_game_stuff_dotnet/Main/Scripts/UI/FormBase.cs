@@ -10,6 +10,7 @@ public abstract class FormBase : IFormObject {
     protected IFormObject _topLevelLayout;
     protected FormListener _listener;
 
+    private ICursor _cursorElement;
     private readonly SignalNode _onReadyAction;
     public bool _captureInput = true;
     private bool _registerListenerOnReady = true;
@@ -65,7 +66,19 @@ public abstract class FormBase : IFormObject {
     public void SetTopLevelLayout(IFormObject layout) => _topLevelLayout = layout;
     
     /* --- BEHAVIOUR --- */
-    
+
+    public void SetDefaultCursor() {
+        RoundCursor roundCursor = new("Cursor");
+        roundCursor.SetPosition(new Vector2(0, 0));
+        SetCursor(roundCursor);
+    }
+    public void SetCursor(ICursor cursor) {
+        _cursorElement = cursor;
+        _cursorElement.GetCursorElement().GetElement().SetZIndex(50);
+        _menu.AddChild(cursor.GetCursorElement().GetElement());
+    }
+    public ICursor GetCursor() => _cursorElement;
+
     protected abstract void OnDestroy();
     public void SetListener(FormListener listener, bool registerNow = false) {
         _listener?.Unregister();
