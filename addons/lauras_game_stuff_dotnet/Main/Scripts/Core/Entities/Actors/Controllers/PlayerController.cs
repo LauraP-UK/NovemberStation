@@ -24,11 +24,13 @@ public class PlayerController : ControllerBase {
     private readonly ContextMenu _contextMenu = new();
     private readonly CrosshairOverlay _crosshair = new();
     private readonly ShopMenu _shopMenu = new();
+    private readonly ToastUI _toastUI = new();
 
     public PlayerController(Player player) : base(player) {
         GetActor().GetModel().CollisionLayer = PLAYER_LAYER;
         _contextMenu.Open();
         _crosshair.Open();
+        _toastUI.Open();
     }
 
 
@@ -329,11 +331,6 @@ public class PlayerController : ControllerBase {
         float distRatio = Mathsf.InverseLerpClamped(2.9f, 0.9f, distanceTo);
         float actionRatio = Mathsf.InverseLerpClamped(2.9f, 2.5f, distanceTo);
         
-        /*if (!_uiVisible) {
-            distRatio = 0.0f;
-            actionRatio = 0.0f;
-        }*/
-        
         ContextMenuForm form = _contextMenu.GetForm();
         form?.Draw(_actionIndex, minPos, maxPos, distRatio, actionRatio, objectData);
     }
@@ -343,4 +340,6 @@ public class PlayerController : ControllerBase {
         if (_contextMenu.GetForm() == null) return;
         _contextMenu.GetForm().Hide();
     }
+
+    public ToastUI GetToastUI() => _toastUI;
 }

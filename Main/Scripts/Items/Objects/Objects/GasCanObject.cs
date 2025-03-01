@@ -14,6 +14,7 @@ public class GasCanObject : ObjectBase<RigidBody3D>, IGrabbable, IShovable, IDri
     public void Drink(ActorBase actorBase, IEventBase ev) {
         if (ev is not KeyPressEvent) return;
         _fuelAmount -= 10;
-        GD.Print($"Drinking from gas can. {(_fuelAmount == 0 ? "Can is now EMPTY!" : $"Fuel remaining: {_fuelAmount}")}");
+        if (_fuelAmount == 0) Toast.Error((Player)actorBase, "Gas Can is now EMPTY!");
+        else Toast.Info((Player)actorBase, $"Drank 10 fuel. Gasoline remaining {_fuelAmount}.");
     }
 }

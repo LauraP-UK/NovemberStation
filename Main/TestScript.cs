@@ -52,7 +52,10 @@ public partial class TestScript : Node {
 		GameManager.I().Process(delta);
 		
 		Player player = GameManager.I().GetPlayer();
-		if (player.GetModel().Position.Y < -20) player.SetPosition(new Vector3(5f, 0.2f, 0f), new Vector3(0.0f, 90.0f, 0.0f));
+		if (player.GetModel().Position.Y < -20) {
+			player.SetPosition(new Vector3(5f, 0.2f, 0f), new Vector3(0.0f, 90.0f, 0.0f));
+			Toast.Warn(player, "You fell off you numpty, respawning you...");
+		}
 
 		Node sceneObjects = GameManager.I().GetSceneObjects();
 		
@@ -61,8 +64,10 @@ public partial class TestScript : Node {
 			if (!(physicsObj.GlobalPosition.Y < -20)) continue;
 			if (_objSpawns.TryGetValue(physicsObj, out Vector3 origPosition))
 				physicsObj.GlobalPosition = origPosition;
-			else
+			else {
+				Toast.Error(player, $"Deleted {GameManager.I().GetObjectClass(physicsObj.GetInstanceId()).GetType()}");
 				physicsObj.QueueFree();
+			}
 		}
 	}
 

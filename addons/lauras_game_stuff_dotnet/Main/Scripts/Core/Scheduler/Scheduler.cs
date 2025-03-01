@@ -12,10 +12,12 @@ public static class Scheduler {
         _lastUpdateTime = currentTime;
 
         List<SchedulerTask> toRemove = new();
-        foreach (SchedulerTask schedulerTask in _tasks) {
+        SmartSet<SchedulerTask> clonedTasks = _tasks.Clone();
+        foreach (SchedulerTask schedulerTask in clonedTasks) {
             schedulerTask.Update((long) deltaMillis);
             if (schedulerTask.IsComplete()) toRemove.Add(schedulerTask);
         }
+        clonedTasks.Clear();
         
         _tasks.RemoveAll(toRemove);
     }

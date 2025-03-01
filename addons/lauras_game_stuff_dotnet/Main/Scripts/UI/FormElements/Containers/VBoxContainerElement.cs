@@ -12,13 +12,21 @@ public class VBoxContainerElement : FormElement<VBoxContainer> {
     public List<IFormObject> GetDisplayObjects() => _displayObjects;
     public bool IsEmpty() => _displayObjects.Count == 0;
     public int GetChildCount() => _displayObjects.Count;
-    public void AddChild(IFormObject child) {
+    public void AddChild(IFormObject child, int childIndex = -1) {
         if (_uniquesOnly && _displayObjects.Contains(child)) {
             child.GetNode().QueueFree();
             return;
         }
+
         _displayObjects.Add(child);
         GetElement().AddChild(child.GetNode());
+        if (childIndex > -1) GetElement().MoveChild(child.GetNode(), childIndex);
+    }
+
+    public void RemoveChild(IFormObject child) {
+        _displayObjects.Remove(child);
+        GetElement().RemoveChild(child.GetNode());
+        child.GetNode().QueueFree();
     }
     
     public void SetChildren<T>(List<T> children) where T : IFormObject {

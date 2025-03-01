@@ -1,13 +1,14 @@
 [gd_scene load_steps=4 format=3 uid="uid://cwravmdkjck75"]
 
-[ext_resource type="Texture2D" uid="uid://4h4eirvj24su" path="res://Main/Textures/UI/Symbols/WarningIcon.png" id="1_yrd72"]
-[ext_resource type="Texture2D" uid="uid://dtssjmv605wsg" path="res://Main/Textures/UI/ContextNinePatch.png" id="2_yar6e"]
+[ext_resource type="Texture2D" uid="uid://4h4eirvj24su" path="res://Main/Textures/UI/Symbols/WarningIcon.png" id="1_jvbgw"]
+[ext_resource type="Texture2D" uid="uid://dtssjmv605wsg" path="res://Main/Textures/UI/ContextNinePatch.png" id="2_n8gs0"]
 
 [sub_resource type="LabelSettings" id="LabelSettings_hbfcc"]
 outline_size = 5
 outline_color = Color(0, 0, 0, 1)
 
 [node name="Control" type="Control"]
+custom_minimum_size = Vector2(0, 25)
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -16,7 +17,14 @@ offset_bottom = -623.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="BGColour" type="ColorRect" parent="."]
+[node name="Sizer" type="Control" parent="."]
+custom_minimum_size = Vector2(0, 25)
+layout_mode = 1
+anchors_preset = 0
+offset_right = 400.0
+offset_bottom = 25.0
+
+[node name="BGColour" type="ColorRect" parent="Sizer"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -25,19 +33,20 @@ grow_horizontal = 2
 grow_vertical = 2
 color = Color(0.3003, 0.37206, 0.39, 1)
 
-[node name="HBoxContainer" type="HBoxContainer" parent="."]
+[node name="HBoxContainer" type="HBoxContainer" parent="Sizer"]
 layout_mode = 1
 anchors_preset = 10
 anchor_right = 1.0
+offset_right = 390.0
 offset_bottom = 25.0
 grow_horizontal = 2
 theme_override_constants/separation = 5
 
-[node name="Control" type="Control" parent="HBoxContainer"]
+[node name="Control" type="Control" parent="Sizer/HBoxContainer"]
 custom_minimum_size = Vector2(25, 25)
 layout_mode = 2
 
-[node name="Icon" type="TextureRect" parent="HBoxContainer/Control"]
+[node name="Icon" type="TextureRect" parent="Sizer/HBoxContainer/Control"]
 custom_minimum_size = Vector2(25, 25)
 layout_mode = 1
 anchors_preset = 8
@@ -52,25 +61,25 @@ offset_bottom = 15.5
 grow_horizontal = 2
 grow_vertical = 2
 scale = Vector2(0.75, 0.75)
-texture = ExtResource("1_yrd72")
+texture = ExtResource("1_jvbgw")
 expand_mode = 5
 
-[node name="Text" type="Label" parent="HBoxContainer"]
-custom_minimum_size = Vector2(250, 25)
+[node name="Text" type="Label" parent="Sizer/HBoxContainer"]
+custom_minimum_size = Vector2(400, 25)
 layout_mode = 2
 text = "Text info goes here..."
 label_settings = SubResource("LabelSettings_hbfcc")
 vertical_alignment = 1
 autowrap_mode = 2
 
-[node name="BoarderNinePatch" type="NinePatchRect" parent="."]
+[node name="Border" type="NinePatchRect" parent="Sizer"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-texture = ExtResource("2_yar6e")
+texture = ExtResource("2_n8gs0")
 patch_margin_left = 7
 patch_margin_top = 7
 patch_margin_right = 7

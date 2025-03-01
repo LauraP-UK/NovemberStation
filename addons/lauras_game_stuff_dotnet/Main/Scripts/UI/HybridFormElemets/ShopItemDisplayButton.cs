@@ -17,7 +17,7 @@ public class ShopItemDisplayButton : FormBase, IFocusable {
         SELECTED_BG_COLOR = Colors.Gold;
     
     private Action<Key, ShopItemDisplayButton> _keyboardBehaviour;
-    
+
     private const string
         FORM_PATH = "res://Main/Prefabs/UI/GameElements/ShopItemDisplay.tscn",
         OBJ_NAME_LABEL = "Content/ObjName",
@@ -25,8 +25,9 @@ public class ShopItemDisplayButton : FormBase, IFocusable {
         OBJ_COST_LABEL = "Content/ObjCost",
         OBJ_IMG_TEXTURE = "Content/ObjImg",
         BUTTON = "Button",
-        BG_COLOUR = "BGContainer/BGColour",
-        CREDITS_SYMBOL = " \u20bd";
+        BG_COLOUR = "BGContainer/BGColour";
+
+    public const string CREDITS_SYMBOL = "\u20bd";
 
     public ShopItemDisplayButton(ItemType itemType) : this(itemType.GetItemName()) => _itemType = itemType;
 

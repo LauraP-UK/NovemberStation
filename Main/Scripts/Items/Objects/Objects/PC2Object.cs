@@ -51,6 +51,7 @@ public class PC2Object : ObjectBase<Node3D>, IUsable {
                         rigidBody3D.SetPosition(_spawnPoint.GlobalPosition + new Vector3(0,0.5f,0));
                     
                         gameManager.RegisterObject(rigidBody3D);
+                        Toast.Info(gameManager.GetPlayer(), $"Purchased {itemType.GetItemName()} for {itemType.GetItemCost()}{ShopItemDisplayButton.CREDITS_SYMBOL}");
                     });
 
                     btn.SetTopLevelLayout(form.GetTopLevelLayout());
