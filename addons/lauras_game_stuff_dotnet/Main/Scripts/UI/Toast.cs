@@ -10,7 +10,7 @@ public static class Toast {
     }
 
     public static void Info(ICollection<Player> viewers, string message) {
-        Pop(viewers, message, 5000L, "res://Main/Textures/UI/Symbols/WarningIcon.png", default);
+        Pop(viewers, message, 5000L, "res://Main/Textures/UI/Symbols/WarningIcon.png");
     }
 
     public static void Warn(Player viewer, string message) {
@@ -18,7 +18,7 @@ public static class Toast {
     }
 
     public static void Warn(ICollection<Player> viewers, string message) {
-        Pop(viewers, message, 5000L, "res://Main/Textures/UI/Symbols/WarningIconUpsidedown.png", default);
+        Pop(viewers, message, 5000L, "res://Main/Textures/UI/Symbols/WarningIconUpsidedown.png");
     }
 
     public static void Error(Player viewer, string message) {
@@ -29,7 +29,7 @@ public static class Toast {
         Pop(viewers, message, 5000L, "res://Main/Textures/UI/Symbols/WarningIconUpsidedown.png", Colors.DarkRed);
     }
     
-    private static void Pop(ICollection<Player> viewers, string message, long duration, string iconPath, Color color) {
+    private static void Pop(ICollection<Player> viewers, string message, long duration, string iconPath, Color color = default) {
         ToastMessage tMessage = new("ToastMessage");
         tMessage.SetText(message);
         tMessage.SetIcon(iconPath);

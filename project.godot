@@ -53,4 +53,4 @@ ui_focus_prev={
 [physics]
 
 3d/physics_engine="JoltPhysics3D"
-3d/default_gravity=15.0
+3d/default_gravity=13.0

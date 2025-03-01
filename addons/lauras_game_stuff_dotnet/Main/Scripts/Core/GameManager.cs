@@ -46,7 +46,7 @@ public class GameManager {
     /* --- System Methods --- */
     
     public void Process(double delta) {
-        Scheduler.Update();
+        Scheduler.Process();
         MovementActionTracker.Process();
         UIManager.Process(delta);
         if (!GetTree().Paused) GetPlayer().GetController().Update((float)delta);
@@ -60,11 +60,14 @@ public class GameManager {
     
     public void PopPauseMenu() => new PauseMenu().Open();
 
-    public void Quit() => Scheduler.ScheduleOnce(50, _ => GetActiveScene().GetTree().Quit());
+    public void Quit() {
+        Toast.Info(GetPlayer(), "K thx bye");
+        Scheduler.ScheduleOnce(50, _ => GetTree().Quit());
+    }
 
-    public Rid GetWorldRid() => GetActiveScene().GetTree().Root.GetWorld3D().Space;
     public SceneTree GetTree() => GetActiveScene().GetTree();
-    public Viewport GetViewport() => GetActiveScene().GetTree().Root.GetViewport();
+    public Rid GetWorldRid() => GetTree().Root.GetWorld3D().Space;
+    public Viewport GetViewport() => GetTree().Root.GetViewport();
     public Camera3D GetActiveCamera() => GetViewport().GetCamera3D();
     public bool IsActiveCameraPlayer() => GetActiveCamera().Equals(GetPlayer().GetCamera());
     public T GetObjectClass<T>(ulong id) where T : IObjectBase => (T) GetObjectClass(id);
@@ -82,7 +85,7 @@ public class GameManager {
             activeScene.GetObjects().Add(rootNode.GetInstanceId(), objBase);
     }
     
-    public void Pause(bool pause) => GetActiveScene().GetTree().Paused = pause;
+    public void Pause(bool pause) => GetTree().Paused = pause;
     public void SetMouseControl(bool mouseAvailable) => Input.MouseMode = mouseAvailable ? Input.MouseModeEnum.Visible : Input.MouseModeEnum.Captured;
     public void SetMouseVisible(bool visible) => Input.MouseMode = visible ? Input.MouseModeEnum.Visible : Input.MouseModeEnum.Hidden;
 }

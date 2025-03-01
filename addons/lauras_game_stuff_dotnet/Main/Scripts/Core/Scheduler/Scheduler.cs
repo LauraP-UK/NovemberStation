@@ -6,7 +6,7 @@ public static class Scheduler {
     private static readonly SmartSet<SchedulerTask> _tasks = new();
     private static ulong _lastUpdateTime = Time.GetTicksMsec();
 
-    public static void Update() {
+    public static void Process() {
         ulong currentTime = Time.GetTicksMsec();
         ulong deltaMillis = currentTime - _lastUpdateTime;
         _lastUpdateTime = currentTime;

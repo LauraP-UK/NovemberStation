@@ -39,8 +39,7 @@ public class PlayerController : ControllerBase {
     private void ToggleUI(KeyPressEvent ev, Key key) {
         if (IsLocked()) return;
         if (key != Key.F1) return;
-        _uiVisible = !_uiVisible;
-        _crosshair.GetForm().GetMenu().SetVisible(_uiVisible);
+        ShowUI(!_uiVisible);
     }
     
     [EventListener]
@@ -342,4 +341,8 @@ public class PlayerController : ControllerBase {
     }
 
     public ToastUI GetToastUI() => _toastUI;
+    public void ShowUI(bool show) {
+        _uiVisible = show;
+        _crosshair.GetForm().GetMenu().SetVisible(show);
+    }
 }

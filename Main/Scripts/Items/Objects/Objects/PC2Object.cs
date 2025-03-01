@@ -92,7 +92,7 @@ public class PC2Object : ObjectBase<Node3D>, IUsable {
                         }
                         else {
                             IFormObject focusedElement = form.GetFocusedElement();
-                            ((ShopItemDisplayButton)focusedElement)?.VisualPress(false);
+                            ((ShopItemDisplayButton) focusedElement)?.VisualPress(false);
                         }
                         break;
                     }
@@ -119,7 +119,9 @@ public class PC2Object : ObjectBase<Node3D>, IUsable {
     
     private void View() {
         _camera.SetCurrent(true);
-        _gameManager.GetPlayer().GetController<PlayerController>().SetLocked(true);
+        PlayerController playerController = _gameManager.GetPlayer().GetController<PlayerController>();
+        playerController.SetLocked(true);
+        playerController.ShowUI(false);
         _gameManager.SetMouseControl(true);
         _gameManager.SetMouseVisible(false);
         TestDisplayForm form = _shopMenu.GetForm();
@@ -131,7 +133,9 @@ public class PC2Object : ObjectBase<Node3D>, IUsable {
 
     private void Release() {
         _gameManager.GetPlayer().GetCamera().SetCurrent(true);
-        _gameManager.GetPlayer().GetController<PlayerController>().SetLocked(false);
+        PlayerController playerController = _gameManager.GetPlayer().GetController<PlayerController>();
+        playerController.SetLocked(false);
+        playerController.ShowUI(true);
         _gameManager.SetMouseControl(false);
         TestDisplayForm form = _shopMenu.GetForm();
         ScrollDisplayList display = form.GetScrollDisplay();

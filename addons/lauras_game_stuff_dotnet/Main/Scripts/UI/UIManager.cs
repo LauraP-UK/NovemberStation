@@ -33,6 +33,7 @@ public static class UIManager {
         if (form != null && form.LockMovement()) {
             GameManager gameManager = GameManager.I();
             gameManager.GetPlayer().GetController().SetLocked(false);
+            gameManager.GetPlayer().GetController<PlayerController>().ShowUI(true);
             gameManager.Pause(false);
             gameManager.SetMouseControl(false);
         }
@@ -49,6 +50,7 @@ public static class UIManager {
         if (!menu.LockMovement()) return;
         GameManager gameManager = GameManager.I();
         gameManager.GetPlayer().GetController().SetLocked(true);
+        gameManager.GetPlayer().GetController<PlayerController>().ShowUI(false);
         gameManager.Pause(true);
         gameManager.SetMouseControl(true);
     }
