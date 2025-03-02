@@ -1,0 +1,21 @@
+[gd_scene load_steps=5 format=3 uid="uid://o5oomgbbvvf7"]
+
+[ext_resource type="Texture2D" uid="uid://cnafjpoh1lxps" path="res://Main/Textures/Sandbox/Checkerboard1.png" id="1_phkmx"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_achu8"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_pjgfq"]
+albedo_texture = ExtResource("1_phkmx")
+
+[sub_resource type="BoxMesh" id="BoxMesh_ov4gx"]
+material = SubResource("StandardMaterial3D_pjgfq")
+
+[node name="Main" type="StaticBody3D"]
+collision_layer = 2
+collision_mask = 7
+
+[node name="Collision" type="CollisionShape3D" parent="."]
+shape = SubResource("BoxShape3D_achu8")
+
+[node name="Mesh" type="MeshInstance3D" parent="."]
+mesh = SubResource("BoxMesh_ov4gx")

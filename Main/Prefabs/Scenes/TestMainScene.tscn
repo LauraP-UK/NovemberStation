@@ -1,4 +1,4 @@
-[gd_scene load_steps=29 format=3 uid="uid://bea3c2ji0la15"]
+[gd_scene load_steps=31 format=3 uid="uid://bea3c2ji0la15"]
 
 [ext_resource type="Script" path="res://Main/TestScript.cs" id="1_htyov"]
 [ext_resource type="PackedScene" uid="uid://cbyboln8qtkr5" path="res://Main/Prefabs/PhysicsObjects/FireExtinguisher.tscn" id="2_s7uom"]
@@ -10,6 +10,8 @@
 [ext_resource type="Texture2D" uid="uid://c5q1hp1s028lo" path="res://Main/Textures/Sandbox/Noise1.png" id="6_eukhs"]
 [ext_resource type="PackedScene" uid="uid://vcuoeoep6iag" path="res://Main/Prefabs/StaticObjects/PCTest.tscn" id="7_0u05g"]
 [ext_resource type="PackedScene" uid="uid://bglqvyeeifjom" path="res://Main/Prefabs/PhysicsObjects/Crowbar.tscn" id="8_crd5k"]
+[ext_resource type="PackedScene" uid="uid://o5oomgbbvvf7" path="res://Main/Prefabs/StaticObjects/Scenery/StaticCube.tscn" id="11_8d7ou"]
+[ext_resource type="Script" path="res://Main/Prefabs/StaticObjects/Scenery/StaticCubeTool.gd" id="12_g2rax"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_vlb6p"]
 sky_horizon_color = Color(0.64625, 0.65575, 0.67075, 1)
@@ -87,6 +89,13 @@ script = ExtResource("1_htyov")
 transform = Transform3D(-0.866024, -0.433016, 0.250001, 0, 0.499998, 0.866026, -0.500003, 0.749999, -0.43301, 0, 10.7506, 0)
 shadow_enabled = true
 
+[node name="OmniLight3D" type="OmniLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.70464, 3.93506, 6.91723)
+visible = false
+light_energy = 2.0
+shadow_enabled = true
+omni_range = 7.5
+
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
 environment = SubResource("Environment_1182q")
 
@@ -106,7 +115,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.05288, -4.63504)
 transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, 13.2965, 0.317834, -3.90072)
 
 [node name="PC2" parent="SceneObjects" instance=ExtResource("5_cpa2d")]
-transform = Transform3D(0.0014586, 0, 0.0599823, 0, 0.06, 0, -0.0599823, 0, 0.0014586, 6.16559, 0, -11.2916)
+transform = Transform3D(0.06, 0, 0, 0, 0.06, 0, 0, 0, 0.06, -3.21617, 0.736784, 5.83165)
 
 [node name="Desk" parent="SceneObjects" instance=ExtResource("3_dkfcn")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.521518, 4.5054)
@@ -292,3 +301,50 @@ shape = SubResource("BoxShape3D_wmdie")
 
 [node name="UILayer" type="CanvasLayer" parent="."]
 process_mode = 3
+
+[node name="Wall1" parent="." instance=ExtResource("11_8d7ou")]
+transform = Transform3D(-4.37114e-08, 0, -1, 0, 1, 0, 1, 0, -4.37114e-08, -7.49994, 2.5, 12.4408)
+script = ExtResource("12_g2rax")
+size = Vector3(0.25, 5, 10)
+
+[node name="Wall2" parent="." instance=ExtResource("11_8d7ou")]
+transform = Transform3D(-4.37114e-08, 0, -1, 0, 1, 0, 1, 0, -4.37114e-08, -12.4078, 2.5, 6.6081)
+script = ExtResource("12_g2rax")
+size = Vector3(12, 5, 0.25)
+
+[node name="Wall3" parent="." instance=ExtResource("11_8d7ou")]
+transform = Transform3D(-4.37114e-08, 0, -1, 0, 1, 0, 1, 0, -4.37114e-08, -10.0236, 2.5, 0.654736)
+script = ExtResource("12_g2rax")
+size = Vector3(0.25, 5, 5)
+
+[node name="Wall5" parent="." instance=ExtResource("11_8d7ou")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.57292, 2.5, 0.649773)
+script = ExtResource("12_g2rax")
+size = Vector3(2, 5, 0.25)
+
+[node name="Wall4" parent="." instance=ExtResource("11_8d7ou")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.64122, 2.5, 6.50205)
+script = ExtResource("12_g2rax")
+size = Vector3(0.25, 5, 12)
+
+[node name="DoorTop" parent="." instance=ExtResource("11_8d7ou")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.05984, 4.24963, 0.651292)
+script = ExtResource("12_g2rax")
+size = Vector3(3.2, 1.5, 0.25)
+
+[node name="Shelf" parent="." instance=ExtResource("11_8d7ou")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.50412, 0.703289, 5.098)
+script = ExtResource("12_g2rax")
+size = Vector3(1.7, 0.1, 3)
+
+[node name="Roof" parent="." instance=ExtResource("11_8d7ou")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.52341, 5, 6.51872)
+script = ExtResource("12_g2rax")
+size = Vector3(10, 0.25, 12)
+
+[node name="SpotLight3D" type="SpotLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, -7.70216, 4.77505, 6.91605)
+light_energy = 10.0
+shadow_enabled = true
+spot_range = 10.0
+spot_angle = 75.0

@@ -13,7 +13,7 @@ public static class UIManager {
             _uiLayer = uiLayer;
             return;
         }
-        _uiLayer = GameManager.I().GetActiveScene().GetTree().Root.GetNodeOrNull<CanvasLayer>("Main/UILayer");
+        _uiLayer = GameManager.I().GetTree().Root.GetNodeOrNull<CanvasLayer>("Main/UILayer");
     }
 
     public static CanvasLayer GetUILayer() {
@@ -21,10 +21,10 @@ public static class UIManager {
         return _uiLayer;
     }
 
-    public static bool HasMenu(string menuName) => GetUILayer().GetChildren().Any(child => child.Name == menuName);
+    public static bool HasMenu(string menuName) => GetUILayer().GetChildren().Any(child => child.Name.ToString() == menuName);
 
     public static void CloseMenu(string menuName) {
-        if (GetUILayer().GetChildren().FirstOrDefault(child => child.Name == menuName) is not Control menu) return;
+        if (GetUILayer().GetChildren().FirstOrDefault(child => child.Name.ToString() == menuName) is not Control menu) return;
 
         if (menu == _primaryUIOpen) _primaryUIOpen = null;
 
@@ -42,7 +42,7 @@ public static class UIManager {
     }
 
     public static void OpenMenu(FormBase menu, bool isPrimaryMenu = false) {
-        if (HasMenu(menu.GetMenu().Name) || _primaryUIOpen != null) return;
+        if (HasMenu(menu.GetMenu().Name.ToString()) || _primaryUIOpen != null) return;
         if (isPrimaryMenu) _primaryUIOpen = menu.GetMenu();
         menu.AddToScene(GetUILayer());
         _menus.Add(menu.GetMenu(), menu);

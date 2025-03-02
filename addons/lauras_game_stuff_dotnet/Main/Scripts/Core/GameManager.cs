@@ -61,7 +61,7 @@ public class GameManager {
     public void PopPauseMenu() => new PauseMenu().Open();
 
     public void Quit() {
-        Toast.Info(GetPlayer(), "K thx bye");
+        Toast.Info(GetPlayer(), Randf.Random("K thx bye", "Don't leave me!", "I'll miss you!", "Love you!", "Don't go!", "Aww, it was just getting to the good bit!"));
         Scheduler.ScheduleOnce(50, _ => GetTree().Quit());
     }
 

@@ -27,10 +27,9 @@ public abstract class PreMadeMenu<T> where T : FormBase {
         }
         _form = (T) Build();
         _modify?.Invoke(_form);
-        if (AddCursor()) {
-            
-            _form.SetDefaultCursor();
-        }
+        
+        if (AddCursor()) _form.SetDefaultCursor();
+        
         viewport.AddChild(_form.GetMenu());
     }
     
