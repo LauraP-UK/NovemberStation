@@ -40,9 +40,6 @@ public class ContextMenuForm : FormBase {
 
     protected override void OnDestroy() => GetListContainer().ClearChildren();
     public override bool LockMovement() => false;
-    public override bool RequiresProcess() => true;
-
-    public override void Process(double delta) { }
 
     public NinePatchRectElement GetMainFrame() => _mainFrame;
     public NinePatchRectElement GetActionsContainerFrame() => _actionsContainerFrame;

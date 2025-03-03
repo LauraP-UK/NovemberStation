@@ -1,8 +1,9 @@
 ﻿
+using System;
 using System.Collections.Generic;
 using Godot;
 
-public class ToastForm : FormBase {
+public class ToastForm : FormBase, IProcess {
     private readonly VBoxContainerElement _display;
 
     private readonly SmartDictionary<ToastMessage, (ulong startTime, long duration)> _messages = new();
@@ -25,9 +26,8 @@ public class ToastForm : FormBase {
     }
 
     public override bool LockMovement() => false;
-    public override bool RequiresProcess() => true;
 
-    public override void Process(double delta) {
+    public void Process(float delta) {
         ulong currentMillis = Time.GetTicksMsec();
         _messages.RemoveWhere(entry => {
             ToastMessage message = entry.Key;
@@ -37,7 +37,7 @@ public class ToastForm : FormBase {
             if (start + (ulong)duration >= currentMillis) {
                 long remaining = (long)start + duration - (long)currentMillis;
                 float alpha = Mathsf.Remap(500, 0, remaining, 1f, 0f);
-                if (alpha != 1.0f) message.SetAlpha(alpha);
+                if (Math.Abs(alpha - 1.0f) > 0.01f) message.SetAlpha(alpha);
                 return false;
             }
             _display.RemoveChild(message);

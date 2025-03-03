@@ -56,10 +56,9 @@ public static class UIManager {
     }
 
     public static void Process(double delta) {
-        foreach (KeyValuePair<Control, FormBase> pair in _menus) {
-            FormBase form = pair.Value;
-            if (form.RequiresProcess()) form.Process(delta);
-        }
+        foreach ((Control _, FormBase form) in _menus)
+            if (form is IProcess formProcess)
+                formProcess.Process((float)delta);
     }
 
     public static Vector2 GetSubViewportUIPos(SubViewport viewport, Camera3D camera3D, MeshInstance3D mesh) {

@@ -97,8 +97,6 @@ public abstract class FormBase : IFormObject {
         if (GetTopLevelLayout().Equals(this)) _captureInput = value;
         else GetTopLevelLayout().SetCaptureInput(value);
     }
-    public virtual bool RequiresProcess() => false;
-    public virtual void Process(double delta) {}
     
     /* --- VALIDATION --- */
     
