@@ -35,8 +35,14 @@ public class Items {
         "res://Main/Prefabs/PhysicsObjects/FireExtinguisher.tscn",
         "Set things on unfire.",
         150);
+    public static readonly ItemType FLOODLIGHT = ItemType.Create(
+        "Floodlight",
+        "res://Main/Textures/Items/Floodlight.png",
+        "res://Main/Prefabs/PhysicsObjects/Floodlight.tscn",
+        "I love lamp.",
+        300);
     
-    private static readonly ItemType[] ALL_ITEMS = {GAS_CAN, WORK_DESK, STORAGE_CRATE, CROWBAR, FIRE_EXTINGUISHER};
+    private static readonly ItemType[] ALL_ITEMS = {GAS_CAN, WORK_DESK, STORAGE_CRATE, CROWBAR, FIRE_EXTINGUISHER, FLOODLIGHT};
     public static List<ItemType> GetItems() => new(ALL_ITEMS);
     public static List<ShopItemDisplayButton> GetItemButtons() => GetItems().Select(item => item.CreateButton()).ToList();
     

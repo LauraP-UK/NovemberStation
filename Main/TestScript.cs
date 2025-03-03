@@ -49,15 +49,16 @@ public partial class TestScript : Node {
 
 	// Called every frame. 'delta' is the elapsed time since the previous frame.
 	public override void _Process(double delta) {
-		GameManager.I().Process(delta);
+		GameManager gameManager = GameManager.I();
+		gameManager.Process(delta);
 		
-		Player player = GameManager.I().GetPlayer();
+		Player player = gameManager.GetPlayer();
 		if (player.GetModel().Position.Y < -20) {
 			player.SetPosition(new Vector3(5f, 0.2f, 0f), new Vector3(0.0f, 90.0f, 0.0f));
-			Toast.Warn(player, "You fell off you numpty, respawning you...");
+			Toast.Warn(player, "You fell off, you numpty. I'm respawning you...");
 		}
 
-		Node sceneObjects = GameManager.I().GetSceneObjects();
+		Node sceneObjects = gameManager.GetSceneObjects();
 		
 		foreach (Node child in sceneObjects.GetChildren()) {
 			if (child is not RigidBody3D physicsObj) continue;
@@ -65,7 +66,7 @@ public partial class TestScript : Node {
 			if (_objSpawns.TryGetValue(physicsObj, out Vector3 origPosition))
 				physicsObj.GlobalPosition = origPosition;
 			else {
-				Toast.Error(player, $"Deleted {GameManager.I().GetObjectClass(physicsObj.GetInstanceId()).GetType()}");
+				Toast.Error(player, $"Deleted {gameManager.GetObjectClass(physicsObj.GetInstanceId()).GetType()}");
 				physicsObj.QueueFree();
 			}
 		}

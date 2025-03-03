@@ -114,8 +114,7 @@ public class PlayerController : ControllerBase {
         RigidBody3D hitBody = ev.GetItem();
 
         if (hitBody == null || hitBody.Equals(_heldObject) || _heldObject != null) {
-            Vector3 tossDirection = -((Player)GetActor()).GetCamera().GlobalTransform.Basis.Z * 0.1f;
-            ReleaseHeldObject(tossDirection + Vector3.Down); // Mini push in a direction plus a nudge down
+            ReleaseHeldObject(Vector3.Down * 0.2f); // Mini nudge down
             return;
         }
 
