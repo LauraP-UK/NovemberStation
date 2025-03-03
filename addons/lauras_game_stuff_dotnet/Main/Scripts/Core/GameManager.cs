@@ -49,7 +49,11 @@ public class GameManager {
         Scheduler.Process();
         MovementActionTracker.Process();
         UIManager.Process(delta);
-        if (!GetTree().Paused) GetPlayer().GetController().Update((float)delta);
+        if (!GetTree().Paused) {
+            GetPlayer().GetController().Update((float)delta);
+            foreach ((ulong _, IObjectBase obj) in ((TestScript)GetActiveScene()).GetObjects())
+                if (obj is IProcess processObj) processObj.Process((float)delta);
+        }
     }
     
     public void PhysicsProcess(double delta) {
@@ -61,7 +65,9 @@ public class GameManager {
     public void PopPauseMenu() => new PauseMenu().Open();
 
     public void Quit() {
-        Toast.Info(GetPlayer(), Randf.Random("K thx bye", "Don't leave me!", "I'll miss you!", "Love you!", "Don't go!", "Aww, it was just getting to the good bit!"));
+        string leaveMessage = Randf.Random("K thx bye", "Don't leave me!", "I'll miss you!", "Love you!", "Don't go!", "Aww, it was just getting to the good bit!");
+        Toast.Info(GetPlayer(), leaveMessage);
+        GD.Print(leaveMessage);
         Scheduler.ScheduleOnce(50, _ => GetTree().Quit());
     }
 
