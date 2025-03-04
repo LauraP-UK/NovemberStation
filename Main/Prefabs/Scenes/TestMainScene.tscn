@@ -23,8 +23,10 @@ sky_material = SubResource("ProceduralSkyMaterial_vlb6p")
 [sub_resource type="Environment" id="Environment_1182q"]
 background_mode = 2
 sky = SubResource("Sky_iivj2")
+ambient_light_source = 3
 tonemap_mode = 2
 glow_enabled = true
+fog_aerial_perspective = 1.0
 volumetric_fog_emission_energy = 10.0
 volumetric_fog_length = 256.0
 
@@ -87,9 +89,19 @@ size = Vector3(1, 1, 2.1)
 process_mode = 3
 script = ExtResource("1_htyov")
 
+[node name="SunContainer" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 11.5191, 0)
+
+[node name="Sun" type="DirectionalLight3D" parent="SunContainer"]
+transform = Transform3D(-4.37114e-08, -0.939693, 0.34202, 0, 0.34202, 0.939693, -1, 4.10753e-08, -1.49502e-08, 0, 0, 0)
+shadow_enabled = true
+sky_mode = 1
+
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
 transform = Transform3D(-0.866024, -0.433016, 0.250001, 0, 0.499998, 0.866026, -0.500003, 0.749999, -0.43301, 0, 10.7506, 0)
+visible = false
 shadow_enabled = true
+sky_mode = 1
 
 [node name="OmniLight3D" type="OmniLight3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.70464, 3.93506, 6.91723)

@@ -7,7 +7,7 @@ public partial class TestScript : Node {
 	private readonly SmartDictionary<ulong, IObjectBase> _objects = new();
 	private WorldEnvironment _worldEnvironment;
 	private EnvironmentType _currentEnvironment = Environments.MORNING;
-	private const long DAY_LENGTH = 5000L * 4L;
+	private static readonly long DAY_LENGTH = 20000L * Environments.GetCount();
 	
 	private long _dayTime = 0L;
 
@@ -48,7 +48,7 @@ public partial class TestScript : Node {
 		}
 
 		_worldEnvironment = GetTree().Root.GetNode<WorldEnvironment>("Main/WorldEnvironment");
-		//_currentEnvironment.Apply(_worldEnvironment);
+		_currentEnvironment.Apply(_worldEnvironment);
 
 		GD.Print($"Dynamic Objects: {_objSpawns.Count}");
 		
@@ -65,22 +65,37 @@ public partial class TestScript : Node {
 			player.SetPosition(new Vector3(5f, 0.2f, 0f), new Vector3(0.0f, 90.0f, 0.0f));
 			Toast.Warn(player, "You fell off, you numpty. I'm respawning you...");
 		}
+		
+		DirectionalLight3D sun = GetTree().Root.GetNode<DirectionalLight3D>("Main/SunContainer/Sun");
+		Node3D sunContainer = GetTree().Root.GetNode<Node3D>("Main/SunContainer");
+		Vector3 playerPos = player.GetPosition();
+		sunContainer.SetPosition(new Vector3(playerPos.X, 100, playerPos.Z));
 
-		if (false && !gameManager.GetTree().IsPaused()) {
+		if (!gameManager.GetTree().IsPaused()) {
 			_dayTime += (long)(delta * 1000L);
 			if (_dayTime >= DAY_LENGTH) _dayTime = 0L;
 			
+			long phaseLength = DAY_LENGTH / Environments.GetCount();
+			int phaseIndex = (int)Mathsf.Remap(0L, DAY_LENGTH, _dayTime, 0, Environments.GetCount());
+			float ratio = (_dayTime % phaseLength) / (float)phaseLength;
+			
+			sunContainer.SetRotation(new Vector3(Mathf.DegToRad(Mathsf.Remap(0L, 80000L, _dayTime, 360.0f, 0.0f) + 90.0f),0.0f, 0.0f));
+			
 			EnvironmentType currentEnvironment = _currentEnvironment;
-			_currentEnvironment = Mathsf.Remap(0L, DAY_LENGTH, _dayTime, 0, 4) switch {
-				0 => Environments.MORNING,
-				1 => Environments.DAY,
-				2 => Environments.EVENING,
-				3 => Environments.NIGHT,
-				_ => _currentEnvironment
+			_currentEnvironment = Environments.GetAll()[phaseIndex];
+			
+			if (!currentEnvironment.Equals(_currentEnvironment)) Toast.Info(player, $"Time: {_currentEnvironment.GetName()}");
+			EnvironmentType next = currentEnvironment.GetNext();
+			EnvironmentType blend = _currentEnvironment.BlendWith(next, ratio);
+			blend.Apply(_worldEnvironment);
+			
+			GD.Print($"DayTime: {_dayTime}  |  LightEnergy: {sun.LightEnergy}");
+			sun.LightEnergy = _dayTime switch {
+				>= 40000L and <= 50000L => Mathsf.Remap(40000L, 50000L, _dayTime, 1.0f, 0.0f),
+				>= 75000L and <= 80000L => Mathsf.Remap(75000L, 80000L, _dayTime, 0.0f, 1.0f),
+				_ => sun.LightEnergy
 			};
-			if (!currentEnvironment.Equals(_currentEnvironment)) _currentEnvironment.Apply(_worldEnvironment);
 		}
-
 
 		Node sceneObjects = gameManager.GetSceneObjects();
 		
