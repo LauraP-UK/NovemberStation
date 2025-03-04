@@ -61,7 +61,7 @@ public class FloodlightObject : ObjectBase<RigidBody3D>, IGrabbable, IUsable, IP
 
     private void HandleColour() {
         if (_lightTip.MaterialOverride is not StandardMaterial3D mat) {
-            GD.PrintErr("WARN: FloodlightObject.SetOn : Failed to get material override.");
+            GD.PrintErr("WARN: FloodlightObject.HandleColour() : Failed to get material override.");
             return;
         }
 
@@ -71,8 +71,8 @@ public class FloodlightObject : ObjectBase<RigidBody3D>, IGrabbable, IUsable, IP
             mat.AlbedoColor = new Color(colourValue, colourValue, colourValue);
             mat.EmissionEnergyMultiplier = Mathsf.Round(Mathsf.Lerp(50.0f, 0.0f, fadeRatio), 4);
             _light.SpotAngle = Mathsf.Round(Mathsf.Lerp(_initialAngle, _initialAngle * 0.33f, fadeRatio), 4);
-            _light.SpotRange = Mathsf.Round(Mathsf.Lerp(_initialRange, _initialRange * 0.2f, fadeRatio), 4);
-            _light.LightEnergy = Mathsf.Round(Mathsf.Lerp(_initialEnergy, _initialEnergy * 0.1f, fadeRatio), 4);
+            _light.SpotRange = Mathsf.Round(Mathsf.Lerp(_initialRange, _initialRange * 0.5f, fadeRatio), 4);
+            _light.LightEnergy = Mathsf.Round(Mathsf.Lerp(_initialEnergy, _initialEnergy * 0.5f, fadeRatio), 4);
         }
         else {
             mat.AlbedoColor = Colors.Black;

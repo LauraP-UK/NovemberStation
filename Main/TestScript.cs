@@ -5,6 +5,11 @@ public partial class TestScript : Node {
 	private readonly Dictionary<RigidBody3D, Vector3> _objSpawns = new();
 	
 	private readonly SmartDictionary<ulong, IObjectBase> _objects = new();
+	private WorldEnvironment _worldEnvironment;
+	private EnvironmentType _currentEnvironment = Environments.MORNING;
+	private const long DAY_LENGTH = 5000L * 4L;
+	
+	private long _dayTime = 0L;
 
 	public TestScript() {
 		GameManager.Init();
@@ -42,6 +47,9 @@ public partial class TestScript : Node {
 			obj.AngularDamp = 0.5f;
 		}
 
+		_worldEnvironment = GetTree().Root.GetNode<WorldEnvironment>("Main/WorldEnvironment");
+		//_currentEnvironment.Apply(_worldEnvironment);
+
 		GD.Print($"Dynamic Objects: {_objSpawns.Count}");
 		
 		Scheduler.ScheduleRepeating(0L, 1000L, _ => _objects.RemoveWhere(pair => GameUtils.IsNodeInvalid(pair.Value.GetBaseNode3D())));
@@ -57,6 +65,22 @@ public partial class TestScript : Node {
 			player.SetPosition(new Vector3(5f, 0.2f, 0f), new Vector3(0.0f, 90.0f, 0.0f));
 			Toast.Warn(player, "You fell off, you numpty. I'm respawning you...");
 		}
+
+		if (false && !gameManager.GetTree().IsPaused()) {
+			_dayTime += (long)(delta * 1000L);
+			if (_dayTime >= DAY_LENGTH) _dayTime = 0L;
+			
+			EnvironmentType currentEnvironment = _currentEnvironment;
+			_currentEnvironment = Mathsf.Remap(0L, DAY_LENGTH, _dayTime, 0, 4) switch {
+				0 => Environments.MORNING,
+				1 => Environments.DAY,
+				2 => Environments.EVENING,
+				3 => Environments.NIGHT,
+				_ => _currentEnvironment
+			};
+			if (!currentEnvironment.Equals(_currentEnvironment)) _currentEnvironment.Apply(_worldEnvironment);
+		}
+
 
 		Node sceneObjects = gameManager.GetSceneObjects();
 		

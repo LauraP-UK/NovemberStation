@@ -25,6 +25,8 @@ background_mode = 2
 sky = SubResource("Sky_iivj2")
 tonemap_mode = 2
 glow_enabled = true
+volumetric_fog_emission_energy = 10.0
+volumetric_fog_length = 256.0
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_rr383"]
 size = Vector3(50, 1, 50)
@@ -106,7 +108,7 @@ process_mode = 1
 process_mode = 1
 
 [node name="Floodlight" parent="SceneObjects" instance=ExtResource("2_f38n5")]
-transform = Transform3D(0.0931179, 0.995655, 0, -0.995655, 0.0931179, 0, 0, 0, 1, -5.80921, 1.46207, -4.47165)
+transform = Transform3D(0.996434, 0.0843734, 0, -0.0843734, 0.996434, 0, 0, 0, 1, -7.95799, 1.30605, -4.47165)
 
 [node name="RigidBody3D" parent="SceneObjects" instance=ExtResource("8_crd5k")]
 transform = Transform3D(-0.026299, 4.59954e-08, -0.999654, -0.999654, 8.6243e-08, 0.026299, 8.74228e-08, 1, 4.37114e-08, -0.244393, 1.42133, 4.56328)
@@ -344,7 +346,7 @@ size = Vector3(10, 0.25, 12)
 
 [node name="SpotLight3D" type="SpotLight3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, -7.70216, 4.77505, 6.91605)
-light_energy = 10.0
+light_energy = 3.0
 shadow_enabled = true
 spot_range = 10.0
 spot_angle = 75.0

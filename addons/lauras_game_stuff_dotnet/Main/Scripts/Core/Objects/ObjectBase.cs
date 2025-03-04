@@ -28,7 +28,6 @@ public abstract class ObjectBase<T> : IObjectBase where T : Node3D {
         test = null;
         action = null;
         return false;
-        
     }
 
     public List<Type> GetValidActions(ActorBase actorBase, IEventBase ev) {
