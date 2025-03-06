@@ -1,0 +1,23 @@
+[gd_scene load_steps=3 format=3 uid="uid://crdn3x1rjqj4w"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_402jc"]
+albedo_color = Color(1, 0.916, 0.44, 1)
+emission_enabled = true
+emission = Color(1, 0.917647, 0.439216, 1)
+emission_energy_multiplier = 20.0
+
+[sub_resource type="SphereMesh" id="SphereMesh_4vk03"]
+radius = 10.0
+height = 20.0
+radial_segments = 16
+rings = 16
+
+[node name="SunPivot" type="Node3D"]
+
+[node name="SunHolder" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 128.856, 300, 0)
+
+[node name="SunSphere" type="MeshInstance3D" parent="SunHolder"]
+material_override = SubResource("StandardMaterial3D_402jc")
+cast_shadow = 0
+mesh = SubResource("SphereMesh_4vk03")
