@@ -9,23 +9,23 @@ public static class EnvironmentManager {
     private const long SUN_FADE_TIME = 10000L / 2L;
 	
     private static long _dayTime;
+    private static bool _forcePause;
+    private static float _daySpeed = 1.0f;
     
     private static Node3D _sunContainer, _sunObj;
     private static DirectionalLight3D _sunLight;
     private static EnvListeners _envListeners;
     
     public static void Init(WorldEnvironment worldEnvironment, Node3D sunContainer, Node3D sunObj, DirectionalLight3D sunLight) {
-        if (_envListeners != null) EventManager.UnregisterListeners(_envListeners);
+        if (_envListeners == null) EventManager.RegisterListeners(_envListeners = new EnvListeners());
         _worldEnvironment = worldEnvironment;
         _sunContainer = sunContainer;
         _sunObj = sunObj;
         _sunLight = sunLight;
-        _envListeners = new EnvListeners();
-        EventManager.RegisterListeners(_envListeners);
     }
     
     public static void Process(double delta) {
-        _dayTime += (long)(delta * 1000L);
+        if (!_forcePause) _dayTime += (long)(delta * 1000L * _daySpeed);
         if (_dayTime >= DAY_LENGTH) _dayTime = 0L;
 
         Player player = GameManager.I().GetPlayer();
@@ -71,15 +71,34 @@ public static class EnvironmentManager {
     }
 
     private class EnvListeners {
-        private const long DAY_ADD = 15000L;
+        private const long TIME_ADD = 15000L;
         
         [EventListener]
         public void OnKeyPressed(KeyPressEvent ev, Key key) {
             if (ev.IsCaptured()) return;
-            if (key == Key.R) {
-                AddTime(DAY_ADD);
-            } else if (key == Key.T) {
-                AddTime(-DAY_ADD);
+            switch (key) {
+                case Key.R:
+                    AddTime(TIME_ADD);
+                    break;
+                case Key.T:
+                    AddTime(-TIME_ADD);
+                    break;
+                case Key.Y:
+                    _forcePause = !_forcePause;
+                    Toast.Info(GameManager.I().GetPlayer(), $"Time {( _forcePause ? "paused" : "resumed")}");
+                    break;
+                case Key.G:
+                    _daySpeed += 0.1f;
+                    Toast.Info(GameManager.I().GetPlayer(), $"Day Speed: {_daySpeed:0.0}");
+                    break;
+                case Key.H:
+                    _daySpeed -= 0.1f;
+                    Toast.Info(GameManager.I().GetPlayer(), $"Day Speed: {_daySpeed:0.0}");
+                    break;
+                case Key.J:
+                    _daySpeed = 1.0f;
+                    Toast.Info(GameManager.I().GetPlayer(), $"Day Speed: {_daySpeed:0.0}");
+                    break;
             }
         }
     }

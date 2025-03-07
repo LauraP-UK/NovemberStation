@@ -13,11 +13,13 @@ radial_segments = 16
 rings = 16
 
 [node name="SunPivot" type="Node3D"]
+transform = Transform3D(1.25, 0, 0, 0, 1.25, 0, 0, 0, 1.25, 0, 0, 0)
 
 [node name="SunHolder" type="Node3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 128.856, 300, 0)
 
 [node name="SunSphere" type="MeshInstance3D" parent="SunHolder"]
+transform = Transform3D(0.75, 0, 0, 0, 0.75, 0, 0, 0, 0.75, -10.1454, 0, 0)
 material_override = SubResource("StandardMaterial3D_402jc")
 cast_shadow = 0
 mesh = SubResource("SphereMesh_4vk03")
