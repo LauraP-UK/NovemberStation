@@ -39,7 +39,6 @@ public static class EnvironmentManager {
         EnvironmentType currentEnvironment = EnvironmentSchedule.GetEnvironmentFromTime(_dayTime);
         EnvironmentType nextEnvironment = EnvironmentSchedule.GetNextEnvironment(_dayTime);
         float ratio = EnvironmentSchedule.GetDistanceThroughCurrentEnvironment(_dayTime);
-        GD.Print($"Ratio: {ratio}");
         EnvironmentType blend = currentEnvironment.BlendWith(nextEnvironment, ratio);
 
         if (!_lastEnvironment.Equals(currentEnvironment) || !nextEnvironment.Equals(_lastNext)) {
