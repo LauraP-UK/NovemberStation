@@ -74,7 +74,5 @@ public class EnvironmentType {
             Mathsf.Lerp(_glowStrength, other._glowStrength, weight)
         );
     }
-
-    public EnvironmentType GetNext() => Environments.GetNext(this);
     public string GetName() => _name;
 }

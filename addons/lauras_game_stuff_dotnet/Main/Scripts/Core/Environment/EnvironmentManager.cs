@@ -4,13 +4,13 @@ using Godot;
 public static class EnvironmentManager {
     
     private static WorldEnvironment _worldEnvironment;
-    private static EnvironmentType _currentEnvironment = Environments.MORNING;
-    private static readonly long DAY_LENGTH = 120000L * Environments.GetCount();
+    private static EnvironmentType _lastEnvironment = Environments.MORNING_CLEAR, _lastNext;
     private const long SUN_FADE_TIME = 10000L / 2L;
 	
     private static long _dayTime;
     private static bool _forcePause;
     private static float _daySpeed = 1.0f;
+    private static int _dayIndex;
     
     private static Node3D _sunContainer, _sunObj;
     private static DirectionalLight3D _sunLight;
@@ -25,39 +25,48 @@ public static class EnvironmentManager {
     }
     
     public static void Process(double delta) {
-        if (!_forcePause) _dayTime += (long)(delta * 1000L * _daySpeed);
-        if (_dayTime >= DAY_LENGTH) _dayTime = 0L;
-
+        long dayLength = EnvironmentSchedule.GetDayLength();
         Player player = GameManager.I().GetPlayer();
 
-        long phaseLength = DAY_LENGTH / Environments.GetCount();
-        int phaseIndex = (int)Mathsf.Remap(0L, DAY_LENGTH, _dayTime, 0, Environments.GetCount());
-        float ratio = _dayTime % phaseLength / (float)phaseLength;
+        if (!_forcePause) _dayTime += (long)(delta * 1000L * _daySpeed);
+        if (_dayTime >= dayLength) {
+            Toast.Error(player, "Day cycle reset!");
+            _dayTime = 0L;
+            _dayIndex++;
+            EnvironmentSchedule.ProgressSchedule();
+        }
 
-        float sunRotationDegs = Mathsf.Remap(0L, DAY_LENGTH, _dayTime, 360.0f, 0.0f) + 90.0f; // 90 degrees offset because we start at morning
+        EnvironmentType currentEnvironment = EnvironmentSchedule.GetEnvironmentFromTime(_dayTime);
+        EnvironmentType nextEnvironment = EnvironmentSchedule.GetNextEnvironment(_dayTime);
+        float ratio = EnvironmentSchedule.GetDistanceThroughCurrentEnvironment(_dayTime);
+        GD.Print($"Ratio: {ratio}");
+        EnvironmentType blend = currentEnvironment.BlendWith(nextEnvironment, ratio);
+
+        if (!_lastEnvironment.Equals(currentEnvironment) || !nextEnvironment.Equals(_lastNext)) {
+            Toast.Info(player, $"Time: {currentEnvironment.GetName()} : Blending with {nextEnvironment.GetName()}");
+            GD.Print($"Day {GetDay()} : {currentEnvironment.GetName()}");
+        }
+        _lastEnvironment = currentEnvironment;
+        _lastNext = nextEnvironment;
+        
+        if (_worldEnvironment != null) blend.Apply(_worldEnvironment);
+
+        float sunRotationDegs = Mathsf.Remap(0L, dayLength, _dayTime, 360.0f, 0.0f) + 90.0f; // 90 degrees offset because we start at morning
         Vector3 sunRot = new(Mathf.DegToRad(sunRotationDegs), 0.0f, 0.0f);
         _sunContainer?.SetRotation(sunRot);
         _sunObj?.SetRotation(sunRot);
         _sunObj?.SetPosition(player.GetPosition());
-
-        EnvironmentType currentEnvironment = _currentEnvironment;
-        _currentEnvironment = Environments.GetAll()[phaseIndex];
-			
-        if (!currentEnvironment.Equals(_currentEnvironment)) Toast.Info(player, $"Time: {_currentEnvironment.GetName()}");
-        EnvironmentType next = currentEnvironment.GetNext();
-        EnvironmentType blend = _currentEnvironment.BlendWith(next, ratio);
-        if (_worldEnvironment != null) blend.Apply(_worldEnvironment);
-
+        
         if (_sunLight == null) return;
-        if (_dayTime >= (DAY_LENGTH / 2L) - SUN_FADE_TIME && _dayTime <= (DAY_LENGTH / 2L) + SUN_FADE_TIME) {
-            _sunLight.LightEnergy = Mathsf.Remap(DAY_LENGTH / 2L - SUN_FADE_TIME, DAY_LENGTH / 2L + SUN_FADE_TIME, _dayTime, 1.0f, 0.0f);
-        } else if (_dayTime >= (DAY_LENGTH / 2L) + SUN_FADE_TIME && _dayTime <= DAY_LENGTH - SUN_FADE_TIME) {
+        if (_dayTime >= dayLength / 2L - SUN_FADE_TIME && _dayTime <= dayLength / 2L + SUN_FADE_TIME) {
+            _sunLight.LightEnergy = Mathsf.Remap(dayLength / 2L - SUN_FADE_TIME, dayLength / 2L + SUN_FADE_TIME, _dayTime, 1.0f, 0.0f);
+        } else if (_dayTime >= dayLength / 2L + SUN_FADE_TIME && _dayTime <= dayLength - SUN_FADE_TIME) {
             _sunLight.LightEnergy = 0.0f;
-        } else if (_dayTime >= DAY_LENGTH - SUN_FADE_TIME || _dayTime <= SUN_FADE_TIME) {
+        } else if (_dayTime >= dayLength - SUN_FADE_TIME || _dayTime <= SUN_FADE_TIME) {
             
-            float startTime = DAY_LENGTH - SUN_FADE_TIME;
-            float endTime = SUN_FADE_TIME + DAY_LENGTH;
-            float adjustedDayTime = _dayTime < SUN_FADE_TIME ? _dayTime + DAY_LENGTH : _dayTime;
+            float startTime = dayLength - SUN_FADE_TIME;
+            float endTime = SUN_FADE_TIME + dayLength;
+            float adjustedDayTime = _dayTime < SUN_FADE_TIME ? _dayTime + dayLength : _dayTime;
 
             _sunLight.LightEnergy = Mathsf.Remap(startTime, endTime, adjustedDayTime, 0.0f, 1.0f);
         } else {
@@ -67,8 +76,10 @@ public static class EnvironmentManager {
 
     private static void AddTime(long time) {
         Toast.Info(GameManager.I().GetPlayer(), $"{(time >= 0 ? "Adding" : "Subtracting")} {Mathsf.Round(time / 1000L, 2)} seconds");
-        _dayTime = (long)Mathf.Wrap(_dayTime + time, 0L, DAY_LENGTH);
+        _dayTime = (long)Mathf.Wrap(_dayTime + time, 0L, EnvironmentSchedule.GetDayLength());
     }
+    
+    public static int GetDay() => _dayIndex;
 
     private class EnvListeners {
         private const long TIME_ADD = 15000L;
@@ -88,11 +99,11 @@ public static class EnvironmentManager {
                     Toast.Info(GameManager.I().GetPlayer(), $"Time {( _forcePause ? "paused" : "resumed")}");
                     break;
                 case Key.G:
-                    _daySpeed += 0.1f;
+                    _daySpeed += 1.0f;
                     Toast.Info(GameManager.I().GetPlayer(), $"Day Speed: {_daySpeed:0.0}");
                     break;
                 case Key.H:
-                    _daySpeed -= 0.1f;
+                    _daySpeed -= 1.0f;
                     Toast.Info(GameManager.I().GetPlayer(), $"Day Speed: {_daySpeed:0.0}");
                     break;
                 case Key.J:
