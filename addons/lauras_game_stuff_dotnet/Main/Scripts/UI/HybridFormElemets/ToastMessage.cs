@@ -32,7 +32,7 @@ public class ToastMessage : FormBase {
         
         _menuElement = new ControlElement(_menu);
     }
-    protected override List<IFormObject> GetAllElements() => new() { _icon, _text, _background };
+    protected override List<IFormObject> GetAllElements() => new() { _icon, _text, _background, _border, _sizer };
     protected override void OnDestroy() { }
     
     public void SetIcon(string path) => _icon.SetTexture(path);

@@ -61,9 +61,9 @@ public static class Environments {
     
     public static readonly EnvironmentType DAY_CLEAR = EnvironmentType.Create("ClearDay",
         1.0f,
-        new Color(0.4f, 0.4f, 0.4f),
-        1.0f,
-        4.0f,
+        new Color(0.8f, 0.8f, 0.8f),
+        0.750f,
+        0.750f,
         true,
         new Color(0.0f, 0.0f, 0.0f),
         0.0f,
