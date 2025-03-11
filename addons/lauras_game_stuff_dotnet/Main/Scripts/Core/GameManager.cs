@@ -4,6 +4,8 @@ using Godot;
 
 public class GameManager {
     
+    private const bool DEBUG_MODE = true;
+    
     private static GameManager instance;
 
     private Node _activeScene, _sceneObjects;
@@ -94,4 +96,6 @@ public class GameManager {
     public void Pause(bool pause) => GetTree().Paused = pause;
     public void SetMouseControl(bool mouseAvailable) => Input.MouseMode = mouseAvailable ? Input.MouseModeEnum.Visible : Input.MouseModeEnum.Captured;
     public void SetMouseVisible(bool visible) => Input.MouseMode = visible ? Input.MouseModeEnum.Visible : Input.MouseModeEnum.Hidden;
+    
+    public static bool IsDebugMode() => DEBUG_MODE;
 }

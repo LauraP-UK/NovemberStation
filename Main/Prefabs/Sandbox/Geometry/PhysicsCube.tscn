@@ -8,6 +8,7 @@
 resource_name = "crate"
 cull_mode = 2
 albedo_texture = ExtResource("1_obiqo")
+metallic_specular = 0.0
 roughness = 0.6
 
 [sub_resource type="ArrayMesh" id="ArrayMesh_qocus"]

@@ -8,4 +8,6 @@ public class CubeObject : ObjectBase<RigidBody3D>, IGrabbable, IShovable {
     }
     public void Grab(ActorBase actorBase, IEventBase ev) => GrabActionDefault.Invoke(actorBase, GetBaseNode(), ev);
     public void Shove(ActorBase actorBase, IEventBase ev) => ShoveActionDefault.Invoke(actorBase, GetBaseNode(), ev);
+
+    public override string GetDisplayName() => "Storage Crate";
 }

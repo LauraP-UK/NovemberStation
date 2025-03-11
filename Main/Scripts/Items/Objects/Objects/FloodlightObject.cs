@@ -91,4 +91,6 @@ public class FloodlightObject : ObjectBase<RigidBody3D>, IGrabbable, IUsable, IP
     }
 
     private float GetPowerRemaining() => Mathsf.Round(Mathsf.Remap(MAX_POWER_MILLIS, 0f, _powerMillis, 100f, 0f), 2);
+
+    public override string GetDisplayName() => "Floodlight";
 }

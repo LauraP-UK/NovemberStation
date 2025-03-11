@@ -7,8 +7,7 @@ public static class EnvironmentManager {
     private static EnvironmentType _lastEnvironment = Environments.MORNING_CLEAR, _lastNext;
     
     private const long SUN_FADE_TIME = 5000L;
-    private const double DAY_START = 0.1D, SUN_RISE = 0.25D, SUN_SET = 0.75D;
-    private const bool DEBUG_CONTROLS = true;
+    private const double DAY_START = 0.24D, SUN_RISE = 0.25D, SUN_SET = 0.75D;
 
     private static long _dayTime = Mathsf.Lerp(0L, EnvironmentSchedule.GetDayLength(0), DAY_START);
     private static bool _forcePause;
@@ -20,7 +19,7 @@ public static class EnvironmentManager {
     private static EnvListeners _envListeners;
     
     public static void Init(WorldEnvironment worldEnvironment, Node3D sunContainer, Node3D sunObj, DirectionalLight3D sunLight) {
-        if (_envListeners == null && DEBUG_CONTROLS) EventManager.RegisterListeners(_envListeners = new EnvListeners());
+        if (_envListeners == null && GameManager.IsDebugMode()) EventManager.RegisterListeners(_envListeners = new EnvListeners());
         _worldEnvironment = worldEnvironment;
         _sunContainer = sunContainer;
         _sunObj = sunObj;
@@ -33,7 +32,7 @@ public static class EnvironmentManager {
 
         if (!_forcePause) _dayTime += (long)(delta * 1000L * _daySpeed);
         if (_dayTime >= dayLength) {
-            Toast.Error(player, "Day cycle reset!");
+            if (GameManager.IsDebugMode()) Toast.Error(player, "Day cycle reset!");
             _dayTime = 0L;
             _dayIndex++;
             EnvironmentSchedule.SetSchedule(GetDay() + 1, EnvironmentSchedule.GetRandomPhases(EnvironmentSchedule.GetSchedule(_dayIndex)[^1].Item2));
@@ -50,7 +49,7 @@ public static class EnvironmentManager {
         float ratio = EnvironmentSchedule.GetDistanceThroughCurrentEnvironment(GetDay(), _dayTime);
         EnvironmentType blend = currentEnvironment.Equals(nextEnvironment) ? currentEnvironment : currentEnvironment.BlendWith(nextEnvironment, ratio);
 
-        if (!_lastEnvironment.Equals(currentEnvironment) || !nextEnvironment.Equals(_lastNext))
+        if (GameManager.IsDebugMode() && (!currentEnvironment.Equals(_lastEnvironment) || !nextEnvironment.Equals(_lastNext)))
             Toast.Info(player, $"Time: {currentEnvironment.GetName()} : Blending with {nextEnvironment.GetName()}");
         _lastEnvironment = currentEnvironment;
         _lastNext = nextEnvironment;
@@ -64,18 +63,15 @@ public static class EnvironmentManager {
         _sunObj?.SetPosition(player.GetPosition());
         
         if (_sunLight == null) return;
-        if (_dayTime >= sunRiseStart && _dayTime < sunRiseEnd)
-            _sunLight.LightEnergy = Mathsf.Remap(sunRiseStart, sunRiseEnd, _dayTime, 0.0f, 1.0f);
-        else if (_dayTime >= sunRiseEnd && _dayTime < sunSetStart)
-            _sunLight.LightEnergy = 1.0f;
-        else if (_dayTime >= sunSetStart && _dayTime < sunSetEnd)
-            _sunLight.LightEnergy = Mathsf.Remap(sunSetStart, sunSetEnd, _dayTime, 1.0f, 0.0f);
-        else
-            _sunLight.LightEnergy = 0.0f;
+        
+        if (_dayTime >= sunRiseStart && _dayTime < sunRiseEnd) _sunLight.LightEnergy = Mathsf.Remap(sunRiseStart, sunRiseEnd, _dayTime, 0.0f, 1.0f);
+        else if (_dayTime >= sunRiseEnd && _dayTime < sunSetStart) _sunLight.LightEnergy = 1.0f;
+        else if (_dayTime >= sunSetStart && _dayTime < sunSetEnd) _sunLight.LightEnergy = Mathsf.Remap(sunSetStart, sunSetEnd, _dayTime, 1.0f, 0.0f);
+        else _sunLight.LightEnergy = 0.0f;
     }
 
     private static void AddTime(long time) {
-        Toast.Info(GameManager.I().GetPlayer(), $"{(time >= 0 ? "Adding" : "Subtracting")} {Mathsf.Round(time / 1000L, 2)} seconds");
+        if (GameManager.IsDebugMode()) Toast.Info(GameManager.I().GetPlayer(), $"{(time >= 0 ? "Adding" : "Subtracting")} {Mathsf.Round(time / 1000L, 2)} seconds");
         _dayTime = (long)Mathf.Wrap(_dayTime + time, 0L, EnvironmentSchedule.GetDayLength(GetDay()));
     }
     
@@ -96,19 +92,19 @@ public static class EnvironmentManager {
                     break;
                 case Key.Y:
                     _forcePause = !_forcePause;
-                    Toast.Info(GameManager.I().GetPlayer(), $"Time {( _forcePause ? "paused" : "resumed")}");
+                    if (GameManager.IsDebugMode()) Toast.Info(GameManager.I().GetPlayer(), $"Time {( _forcePause ? "paused" : "resumed")}");
                     break;
                 case Key.G:
                     _daySpeed += 1.0f;
-                    Toast.Info(GameManager.I().GetPlayer(), $"Day Speed: {_daySpeed}");
+                    if (GameManager.IsDebugMode()) Toast.Info(GameManager.I().GetPlayer(), $"Day Speed: {_daySpeed}");
                     break;
                 case Key.H:
                     _daySpeed -= 1.0f;
-                    Toast.Info(GameManager.I().GetPlayer(), $"Day Speed: {_daySpeed}");
+                    if (GameManager.IsDebugMode()) Toast.Info(GameManager.I().GetPlayer(), $"Day Speed: {_daySpeed}");
                     break;
                 case Key.J:
                     _daySpeed = 1.0f;
-                    Toast.Info(GameManager.I().GetPlayer(), $"Day Speed: {_daySpeed}");
+                    if (GameManager.IsDebugMode()) Toast.Info(GameManager.I().GetPlayer(), $"Day Speed: {_daySpeed}");
                     break;
             }
         }

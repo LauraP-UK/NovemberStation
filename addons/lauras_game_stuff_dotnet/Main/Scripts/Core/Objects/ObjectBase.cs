@@ -44,4 +44,5 @@ public abstract class ObjectBase<T> : IObjectBase where T : Node3D {
     public Node3D GetBaseNode3D() => GetBaseNode();
     public string GetObjectTag() => _objectTag;
     public string GetMetaTag() => _metaTag;
+    public abstract string GetDisplayName();
 }

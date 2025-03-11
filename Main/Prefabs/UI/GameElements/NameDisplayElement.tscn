@@ -1,0 +1,49 @@
+[gd_scene load_steps=3 format=3 uid="uid://djk4l52dn02xf"]
+
+[ext_resource type="Texture2D" uid="uid://dtssjmv605wsg" path="res://Main/Textures/UI/ContextNinePatch.png" id="1_6wm47"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_icmuy"]
+font_size = 12
+outline_size = 4
+outline_color = Color(0, 0, 0, 1)
+
+[node name="Control" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_bottom = -628.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Frame" type="NinePatchRect" parent="."]
+modulate = Color(1, 1, 1, 0.392157)
+z_index = 5
+texture_filter = 1
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("1_6wm47")
+patch_margin_left = 7
+patch_margin_top = 7
+patch_margin_right = 7
+patch_margin_bottom = 7
+
+[node name="BGColour" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.32, 0.32, 0.32, 1)
+
+[node name="DisplayName" type="Label" parent="."]
+offset_left = 10.0
+offset_right = 410.0
+offset_bottom = 23.0
+text = "Name Of Object"
+label_settings = SubResource("LabelSettings_icmuy")

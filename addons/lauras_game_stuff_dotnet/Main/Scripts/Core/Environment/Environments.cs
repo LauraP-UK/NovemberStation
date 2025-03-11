@@ -10,11 +10,11 @@ public static class Environments {
         0.5f,
         1.0f,
         true,
-        new Color(0.85f, 0.75f, 0.6f),
-        0.3f,
-        0.5f,
-        0.005f,
-        false,
+        new Color(0.0f, 0.0f, 0.0f),
+        0.0f,
+        1.0f,
+        0.0f,
+        true,
         1.0f
     );
     public static readonly EnvironmentType MORNING_HAZY = EnvironmentType.Create("HazyMorning",
@@ -27,7 +27,7 @@ public static class Environments {
         0.35f,
         0.6f,
         0.007f,
-        false,
+        true,
         1.0f
     );
     public static readonly EnvironmentType MORNING_FOGGY = EnvironmentType.Create("FoggyMorning",
@@ -40,7 +40,7 @@ public static class Environments {
         0.4f,
         0.8f,
         0.015f,
-        false,
+        true,
         1.0f
     );
     public static readonly EnvironmentType MORNING_CLOUDY = EnvironmentType.Create("CloudyMorning",
@@ -53,7 +53,7 @@ public static class Environments {
         0.2f,
         0.4f,
         0.005f,
-        false,
+        true,
         1.0f
     );
 
@@ -120,10 +120,10 @@ public static class Environments {
         0.5f,
         1.0f,
         true,
-        new Color(0.9f, 0.7f, 0.5f),
-        0.2f,
-        0.5f,
-        0.005f,
+        new Color(0.0f, 0.0f, 0.0f),
+        0.0f,
+        1.0f,
+        0.0f,
         true,
         1.0f
     );
@@ -154,15 +154,15 @@ public static class Environments {
         1.0f
     );
     public static readonly EnvironmentType EVENING_BLOOD_RED = EnvironmentType.Create("BloodRedEvening",
-        0.5f,
+        0.8f,
         new Color(0.8f, 0.2f, 0.1f),
         0.6f,
         0.08f,
         true,
-        new Color(0.1f, 0.04f, 0.03f),
-        0.2f,
+        new Color(0.8f, 0.24f, 0.23f),
+        0.42f,
         0.4f,
-        0.004f,
+        0.014f,
         true,
         1.0f
     );

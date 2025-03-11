@@ -141,4 +141,6 @@ public class PCObject : ObjectBase<Node3D>, IUsable {
         if (_camera.IsCurrent()) Release();
         else View();
     }
+
+    public override string GetDisplayName() => "PC";
 }

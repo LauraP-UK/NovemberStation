@@ -17,4 +17,6 @@ public class GasCanObject : ObjectBase<RigidBody3D>, IGrabbable, IShovable, IDri
         if (_fuelAmount == 0) Toast.Error((Player)actorBase, "Gas Can is now EMPTY!");
         else Toast.Info((Player)actorBase, $"Drank 10 fuel. Gasoline remaining {_fuelAmount}.");
     }
+
+    public override string GetDisplayName() => "Gas Can";
 }
