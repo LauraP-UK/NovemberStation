@@ -9,4 +9,5 @@ public interface IObjectBase {
     public List<Type> GetValidActions(ActorBase actorBase, IEventBase ev);
     public Node3D GetBaseNode3D();
     public string GetDisplayName();
+    public string GetContext();
 }

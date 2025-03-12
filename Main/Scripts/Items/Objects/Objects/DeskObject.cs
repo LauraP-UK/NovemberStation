@@ -7,4 +7,5 @@ public class DeskObject : ObjectBase<RigidBody3D>, IGrabbable {
     public void Grab(ActorBase actorBase, IEventBase ev) => GrabActionDefault.Invoke(actorBase, GetBaseNode(), ev);
 
     public override string GetDisplayName() => "Desk";
+    public override string GetContext() => "";
 }

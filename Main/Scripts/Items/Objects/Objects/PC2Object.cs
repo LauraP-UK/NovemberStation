@@ -151,4 +151,5 @@ public class PC2Object : ObjectBase<Node3D>, IUsable {
     }
 
     public override string GetDisplayName() => "PC";
+    public override string GetContext() => "";
 }

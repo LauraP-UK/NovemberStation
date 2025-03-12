@@ -10,4 +10,5 @@ public class CubeObject : ObjectBase<RigidBody3D>, IGrabbable, IShovable {
     public void Shove(ActorBase actorBase, IEventBase ev) => ShoveActionDefault.Invoke(actorBase, GetBaseNode(), ev);
 
     public override string GetDisplayName() => "Storage Crate";
+    public override string GetContext() => "Contains: 0/250 kg";
 }

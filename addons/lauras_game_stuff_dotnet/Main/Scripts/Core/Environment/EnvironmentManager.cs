@@ -7,7 +7,7 @@ public static class EnvironmentManager {
     private static EnvironmentType _lastEnvironment = Environments.MORNING_CLEAR, _lastNext;
     
     private const long SUN_FADE_TIME = 5000L;
-    private const double DAY_START = 0.24D, SUN_RISE = 0.25D, SUN_SET = 0.75D;
+    private const double DAY_START = 0.34D, SUN_RISE = 0.25D, SUN_SET = 0.75D;
 
     private static long _dayTime = Mathsf.Lerp(0L, EnvironmentSchedule.GetDayLength(0), DAY_START);
     private static bool _forcePause;

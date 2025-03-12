@@ -327,10 +327,10 @@ public class PlayerController : ControllerBase {
 
         float distanceTo = !_uiVisible ? 10f : contextObjResult?.Distance ?? _contextObject.GlobalPosition.DistanceTo(activeCamera.GlobalPosition);
         float distRatio = Mathsf.InverseLerpClamped(2.9f, 0.9f, distanceTo);
-        float actionRatio = Mathsf.InverseLerpClamped(2.9f, 2.5f, distanceTo);
+        float titleRatio = Mathsf.InverseLerpClamped(2.9f, 2.5f, distanceTo);
         
         ContextMenuForm form = _contextMenu.GetForm();
-        form?.Draw(_actionIndex, minPos, maxPos, distRatio, actionRatio, objectData);
+        form?.Draw(_actionIndex, minPos, maxPos, distRatio, titleRatio, _heldObject == null ? titleRatio : 0.0f, objectData);
     }
     
     private void HideContextBox() {

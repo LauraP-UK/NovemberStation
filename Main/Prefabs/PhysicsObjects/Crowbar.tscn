@@ -68,8 +68,8 @@ collision_mask = 7
 collision_priority = 20.0
 mass = 15.0
 center_of_mass_mode = 1
-metadata/behaviour_type = "cube_obj"
-metadata/object_tag = "cube_obj"
+metadata/behaviour_type = "crowbar_obj"
+metadata/object_tag = "crowbar_obj"
 
 [node name="Crowbar_Crowbar_0" type="MeshInstance3D" parent="."]
 transform = Transform3D(4.37114e-08, -0.5, 2.86603e-15, 4.37114e-08, 9.55343e-16, -0.5, 0.5, 4.37114e-08, 4.37114e-08, 0, 0, 0)

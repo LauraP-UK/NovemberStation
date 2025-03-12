@@ -5,7 +5,7 @@ public class FloodlightObject : ObjectBase<RigidBody3D>, IGrabbable, IUsable, IP
     private readonly SpotLight3D _light;
     private readonly MeshInstance3D _lightTip;
 
-    private const long MAX_POWER_MILLIS = 6000000L;
+    private const long MAX_POWER_MILLIS = 60000L;
     private const float FAIL_START_AT_PERCENT = 16.6f;
     private readonly float _initialRange, _initialAngle, _initialEnergy;
 
@@ -93,4 +93,5 @@ public class FloodlightObject : ObjectBase<RigidBody3D>, IGrabbable, IUsable, IP
     private float GetPowerRemaining() => Mathsf.Round(Mathsf.Remap(MAX_POWER_MILLIS, 0f, _powerMillis, 100f, 0f), 2);
 
     public override string GetDisplayName() => "Floodlight";
+    public override string GetContext() => $"Status: {(_isOn ? "ON" : "OFF")}\nPower: {GetPowerRemaining():00.00}%";
 }

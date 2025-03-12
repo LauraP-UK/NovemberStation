@@ -219,8 +219,8 @@ collision_layer = 4
 collision_mask = 7
 mass = 10.0
 center_of_mass_mode = 1
-metadata/behaviour_type = "cube_obj"
-metadata/object_tag = "cube_obj"
+metadata/behaviour_type = "extinguisher_obj"
+metadata/object_tag = "extinguisher_obj"
 
 [node name="Tank" type="MeshInstance3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.677921, 0)
