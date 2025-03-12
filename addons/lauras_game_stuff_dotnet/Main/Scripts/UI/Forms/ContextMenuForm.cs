@@ -176,15 +176,15 @@ public class ContextMenuForm : FormBase {
         VBoxContainerElement listContainer = GetListContainer();
         List<ActionDisplayButton> currentButtons = listContainer.GetDisplayObjects().Select(obj => (ActionDisplayButton)obj).ToList();
 
-        List<Type> validActions = objData.GetValidActions(player, null);
-        List<Type> currentActions = currentButtons.Select(obj => obj.GetAction()).ToList();
+        List<ActionKey> validActions = objData.GetValidActions(player, null);
+        List<ActionKey> currentActions = currentButtons.Where(obj => obj.GetAction() != null).Select(obj => (ActionKey)obj.GetAction()).ToList();
 
         float minimumWidth = 0;
 
-        if (!ArrayUtils.ExactMatch<Type>(validActions, currentActions)) {
+        if (!ArrayUtils.ExactMatch<ActionKey>(validActions, currentActions)) {
             List<ActionDisplayButton> buttons = new();
 
-            foreach (Type action in validActions) {
+            foreach (ActionKey action in validActions) {
                 ActionDisplayButton button = new(action);
                 button.SetActionName(ActionAtlas.GetActionName(action));
                 button.SetActionNum(1 + buttons.Count + ".");

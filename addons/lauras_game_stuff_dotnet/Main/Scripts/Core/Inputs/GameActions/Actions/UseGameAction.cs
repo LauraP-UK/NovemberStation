@@ -4,7 +4,7 @@ using Godot;
 
 public class UseGameAction : GameActionBase {
 
-    private Type _lastAction;
+    private ActionKey? _lastAction;
     public UseGameAction(GameAction.Action action) : base(action) { }
 
     [EventListener(PriorityLevels.TERMINUS)]
@@ -29,7 +29,7 @@ public class UseGameAction : GameActionBase {
         Player player = GameManager.I().GetPlayer();
         PlayerController controller = player.GetController<PlayerController>();
         
-        Type actionType = controller.GetCurrentContextAction() ?? _lastAction;
+        ActionKey? actionType = controller.GetCurrentContextAction() ?? _lastAction;
         Node3D obj = controller.GetContextObject();
 
         if (obj == null) return;
@@ -37,7 +37,7 @@ public class UseGameAction : GameActionBase {
         if (actionType == null || objectClass == null) return;
 
         try {
-            objectClass.TryGetAction(actionType, out Func<ActorBase, IEventBase, bool> test, out Action<ActorBase, IEventBase> method);
+            objectClass.TryGetAction((ActionKey)actionType, out Func<ActorBase, IEventBase, bool> test, out Action<ActorBase, IEventBase> method);
             if (test.Invoke(player, ev)) method.Invoke(player, ev);
             _lastAction = actionType;
         } catch (Exception e) {

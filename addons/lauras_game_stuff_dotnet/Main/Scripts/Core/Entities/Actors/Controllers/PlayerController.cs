@@ -174,7 +174,7 @@ public class PlayerController : ControllerBase {
         if (_heldObject != null) UpdateHeldObjectPosition(delta);
     }
 
-    public Type GetCurrentContextAction() {
+    public ActionKey? GetCurrentContextAction() {
         ActionDisplayButton btn = _contextMenu.GetForm().GetAction(_actionIndex);
         return btn?.GetAction();
     }

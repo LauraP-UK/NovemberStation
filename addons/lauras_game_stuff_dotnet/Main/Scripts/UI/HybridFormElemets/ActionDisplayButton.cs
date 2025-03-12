@@ -9,7 +9,7 @@ public class ActionDisplayButton : FormBase, IFocusable {
     private readonly ColorRectElement _bgColor;
     private readonly NinePatchRectElement _btnFrame;
     private readonly ButtonElement _focusButton;
-    private readonly Type _action;
+    private readonly ActionKey? _action;
 
     private static readonly Color
         DEFAULT_BG_COLOR = Colors.DimGray,
@@ -23,7 +23,7 @@ public class ActionDisplayButton : FormBase, IFocusable {
         BUTTON_FRAME = "BtnFrame",
         FOCUS_BUTTON = "FocusButton";
     
-    public ActionDisplayButton(Type action) : base(ActionAtlas.GetActionName(action) + "_btn", FORM_PATH) {
+    public ActionDisplayButton(ActionKey action) : base(ActionAtlas.GetActionName(action) + "_btn", FORM_PATH) {
         _action = action;
         
         Label numLabel = FindNode<Label>(ACTION_NUM);
@@ -50,7 +50,7 @@ public class ActionDisplayButton : FormBase, IFocusable {
     protected override List<IFormObject> GetAllElements() => new() {_nameLabel, _numLabel, _bgColor, _focusButton};
     protected override void OnDestroy() { }
     
-    public Type GetAction() => _action;
+    public ActionKey? GetAction() => _action;
     
     public void SetActionNum(string num) => _numLabel.GetElement().SetText(num);
     public void SetActionName(string name) => _nameLabel.GetElement().SetText(name);
@@ -79,7 +79,6 @@ public class ActionDisplayButton : FormBase, IFocusable {
 
     public override bool Equals(object obj) {
         if (!IsValid()) return false;
-        if (obj is not ActionDisplayButton other) return false;
-        return _action == other._action;
+        return obj is ActionDisplayButton other && _action.Equals(other._action);
     }
 }

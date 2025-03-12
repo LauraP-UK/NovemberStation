@@ -77,19 +77,6 @@ public abstract class FormElement<T> : IFormElement where T : Control {
     
     /* --- --- LISTENER/SIGNAL MANAGEMENT --- --- */
 
-    /*public void OnResize(Action<IFormObject> onResize) {
-        if (onResize == null) return;
-        AddAction(Control.SignalName.Resized, _ => onResize(this));
-    }
-
-    [EventListener]
-    protected void OnWindowResize(WindowResizeEvent ev, Vector2 v) {
-        foreach (string signal in _actions.Keys.Where(signal => signal == Control.SignalName.Resized)) {
-            _actions[signal].RunActionNoArgs();
-            return;
-        }
-    }*/
-
     public void AddAction(string signal, Action<IFormObject> action) => AddAction(signal, (formObj, _) => action(formObj));
 
     public void AddAction(string signal, Action<IFormObject, object[]> action) {

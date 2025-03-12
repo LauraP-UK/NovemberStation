@@ -5,7 +5,7 @@ public class FloodlightObject : ObjectBase<RigidBody3D>, IGrabbable, IUsable, IP
     private readonly SpotLight3D _light;
     private readonly MeshInstance3D _lightTip;
 
-    private const long MAX_POWER_MILLIS = 60000L;
+    private const long MAX_POWER_MILLIS = 60000 * 2L;
     private const float FAIL_START_AT_PERCENT = 16.6f;
     private readonly float _initialRange, _initialAngle, _initialEnergy;
 
@@ -19,6 +19,7 @@ public class FloodlightObject : ObjectBase<RigidBody3D>, IGrabbable, IUsable, IP
     public FloodlightObject(RigidBody3D baseNode) : base(baseNode, "floodlight_obj", "floodlight_obj") {
         RegisterAction<IGrabbable>((_, _) => true, Grab);
         RegisterAction<IUsable>((_, _) => true, Use);
+        RegisterArbitraryAction("Recharge", 10, (_,_) => _powerMillis <= 0, Recharge);
 
         string finding = "NULL";
         try {
@@ -52,6 +53,8 @@ public class FloodlightObject : ObjectBase<RigidBody3D>, IGrabbable, IUsable, IP
 
         ToggleLight(!_isOn);
     }
+
+    public void Recharge(ActorBase actorBase, IEventBase ev) => _powerMillis = MAX_POWER_MILLIS;
 
     private void ToggleLight(bool isOn) {
         _isOn = isOn;

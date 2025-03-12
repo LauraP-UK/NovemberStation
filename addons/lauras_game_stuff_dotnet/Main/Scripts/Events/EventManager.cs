@@ -58,8 +58,6 @@ public class EventManager {
         if (actualOwner == null) throw new ArgumentException("ERROR: EventManager.RegisterListener() : Owner cannot be null if callback has no target.");
 
         EventActionHolder toAdd = new(callback, actualOwner, priority);
-
-        //GD.Print($"INFO: Checking if _listeners contains key {eventType.FullName}  |  EventActionHolder {toAdd.GetHashCode()}");
         
         if (_listeners[eventType].Contains(toAdd)) {
             GD.Print($"WARN: Listener of type {eventType.FullName} already registered with Owner {actualOwner}!");
