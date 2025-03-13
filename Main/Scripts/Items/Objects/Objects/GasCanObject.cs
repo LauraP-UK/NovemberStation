@@ -1,5 +1,4 @@
 ﻿
-using System;
 using Godot;
 
 public class GasCanObject : ObjectBase<RigidBody3D>, IGrabbable, IShovable, IDrinkable {
@@ -24,9 +23,9 @@ public class GasCanObject : ObjectBase<RigidBody3D>, IGrabbable, IShovable, IDri
             _ => "EMPTY"
         };
     }
-    public override SmartDictionary<string, (object, Action<object>)> GetSerializeData() {
-        return new SmartDictionary<string, (object, Action<object>)> {
-            { "fuelAmount", (_fuelAmount, v => _fuelAmount = (int)v) }
+    public override SmartDictionary<string, SmartSerialData> GetSerialiseData() {
+        return new SmartDictionary<string, SmartSerialData> {
+            { "fuelAmount", SmartSerialData.From(_fuelAmount, v => _fuelAmount = (int)v, () => _fuelAmount = 100) }
         };
     }
 }

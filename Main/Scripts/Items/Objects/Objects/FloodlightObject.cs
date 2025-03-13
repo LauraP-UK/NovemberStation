@@ -20,7 +20,7 @@ public class FloodlightObject : ObjectBase<RigidBody3D>, IGrabbable, IUsable, IP
         RegisterAction<IGrabbable>((_, _) => true, Grab);
         RegisterAction<IUsable>((_, _) => true, Use);
         RegisterArbitraryAction("Recharge", 10, (_,_) => _powerMillis <= 0, Recharge);
-        RegisterArbitraryAction("Serialise", 20, (_,_) => true, SerialiseTest);
+        RegisterArbitraryAction("Save to File", 20, (_,_) => true, SerialiseTest);
 
         string finding = "NULL";
         try {
@@ -112,10 +112,10 @@ public class FloodlightObject : ObjectBase<RigidBody3D>, IGrabbable, IUsable, IP
         return $"Status: {(_isOn ? "ON" : "OFF")}\n{secondLine}";
     }
 
-    public override SmartDictionary<string, (object, Action<object>)> GetSerializeData() {
-        return new SmartDictionary<string, (object, Action<object>)> {
-            {"isOn", (_isOn, v => ToggleLight(Convert.ToBoolean(v)))},
-            {"powerMillis", (_powerMillis, v => _powerMillis = Convert.ToInt64(v))}
+    public override SmartDictionary<string, SmartSerialData> GetSerialiseData() {
+        return new SmartDictionary<string, SmartSerialData> {
+            {"isOn", SmartSerialData.From(_isOn, v => ToggleLight(Convert.ToBoolean(v)), () => ToggleLight(false))},
+            {"powerMillis", SmartSerialData.From(_powerMillis, v => _powerMillis = Convert.ToInt64(v), () => _powerMillis = MAX_POWER_MILLIS)}
         };
     }
 }

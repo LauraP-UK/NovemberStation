@@ -10,5 +10,5 @@ public class FireExtinguisherObject : ObjectBase<RigidBody3D>, IGrabbable {
 
     public override string GetDisplayName() => "Fire Extinguisher";
     public override string GetContext() => "";
-    public override SmartDictionary<string, (object, Action<object>)> GetSerializeData() => new();
+    public override SmartDictionary<string, SmartSerialData> GetSerialiseData() => new();
 }

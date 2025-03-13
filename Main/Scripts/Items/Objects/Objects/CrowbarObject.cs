@@ -11,5 +11,5 @@ public class CrowbarObject : ObjectBase<RigidBody3D>, IGrabbable {
 
     public override string GetDisplayName() => "Crowbar";
     public override string GetContext() => "Every good scientist needs a crowbar!";
-    public override SmartDictionary<string, (object, Action<object>)> GetSerializeData() => new();
+    public override SmartDictionary<string, SmartSerialData> GetSerialiseData() => new();
 }

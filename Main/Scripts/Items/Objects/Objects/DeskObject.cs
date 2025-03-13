@@ -9,5 +9,5 @@ public class DeskObject : ObjectBase<RigidBody3D>, IGrabbable {
 
     public override string GetDisplayName() => "Desk";
     public override string GetContext() => "";
-    public override SmartDictionary<string, (object, Action<object>)> GetSerializeData() => new();
+    public override SmartDictionary<string, SmartSerialData> GetSerialiseData() => new();
 }

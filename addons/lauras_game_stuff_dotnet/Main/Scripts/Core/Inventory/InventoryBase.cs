@@ -1,4 +1,6 @@
 ﻿
+using Godot;
+
 public abstract class InventoryBase : IInventory {
     protected float _size;
     private readonly SmartDictionary<string, SmartSet<ulong>> _inventory = new(); // MetaTag Type, List of Object IDs
@@ -10,6 +12,12 @@ public abstract class InventoryBase : IInventory {
     public bool AddItem(IObjectBase item) {
         string objectTag = item.GetObjectTag();
         ulong instanceId = item.GetBaseNode3D().GetInstanceId();
+        return AddItem(objectTag, instanceId);
+    }
+
+    public bool AddItem(Node3D node) {
+        ulong instanceId = node.GetInstanceId();
+        string objectTag = GameManager.I().GetObjectClass(instanceId).GetObjectTag();
         return AddItem(objectTag, instanceId);
     }
     
