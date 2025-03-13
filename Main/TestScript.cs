@@ -55,6 +55,22 @@ public partial class TestScript : Node {
         GD.Print($"Dynamic Objects: {_objSpawns.Count}");
 
         Scheduler.ScheduleRepeating(0L, 1000L, _ => _objects.RemoveWhere(pair => GameUtils.IsNodeInvalid(pair.Value.GetBaseNode3D())));
+
+        
+        using FileAccess file = FileAccess.Open("user://SerialiseTest.json", FileAccess.ModeFlags.Read);
+        string json = file.GetAsText();
+        
+        ObjectAtlas.CreatedObject createdObjectFromJson = ObjectAtlas.CreatedObjectFromJson(json);
+
+        if (createdObjectFromJson.Success) {
+            Vector3 spawn = player.GetLookingAt(2).GetEnd();
+            gameManager.GetSceneObjects().AddChild(createdObjectFromJson.Node);
+            ((Node3D)createdObjectFromJson.Node).SetGlobalPosition(spawn);
+            GetObjects().Add(createdObjectFromJson.Node.GetInstanceId(), createdObjectFromJson.Object);
+        }
+        else {
+            GD.PrintErr($"Failed to create object from JSON.\nGot: {createdObjectFromJson}");
+        }
     }
 
     // Called every frame. 'delta' is the elapsed time since the previous frame.

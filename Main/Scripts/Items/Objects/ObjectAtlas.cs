@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
+using System.Text.Json;
 using Godot;
 
 public static class ObjectAtlas {
@@ -75,7 +76,7 @@ public static class ObjectAtlas {
         return obj;
     }
 
-    public static CreatedObject CreatedObjectFromData(string metaTag, string scenePath, SmartDictionary<string, (Variant, Action<Variant>)> serialiseData) {
+    public static CreatedObject CreatedObjectFromData(string metaTag, string scenePath, Dictionary<string, object> serialiseData) {
         CreatedObject createdObject = new();
         try {
             Node3D node = Loader.SafeInstantiate<Node3D>(scenePath, true);
@@ -91,10 +92,24 @@ public static class ObjectAtlas {
         return createdObject;
     }
     
-    
+    public static CreatedObject CreatedObjectFromJson(string json) {
+        Serialiser.ObjectSaveData data = DeserialiseObject(json);
+        return CreatedObjectFromData(data.MetaTag, data.ScenePath, data.Data);
+    }
+
+    public static Serialiser.ObjectSaveData DeserialiseObject(string json) {
+        Serialiser.ObjectSaveData obj = Serialiser.Deserialise<Serialiser.ObjectSaveData>(json);
+        obj.SanitiseToObjects();
+        return obj;
+    }
+
+
     public class CreatedObject {
         public bool Success { get; set; }
         public IObjectBase Object { get; set; }
         public Node Node { get; set; }
+        public override string ToString() {
+            return $"CreatedObject[Success={Success}, Object={Object}, Node={Node}]";
+        }
     }
 }

@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json;
 using Godot;
 
 public abstract class ObjectBase<T> : IObjectBase where T : Node3D {
@@ -53,12 +54,23 @@ public abstract class ObjectBase<T> : IObjectBase where T : Node3D {
     public string GetMetaTag() => _metaTag;
     public abstract string GetDisplayName();
     public abstract string GetContext();
-    public abstract SmartDictionary<string, (Variant, Action<Variant>)> GetSerializeData();
-
-    public bool BuildFromData(SmartDictionary<string, (Variant, Action<Variant>)> data) {
-        SmartSet<string> keys = new (GetSerializeData().Keys);
-        if (!keys.SetEquals(data.Keys)) return false;
-        foreach ((string _, (Variant variant, Action<Variant> action)) in data) action.Invoke(variant);
+    public abstract SmartDictionary<string, (object, Action<object>)> GetSerializeData();
+    public bool BuildFromData(Dictionary<string, object> data) {
+        SmartDictionary<string,(object, Action<object>)> thisData = GetSerializeData();
+        SmartSet<string> thisKeys = new (thisData.Keys);
+        if (!thisKeys.SetEquals(data.Keys)) {
+            GD.PrintErr($"Data keys do not match for {GetDisplayName()}\nExpected: {string.Join(", ", thisKeys)}\nReceived: {string.Join(", ", data.Keys)}");
+            return false;
+        }
+        foreach ((string key, (object _, Action<object> action)) in thisData) action.Invoke(data[key]);
         return true;
+    }
+    public string Serialize() {
+        Serialiser.ObjectSaveData data = new() {
+            MetaTag = GetObjectTag(),
+            ScenePath = GameUtils.FindSceneFilePath(GetBaseNode3D()),
+            Data = GetSerializeData().ToDictionary(kvp => kvp.Key, kvp => kvp.Value.Item1)
+        };
+        return Serialiser.Serialise(data);
     }
 }

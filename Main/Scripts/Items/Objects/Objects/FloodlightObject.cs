@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using Godot;
 
 public class FloodlightObject : ObjectBase<RigidBody3D>, IGrabbable, IUsable, IProcess {
@@ -21,6 +20,7 @@ public class FloodlightObject : ObjectBase<RigidBody3D>, IGrabbable, IUsable, IP
         RegisterAction<IGrabbable>((_, _) => true, Grab);
         RegisterAction<IUsable>((_, _) => true, Use);
         RegisterArbitraryAction("Recharge", 10, (_,_) => _powerMillis <= 0, Recharge);
+        RegisterArbitraryAction("Serialise", 20, (_,_) => true, SerialiseTest);
 
         string finding = "NULL";
         try {
@@ -56,6 +56,16 @@ public class FloodlightObject : ObjectBase<RigidBody3D>, IGrabbable, IUsable, IP
     }
 
     public void Recharge(ActorBase actorBase, IEventBase ev) => _powerMillis = MAX_POWER_MILLIS;
+    private void SerialiseTest(ActorBase actorBase, IEventBase ev) {
+        if (ev is not KeyPressEvent) return;
+        string savePath = "user://SerialiseTest.json";
+        string jsonData = Serialize(); // from your IObjectBase
+
+        using FileAccess file = FileAccess.Open(savePath, FileAccess.ModeFlags.Write);
+        file.StoreString(jsonData);
+        file.Close();
+        GD.Print($"Serialised to {ProjectSettings.GlobalizePath(savePath)}");
+    }
 
     private void ToggleLight(bool isOn) {
         _isOn = isOn;
@@ -102,10 +112,10 @@ public class FloodlightObject : ObjectBase<RigidBody3D>, IGrabbable, IUsable, IP
         return $"Status: {(_isOn ? "ON" : "OFF")}\n{secondLine}";
     }
 
-    public override SmartDictionary<string, (Variant, Action<Variant>)> GetSerializeData() {
-        return new SmartDictionary<string, (Variant, Action<Variant>)> {
-            {"isOn", (_isOn, v => _isOn = (bool)v)},
-            {"powerMillis", (_powerMillis, v => _powerMillis = (long)v)}
+    public override SmartDictionary<string, (object, Action<object>)> GetSerializeData() {
+        return new SmartDictionary<string, (object, Action<object>)> {
+            {"isOn", (_isOn, v => ToggleLight(Convert.ToBoolean(v)))},
+            {"powerMillis", (_powerMillis, v => _powerMillis = Convert.ToInt64(v))}
         };
     }
 }

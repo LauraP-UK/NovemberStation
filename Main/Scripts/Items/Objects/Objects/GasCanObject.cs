@@ -24,8 +24,8 @@ public class GasCanObject : ObjectBase<RigidBody3D>, IGrabbable, IShovable, IDri
             _ => "EMPTY"
         };
     }
-    public override SmartDictionary<string, (Variant, Action<Variant>)> GetSerializeData() {
-        return new SmartDictionary<string, (Variant, Action<Variant>)> {
+    public override SmartDictionary<string, (object, Action<object>)> GetSerializeData() {
+        return new SmartDictionary<string, (object, Action<object>)> {
             { "fuelAmount", (_fuelAmount, v => _fuelAmount = (int)v) }
         };
     }
