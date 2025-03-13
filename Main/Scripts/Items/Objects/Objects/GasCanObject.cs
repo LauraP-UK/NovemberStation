@@ -1,4 +1,5 @@
 ﻿
+using System;
 using Godot;
 
 public class GasCanObject : ObjectBase<RigidBody3D>, IGrabbable, IShovable, IDrinkable {
@@ -21,6 +22,11 @@ public class GasCanObject : ObjectBase<RigidBody3D>, IGrabbable, IShovable, IDri
         return _fuelAmount switch {
             > 0 => $"Fuel Type: Gasoline\nFuel Remaining: {_fuelAmount}",
             _ => "EMPTY"
+        };
+    }
+    public override SmartDictionary<string, (Variant, Action<Variant>)> GetSerializeData() {
+        return new SmartDictionary<string, (Variant, Action<Variant>)> {
+            { "fuelAmount", (_fuelAmount, v => _fuelAmount = (int)v) }
         };
     }
 }

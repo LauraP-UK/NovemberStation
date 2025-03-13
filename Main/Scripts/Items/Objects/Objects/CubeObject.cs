@@ -1,4 +1,5 @@
 ﻿
+using System;
 using Godot;
 
 public class CubeObject : ObjectBase<RigidBody3D>, IGrabbable, IShovable {
@@ -11,4 +12,5 @@ public class CubeObject : ObjectBase<RigidBody3D>, IGrabbable, IShovable {
 
     public override string GetDisplayName() => "Storage Crate";
     public override string GetContext() => "Contains: 0/250 kg";
+    public override SmartDictionary<string, (Variant, Action<Variant>)> GetSerializeData() => new();
 }

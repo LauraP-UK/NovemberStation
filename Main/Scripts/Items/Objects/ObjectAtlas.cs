@@ -57,7 +57,11 @@ public static class ObjectAtlas {
         
         Type clazz = GetObjectClass(tag);
         if (clazz == null) throw new Exception($"ERROR: ObjectAtlas.CreateObject() : Object class not found for tag '{tag}'.");
-        object instance = Activator.CreateInstance(clazz, node);
+        return CreateObject(clazz, node);
+    }
+    
+    public static IObjectBase CreateObject(Type type, Node3D node) {
+        object instance = Activator.CreateInstance(type, node);
         if (instance is not IObjectBase obj) throw new Exception($"ERROR: ObjectAtlas.CreateObject() : Created object is not of expected type 'IObjectBase'. Got '{instance?.GetType()}'.");
         return obj;
     }
@@ -69,5 +73,28 @@ public static class ObjectAtlas {
         object instance = Activator.CreateInstance(clazz, node);
         if (instance is not T obj) throw new Exception($"ERROR: ObjectAtlas.CreateObject() : Created object is not of expected type '{typeof(T)}'. Got '{instance?.GetType()}'.");
         return obj;
+    }
+
+    public static CreatedObject CreatedObjectFromData(string metaTag, string scenePath, SmartDictionary<string, (Variant, Action<Variant>)> serialiseData) {
+        CreatedObject createdObject = new();
+        try {
+            Node3D node = Loader.SafeInstantiate<Node3D>(scenePath, true);
+            IObjectBase objectBase = CreateObject(GetObjectClass(metaTag), node);
+            createdObject.Object = objectBase;
+            createdObject.Node = node;
+            createdObject.Success = objectBase.BuildFromData(serialiseData);
+        }
+        catch (Exception e) {
+            createdObject.Success = false;
+            GD.PrintErr($"ERROR: ObjectAtlas.CreatedObjectFromData() : Failed to create object from data. Exception: {e.Message}");
+        }
+        return createdObject;
+    }
+    
+    
+    public class CreatedObject {
+        public bool Success { get; set; }
+        public IObjectBase Object { get; set; }
+        public Node Node { get; set; }
     }
 }

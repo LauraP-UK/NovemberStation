@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Godot;
 
 public class FloodlightObject : ObjectBase<RigidBody3D>, IGrabbable, IUsable, IProcess {
@@ -59,12 +60,12 @@ public class FloodlightObject : ObjectBase<RigidBody3D>, IGrabbable, IUsable, IP
     private void ToggleLight(bool isOn) {
         _isOn = isOn;
         _light.Visible = isOn;
-        HandleColour();
+        HandleLighting();
     }
 
-    private void HandleColour() {
+    private void HandleLighting() {
         if (_lightTip.MaterialOverride is not StandardMaterial3D mat) {
-            GD.PrintErr("WARN: FloodlightObject.HandleColour() : Failed to get material override.");
+            GD.PrintErr("WARN: FloodlightObject.HandleLighting() : Failed to get material override.");
             return;
         }
 
@@ -88,7 +89,7 @@ public class FloodlightObject : ObjectBase<RigidBody3D>, IGrabbable, IUsable, IP
         
         _powerMillis -= (long)(delta * 1000.0f);
         _powerMillis = Math.Max(0, _powerMillis);
-        HandleColour();
+        HandleLighting();
 
         if (_powerMillis <= 0) ToggleLight(false);
     }
@@ -96,5 +97,15 @@ public class FloodlightObject : ObjectBase<RigidBody3D>, IGrabbable, IUsable, IP
     private float GetPowerRemaining() => Mathsf.Round(Mathsf.Remap(MAX_POWER_MILLIS, 0f, _powerMillis, 100f, 0f), 2);
 
     public override string GetDisplayName() => "Floodlight";
-    public override string GetContext() => $"Status: {(_isOn ? "ON" : "OFF")}\nPower: {GetPowerRemaining():00.00}%";
+    public override string GetContext() {
+        string secondLine = _powerMillis <= 0 ? "NO POWER" : $"Power: {GetPowerRemaining():00.00}%";
+        return $"Status: {(_isOn ? "ON" : "OFF")}\n{secondLine}";
+    }
+
+    public override SmartDictionary<string, (Variant, Action<Variant>)> GetSerializeData() {
+        return new SmartDictionary<string, (Variant, Action<Variant>)> {
+            {"isOn", (_isOn, v => _isOn = (bool)v)},
+            {"powerMillis", (_powerMillis, v => _powerMillis = (long)v)}
+        };
+    }
 }

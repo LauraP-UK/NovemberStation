@@ -53,4 +53,12 @@ public abstract class ObjectBase<T> : IObjectBase where T : Node3D {
     public string GetMetaTag() => _metaTag;
     public abstract string GetDisplayName();
     public abstract string GetContext();
+    public abstract SmartDictionary<string, (Variant, Action<Variant>)> GetSerializeData();
+
+    public bool BuildFromData(SmartDictionary<string, (Variant, Action<Variant>)> data) {
+        SmartSet<string> keys = new (GetSerializeData().Keys);
+        if (!keys.SetEquals(data.Keys)) return false;
+        foreach ((string _, (Variant variant, Action<Variant> action)) in data) action.Invoke(variant);
+        return true;
+    }
 }

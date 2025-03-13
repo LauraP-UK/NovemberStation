@@ -1,4 +1,5 @@
-﻿using Godot;
+﻿using System;
+using Godot;
 
 public class DeskObject : ObjectBase<RigidBody3D>, IGrabbable {
     public DeskObject(RigidBody3D baseNode) : base(baseNode, "desk_obj", "desk_obj") {
@@ -8,4 +9,5 @@ public class DeskObject : ObjectBase<RigidBody3D>, IGrabbable {
 
     public override string GetDisplayName() => "Desk";
     public override string GetContext() => "";
+    public override SmartDictionary<string, (Variant, Action<Variant>)> GetSerializeData() => new();
 }

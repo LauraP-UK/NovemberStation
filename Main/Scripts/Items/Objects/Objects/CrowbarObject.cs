@@ -1,4 +1,5 @@
 ﻿
+using System;
 using Godot;
 
 public class CrowbarObject : ObjectBase<RigidBody3D>, IGrabbable {
@@ -10,4 +11,5 @@ public class CrowbarObject : ObjectBase<RigidBody3D>, IGrabbable {
 
     public override string GetDisplayName() => "Crowbar";
     public override string GetContext() => "Every good scientist needs a crowbar!";
+    public override SmartDictionary<string, (Variant, Action<Variant>)> GetSerializeData() => new();
 }

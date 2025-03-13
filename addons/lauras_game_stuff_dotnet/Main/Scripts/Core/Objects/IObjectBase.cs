@@ -10,4 +10,6 @@ public interface IObjectBase {
     public Node3D GetBaseNode3D();
     public string GetDisplayName();
     public string GetContext();
+    public SmartDictionary<string, (Variant, Action<Variant>)> GetSerializeData();
+    public bool BuildFromData(SmartDictionary<string, (Variant, Action<Variant>)> data);
 }
