@@ -46,7 +46,6 @@ public class Player : ActorBase, IViewable, IContainer {
     }
 
     public bool DropItem(string objectJson) {
-        VolumetricInventory inv = (VolumetricInventory)GetInventory();
         ObjectAtlas.CreatedObject obj = ObjectAtlas.CreatedObjectFromJson(objectJson);
         if (!obj.Success) return false;
 
@@ -60,7 +59,7 @@ public class Player : ActorBase, IViewable, IContainer {
     }
 
     public bool RemoveItem(string objectJson) {
-        VolumetricInventory inv = (VolumetricInventory)GetInventory();
+        VolumetricInventory inv = GetInventory().GetAs<VolumetricInventory>();
         string tag = Serialiser.GetSpecificData<string>(Serialiser.ObjectSaveData.META_TAG, objectJson);
         inv.RemoveItem(tag, objectJson);
         return true;

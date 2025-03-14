@@ -16,7 +16,7 @@ public class FloodlightObject : ObjectBase<RigidBody3D>, IGrabbable, IUsable, IP
         SPOTLIGHT_PATH = "SpotLight3D",
         LIGHT_TIP_PATH = "Light";
 
-    public FloodlightObject(RigidBody3D baseNode) : base(baseNode, "floodlight_obj", "floodlight_obj") {
+    public FloodlightObject(RigidBody3D baseNode) : base(baseNode, "floodlight_obj") {
         RegisterAction<IGrabbable>((_, _) => true, Grab);
         RegisterAction<IUsable>((_, _) => true, Use);
         RegisterArbitraryAction("Recharge", 10, (_,_) => _powerMillis <= 0, Recharge);

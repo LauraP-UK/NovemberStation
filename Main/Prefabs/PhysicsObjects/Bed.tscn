@@ -1,0 +1,107 @@
+[gd_scene load_steps=12 format=3 uid="uid://thihe8g234f1"]
+
+[ext_resource type="Texture2D" uid="uid://c5q1hp1s028lo" path="res://Main/Textures/Sandbox/Noise1.png" id="1_1lj58"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_krf4d"]
+albedo_color = Color(0.34, 0.252677, 0.1122, 1)
+albedo_texture = ExtResource("1_1lj58")
+metallic_specular = 0.0
+
+[sub_resource type="BoxMesh" id="BoxMesh_ifuvr"]
+material = SubResource("StandardMaterial3D_krf4d")
+size = Vector3(3, 0.1, 1.5)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ptand"]
+albedo_color = Color(0.37, 0.853, 1, 1)
+albedo_texture = ExtResource("1_1lj58")
+metallic_specular = 0.0
+
+[sub_resource type="BoxMesh" id="BoxMesh_ly2f3"]
+size = Vector3(2.4, 0.2, 1.6)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_8e227"]
+albedo_color = Color(0.55, 0.55, 0.55, 1)
+albedo_texture = ExtResource("1_1lj58")
+metallic = 0.5
+metallic_specular = 1.0
+roughness = 0.25
+
+[sub_resource type="BoxMesh" id="BoxMesh_s5fxu"]
+material = SubResource("StandardMaterial3D_8e227")
+size = Vector3(0.1, 0.5, 0.1)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_uc7cn"]
+size = Vector3(0.234455, 1.59975, 3.03191)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_veyfr"]
+size = Vector3(0.1, 0.5, 0.1)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_ciyfu"]
+size = Vector3(3, 0.1, 1.5)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_6mh6x"]
+size = Vector3(2.4, 0.2, 1.6)
+
+[node name="RigidBody3D" type="RigidBody3D"]
+collision_layer = 4
+collision_mask = 7
+mass = 50.0
+metadata/object_tag = "bed_obj"
+
+[node name="BedBase" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.0417844, 0)
+mesh = SubResource("BoxMesh_ifuvr")
+
+[node name="Duvet" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.332159, 0.124487, 0)
+material_override = SubResource("StandardMaterial3D_ptand")
+mesh = SubResource("BoxMesh_ly2f3")
+
+[node name="Leg1" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.449, -0.208216, -0.69)
+mesh = SubResource("BoxMesh_s5fxu")
+
+[node name="Leg2" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.449, -0.208216, 0.69)
+mesh = SubResource("BoxMesh_s5fxu")
+
+[node name="Leg3" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.449, -0.208216, -0.69)
+mesh = SubResource("BoxMesh_s5fxu")
+
+[node name="Leg4" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.449, -0.208216, 0.69)
+mesh = SubResource("BoxMesh_s5fxu")
+
+[node name="Area3D" type="Area3D" parent="."]
+transform = Transform3D(1.91069e-15, -4.37114e-08, 1, -1, -4.37114e-08, 0, 4.37114e-08, -1, -4.37114e-08, 0, -0.458216, 0)
+collision_layer = 128
+collision_mask = 128
+
+[node name="BBox" type="CollisionShape3D" parent="Area3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.567945, 0.000434936, 0.0171542)
+shape = SubResource("BoxShape3D_uc7cn")
+
+[node name="LegCollision1" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.449, -0.208216, -0.69)
+shape = SubResource("BoxShape3D_veyfr")
+
+[node name="LegCollision2" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.449, -0.208216, 0.69)
+shape = SubResource("BoxShape3D_veyfr")
+
+[node name="LegCollision3" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.449, -0.208216, -0.69)
+shape = SubResource("BoxShape3D_veyfr")
+
+[node name="LegCollision4" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.449, -0.208216, 0.69)
+shape = SubResource("BoxShape3D_veyfr")
+
+[node name="BedBaseCollision" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.0417844, 0)
+shape = SubResource("BoxShape3D_ciyfu")
+
+[node name="DuvetCollision" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.332, 0.124784, 0)
+shape = SubResource("BoxShape3D_6mh6x")

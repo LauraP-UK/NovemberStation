@@ -68,7 +68,6 @@ collision_mask = 7
 collision_priority = 20.0
 mass = 15.0
 center_of_mass_mode = 1
-metadata/behaviour_type = "crowbar_obj"
 metadata/object_tag = "crowbar_obj"
 
 [node name="Crowbar_Crowbar_0" type="MeshInstance3D" parent="."]

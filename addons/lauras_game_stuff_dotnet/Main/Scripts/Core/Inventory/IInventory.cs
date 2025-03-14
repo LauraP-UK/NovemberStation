@@ -13,4 +13,5 @@ public interface IInventory {
     public bool IsEmpty();
     public List<string> GetContents();
     public void ClearContents();
+    public T GetAs<T>() where T : IInventory;
 }

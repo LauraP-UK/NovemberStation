@@ -7,12 +7,11 @@ using Godot;
 public abstract class ObjectBase<T> : IObjectBase where T : Node3D {
     private readonly T _baseNode;
     private readonly SmartDictionary<ActionKey, (Func<ActorBase, IEventBase, bool> test, Action<ActorBase, IEventBase> run)> _actions = new();
-    private readonly string _objectTag, _metaTag;
+    private readonly string _objectTag;
     
-    protected ObjectBase(T baseNode, string objectTag, string metaTag) {
+    protected ObjectBase(T baseNode, string objectTag) {
         _baseNode = baseNode;
         _objectTag = objectTag;
-        _metaTag = metaTag;
     }
 
     protected TType FindNode<TType>(string nodePath) where TType : Node => _baseNode.GetNode<TType>(nodePath);
@@ -50,7 +49,6 @@ public abstract class ObjectBase<T> : IObjectBase where T : Node3D {
 
     public Node3D GetBaseNode3D() => GetBaseNode();
     public string GetObjectTag() => _objectTag;
-    public string GetMetaTag() => _metaTag;
     public abstract string GetDisplayName();
     public abstract string GetContext();
     public abstract SmartDictionary<string, SmartSerialData> GetSerialiseData();

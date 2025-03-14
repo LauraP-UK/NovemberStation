@@ -4,12 +4,12 @@ using Godot;
 
 public class CubeObject : ObjectBase<RigidBody3D>, IGrabbable, IShovable, IContainer {
     private readonly VolumetricInventory _inventory;
-    public CubeObject(RigidBody3D baseNode) : base(baseNode, "cube_obj", "cube_obj") {
+    public CubeObject(RigidBody3D baseNode) : base(baseNode, "cube_obj") {
         RegisterAction<IGrabbable>((_,_) => true, Grab);
         RegisterAction<IShovable>((_,_) => true, Shove);
-        RegisterArbitraryAction("Get First Item", 5, (_,_) => GetVolumetricInventory().GetUsedSize() > 0, (_,ev) => {
+        RegisterArbitraryAction("Get First Item", 5, (_,_) => !GetInventory().IsEmpty(), (_,ev) => {
             if (ev is not KeyPressEvent) return;
-            VolumetricInventory inv = GetVolumetricInventory();
+            VolumetricInventory inv = GetInventory().GetAs<VolumetricInventory>();
             string firstJson = inv.GetContents().First();
             RemoveItem(firstJson);
         });
@@ -18,7 +18,7 @@ public class CubeObject : ObjectBase<RigidBody3D>, IGrabbable, IShovable, IConta
             IContainer actorContainer = (IContainer)actor;
             string firstJson = actorContainer.GetInventory().GetContents().First();
             string objectMetaTag = Serialiser.GetSpecificData<string>(Serialiser.ObjectSaveData.META_TAG, firstJson);
-            bool success = GetVolumetricInventory().AddItem(objectMetaTag, firstJson);
+            bool success = GetInventory().GetAs<VolumetricInventory>().AddItem(objectMetaTag, firstJson);
             if (!success) {
                 Toast.Error((Player)actor, "This inventory is full!");
                 return;
@@ -36,7 +36,7 @@ public class CubeObject : ObjectBase<RigidBody3D>, IGrabbable, IShovable, IConta
     public override SmartDictionary<string, SmartSerialData> GetSerialiseData() => new();
     public IInventory GetInventory() => _inventory;
     public bool StoreItem(IObjectBase objectBase, Node node) {
-        bool added = GetVolumetricInventory().AddItem(objectBase);
+        bool added = GetInventory().GetAs<VolumetricInventory>().AddItem(objectBase);
         if (added) {
             GD.Print($"Freeing node {node.Name}  |  {node.GetType()}  |  {objectBase.GetObjectTag()}");
             node.QueueFree();
@@ -45,7 +45,7 @@ public class CubeObject : ObjectBase<RigidBody3D>, IGrabbable, IShovable, IConta
         return added;
     }
     public bool RemoveItem(string objectJson) {
-        VolumetricInventory inv = GetVolumetricInventory();
+        VolumetricInventory inv = GetInventory().GetAs<VolumetricInventory>();
         ObjectAtlas.CreatedObject obj = ObjectAtlas.CreatedObjectFromJson(objectJson);
         if (!obj.Success) {
             obj.Node?.QueueFree();
@@ -59,5 +59,4 @@ public class CubeObject : ObjectBase<RigidBody3D>, IGrabbable, IShovable, IConta
         inv.RemoveItem(obj.Object.GetObjectTag(), objectJson);
         return true;
     }
-    public VolumetricInventory GetVolumetricInventory() => _inventory;
 }

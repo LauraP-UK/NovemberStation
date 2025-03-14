@@ -174,6 +174,19 @@ public class PlayerController : ControllerBase {
         if (_heldObject != null) UpdateHeldObjectPosition(delta);
     }
 
+    public void Sleep() {
+        SetLocked(true);
+        GameManager.I().GetSleepCamera().MakeCurrent();
+        ShowUI(false);
+        Scheduler.ScheduleOnce(5000L, _ => WakeUp());
+    }
+
+    public void WakeUp() {
+        SetLocked(false);
+        ShowUI(true);
+        ((Player)GetActor()).GetCamera().MakeCurrent();
+    }
+
     public ActionKey? GetCurrentContextAction() {
         ActionDisplayButton btn = _contextMenu.GetForm().GetAction(_actionIndex);
         return btn?.GetAction();
@@ -311,9 +324,9 @@ public class PlayerController : ControllerBase {
         if (objectData != null && instanceId != _lastActionID) {
             HideContextBox();
             _lastActionID = instanceId;
-            if (_lastBehaviourType != objectData.GetMetaTag()) {
+            if (_lastBehaviourType != objectData.GetObjectTag()) {
                 _actionIndex = 0;
-                _lastBehaviourType =  objectData.GetMetaTag();
+                _lastBehaviourType =  objectData.GetObjectTag();
             }
         }
 

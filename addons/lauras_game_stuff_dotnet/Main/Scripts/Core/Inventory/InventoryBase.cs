@@ -44,6 +44,11 @@ public abstract class InventoryBase : IInventory {
         return contents;
     }
 
+    public T GetAs<T>() where T : IInventory {
+        if (this is T t) return t;
+        GD.PrintErr($"ERROR: InventoryBase.GetAs<T>() : Could not be casted to {typeof(T).Name}!");
+        return default;
+    }
     public bool IsEmpty() => GetContents().Count == 0;
     public int CountItemType(string objectMetaTag) => GetGroup(objectMetaTag).Count;
     public void ClearContents() => _inventory.Clear();

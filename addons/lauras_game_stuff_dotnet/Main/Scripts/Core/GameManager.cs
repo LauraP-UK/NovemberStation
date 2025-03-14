@@ -39,6 +39,8 @@ public class GameManager {
         return _sceneObjects;
     }
     
+    public Camera3D GetSleepCamera() => GetTree().Root.GetNode<Camera3D>("Main/SleepCamContainer/SleepCam");
+    
     public void SetPlayer(Player player) => _player = player;
     public Player GetPlayer() {
         if (_player == null) throw new InvalidOperationException("ERROR: GameManager.GetPlayer() : Player is null. Set the player first.");
