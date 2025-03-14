@@ -102,10 +102,10 @@ shadow_enabled = true
 sky_mode = 1
 
 [node name="SleepCamContainer" type="Node3D" parent="."]
-transform = Transform3D(-0.376224, -0.211574, -0.902049, 0, 0.973579, -0.228351, 0.926529, -0.0859111, -0.366284, -29.353, 1.549, -15.756)
+transform = Transform3D(-0.376224, -0.372416, -0.848388, 0, 0.915663, -0.401948, 0.926529, -0.151223, -0.344494, -29.353, 1.549, -15.756)
 
 [node name="SleepCam" type="Camera3D" parent="SleepCamContainer"]
-fov = 40.0
+fov = 60.0
 size = 0.001
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]

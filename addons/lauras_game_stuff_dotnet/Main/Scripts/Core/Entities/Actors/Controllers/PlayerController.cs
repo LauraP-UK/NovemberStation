@@ -9,7 +9,7 @@ public class PlayerController : ControllerBase {
         STATIC_LAYER = 1 << 1, // Layer 2
         OBJECT_LAYER = 1 << 2; // Layer 3
 
-    private bool _altAction, _toggleCrouch, _uiVisible = true;
+    private bool _asleep, _altAction, _toggleCrouch, _uiVisible = true;
     private float _holdDistanceModifier = 1.0f;
     private Vector2 _rotationOffset = Vector2.Zero;
     private long _lastJump;
@@ -40,6 +40,13 @@ public class PlayerController : ControllerBase {
         if (IsLocked()) return;
         if (key != Key.F1) return;
         ShowUI(!_uiVisible);
+    }
+    
+    [EventListener]
+    private void OnEscape(KeyPressEvent ev, Key key) {
+        if (key != Key.Escape || !IsAsleep()) return;
+        ev.Capture();
+        WakeUp();
     }
     
     [EventListener]
@@ -175,15 +182,18 @@ public class PlayerController : ControllerBase {
     }
 
     public void Sleep() {
+        _asleep = true;
         SetLocked(true);
         GameManager.I().GetSleepCamera().MakeCurrent();
         ShowUI(false);
-        Scheduler.ScheduleOnce(5000L, _ => WakeUp());
+        Engine.SetTimeScale(20.0f);
     }
 
     public void WakeUp() {
+        _asleep = false;
         SetLocked(false);
         ShowUI(true);
+        Engine.SetTimeScale(1.0f);
         ((Player)GetActor()).GetCamera().MakeCurrent();
     }
 
@@ -192,6 +202,7 @@ public class PlayerController : ControllerBase {
         return btn?.GetAction();
     }
     public Node3D GetContextObject() => _heldObject ?? _contextObject;
+    public bool IsAsleep() => _asleep;
 
     private void ReleaseHeldObject(Vector3? releaseVelocity = null) {
         if (_heldObject == null) return;

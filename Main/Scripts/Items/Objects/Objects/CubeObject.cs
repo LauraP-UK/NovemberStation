@@ -37,11 +37,7 @@ public class CubeObject : ObjectBase<RigidBody3D>, IGrabbable, IShovable, IConta
     public IInventory GetInventory() => _inventory;
     public bool StoreItem(IObjectBase objectBase, Node node) {
         bool added = GetInventory().GetAs<VolumetricInventory>().AddItem(objectBase);
-        if (added) {
-            GD.Print($"Freeing node {node.Name}  |  {node.GetType()}  |  {objectBase.GetObjectTag()}");
-            node.QueueFree();
-        }
-        Scheduler.ScheduleOnce(1000, _ => GD.Print($"Node is valid: {!GameUtils.IsNodeInvalid(node)}"));
+        if (added) node.QueueFree();
         return added;
     }
     public bool RemoveItem(string objectJson) {

@@ -94,8 +94,7 @@ public class GameManager {
     }
     public void RegisterObject(Node3D rootNode, IObjectBase objBase) {
         TestScript activeScene = (TestScript)GetActiveScene();
-        if (objBase != null)
-            activeScene.GetObjects().Add(rootNode.GetInstanceId(), objBase);
+        if (objBase != null) activeScene.GetObjects().Add(rootNode.GetInstanceId(), objBase);
     }
     
     public void Pause(bool pause) => GetTree().Paused = pause;
