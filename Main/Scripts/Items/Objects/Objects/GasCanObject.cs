@@ -20,7 +20,7 @@ public class GasCanObject : ObjectBase<RigidBody3D>, IGrabbable, IShovable, IDri
         _fuelAmount -= 10;
     }
 
-    public override string GetDisplayName() => "Gas Can";
+    public override string GetDisplayName() => Items.GAS_CAN.GetItemName();
     public override string GetContext() {
         return _fuelAmount switch {
             > 0 => $"Fuel Type: Gasoline\nFuel Remaining: {_fuelAmount}",

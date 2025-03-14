@@ -111,7 +111,7 @@ public class FloodlightObject : ObjectBase<RigidBody3D>, IGrabbable, IUsable, IP
 
     private float GetPowerRemaining() => Mathsf.Round(Mathsf.Remap(MAX_POWER_MILLIS, 0f, _powerMillis, 100f, 0f), 2);
 
-    public override string GetDisplayName() => "Floodlight";
+    public override string GetDisplayName() => Items.FLOODLIGHT.GetItemName();
     public override string GetContext() {
         string secondLine = _powerMillis <= 0 ? "NO POWER" : $"Power: {GetPowerRemaining():00.00}%";
         return $"Status: {(_isOn ? "ON" : "OFF")}\n{secondLine}";

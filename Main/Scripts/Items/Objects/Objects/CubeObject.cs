@@ -31,7 +31,7 @@ public class CubeObject : ObjectBase<RigidBody3D>, IGrabbable, IShovable, IConta
     public void Grab(ActorBase actorBase, IEventBase ev) => GrabActionDefault.Invoke(actorBase, GetBaseNode(), ev);
     public void Shove(ActorBase actorBase, IEventBase ev) => ShoveActionDefault.Invoke(actorBase, GetBaseNode(), ev);
 
-    public override string GetDisplayName() => "Storage Crate";
+    public override string GetDisplayName() => Items.STORAGE_CRATE.GetItemName();
     public override string GetContext() => $"Contains: {_inventory.GetUsedSize()}/{_inventory.GetMaxSize()} kg";
     public override SmartDictionary<string, SmartSerialData> GetSerialiseData() => new();
     public IInventory GetInventory() => _inventory;

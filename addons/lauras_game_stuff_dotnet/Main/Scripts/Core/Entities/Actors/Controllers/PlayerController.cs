@@ -184,16 +184,16 @@ public class PlayerController : ControllerBase {
     public void Sleep() {
         _asleep = true;
         SetLocked(true);
-        GameManager.I().GetSleepCamera().MakeCurrent();
         ShowUI(false);
-        Engine.SetTimeScale(20.0f);
+        GameManager.SetEngineSpeed(30.0f);
+        GameManager.I().GetSleepCamera().MakeCurrent();
     }
 
     public void WakeUp() {
         _asleep = false;
         SetLocked(false);
         ShowUI(true);
-        Engine.SetTimeScale(1.0f);
+        GameManager.ResetEngineSpeed();
         ((Player)GetActor()).GetCamera().MakeCurrent();
     }
 

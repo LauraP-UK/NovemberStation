@@ -5,6 +5,7 @@ using Godot;
 public class GameManager {
     
     private const bool DEBUG_MODE = true;
+    public const float SLEEP_SPEED = 20.0f;
     
     private static GameManager instance;
 
@@ -63,6 +64,9 @@ public class GameManager {
     public void PhysicsProcess(double delta) {
         if (!GetTree().Paused) GetPlayer().GetController().PhysicsUpdate((float)delta);
     }
+
+    public static void SetEngineSpeed(float speed) => Engine.SetTimeScale(speed);
+    public static void ResetEngineSpeed() => SetEngineSpeed(1.0f);
 
     /* --- Game Methods --- */
     
