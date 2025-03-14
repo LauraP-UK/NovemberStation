@@ -1,7 +1,7 @@
 ﻿using System;
 using Godot;
 
-public class FloodlightObject : ObjectBase<RigidBody3D>, IGrabbable, IUsable, IProcess {
+public class FloodlightObject : ObjectBase<RigidBody3D>, IGrabbable, IUsable, IProcess, IVolumetricObject {
     private readonly SpotLight3D _light;
     private readonly MeshInstance3D _lightTip;
 
@@ -20,6 +20,11 @@ public class FloodlightObject : ObjectBase<RigidBody3D>, IGrabbable, IUsable, IP
         RegisterAction<IGrabbable>((_, _) => true, Grab);
         RegisterAction<IUsable>((_, _) => true, Use);
         RegisterArbitraryAction("Recharge", 10, (_,_) => _powerMillis <= 0, Recharge);
+        RegisterArbitraryAction("Pick Up", 15, (actor, _) => actor is IContainer, (actor, ev) => {
+            if (ev is not KeyPressEvent) return;
+            bool success = ((IContainer)actor).StoreItem(this, GetBaseNode());
+            if (!success) Toast.Error((Player)actor, "Your inventory is full!");
+        });
         RegisterArbitraryAction("Save to File", 20, (_,_) => true, SerialiseTest);
 
         string finding = "NULL";
@@ -59,7 +64,7 @@ public class FloodlightObject : ObjectBase<RigidBody3D>, IGrabbable, IUsable, IP
     private void SerialiseTest(ActorBase actorBase, IEventBase ev) {
         if (ev is not KeyPressEvent) return;
         string savePath = "user://SerialiseTest.json";
-        string jsonData = Serialize(); // from your IObjectBase
+        string jsonData = Serialize();
 
         using FileAccess file = FileAccess.Open(savePath, FileAccess.ModeFlags.Write);
         file.StoreString(jsonData);
@@ -118,4 +123,5 @@ public class FloodlightObject : ObjectBase<RigidBody3D>, IGrabbable, IUsable, IP
             {"powerMillis", SmartSerialData.From(_powerMillis, v => _powerMillis = Convert.ToInt64(v), () => _powerMillis = MAX_POWER_MILLIS)}
         };
     }
+    public float GetSize() => 90.0f;
 }

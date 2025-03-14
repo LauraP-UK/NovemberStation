@@ -2,11 +2,12 @@ using System.Collections.Generic;
 using System.Linq;
 using Godot;
 
-public class Player : ActorBase, IViewable {
-    
+public class Player : ActorBase, IViewable, IContainer {
     private readonly Camera3D _camera;
     private readonly Node3D _crouchNode;
-    
+
+    private readonly VolumetricInventory _inv;
+
     public Player(CharacterBody3D body) : base(body) {
         new PlayerController(this);
         _crouchNode = GetModel().GetNode<Node3D>("HeadOrigin/CrouchControl");
@@ -21,13 +22,47 @@ public class Player : ActorBase, IViewable {
             child.SetLayerMaskValue(1, false);
             child.SetLayerMaskValue(2, true);
         }
-        
+
         GetCamera().SetCullMaskValue(2, false);
+        _inv = new VolumetricInventory(200, this);
     }
 
     public Camera3D GetCamera() => _camera;
     public Node3D GetCrouchNode() => _crouchNode;
-    
+
     public RaycastResult GetLookingAt(float distance) => Raycast.Trace(this, distance);
     public ActorBase GetActor() => this;
+
+    public IInventory GetInventory() => _inv;
+
+    public bool StoreItem(IObjectBase objectBase, Node node) {
+        bool added = GetInventory().AddItem(objectBase);
+        if (added) node.QueueFree();
+
+        VolumetricInventory inv = (VolumetricInventory)GetInventory();
+        inv.PrintContents();
+
+        return added;
+    }
+
+    public bool DropItem(string objectJson) {
+        VolumetricInventory inv = (VolumetricInventory)GetInventory();
+        ObjectAtlas.CreatedObject obj = ObjectAtlas.CreatedObjectFromJson(objectJson);
+        if (!obj.Success) return false;
+
+        Vector3 spawn = GetLookingAt(2).GetEnd();
+        Node3D objNode = (Node3D)obj.Node;
+        GameManager.I().GetSceneObjects().AddChild(obj.Node);
+        objNode.SetGlobalPosition(spawn);
+        GameManager.I().RegisterObject(objNode, obj.Object);
+        
+        return RemoveItem(objectJson);
+    }
+
+    public bool RemoveItem(string objectJson) {
+        VolumetricInventory inv = (VolumetricInventory)GetInventory();
+        string tag = Serialiser.GetSpecificData<string>(Serialiser.ObjectSaveData.META_TAG, objectJson);
+        inv.RemoveItem(tag, objectJson);
+        return true;
+    }
 }

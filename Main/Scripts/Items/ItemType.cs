@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Godot;
 
 public class ItemType {
-    private readonly string _itemName, _imagePath, _modelPath, _description;
+    private readonly string _typeID, _itemName, _imagePath, _modelPath, _description;
     private readonly int _itemCost;
     private readonly Action<RigidBody3D> _onSpawn;
 
@@ -19,7 +19,8 @@ public class ItemType {
             new KeyValuePair<int, bool>(4, true)
         };
 
-    private ItemType(string itemName, string imagePath, string modelPath, string description, int itemCost, Action<RigidBody3D> onSpawn) {
+    private ItemType(string typeID, string itemName, string imagePath, string modelPath, string description, int itemCost, Action<RigidBody3D> onSpawn) {
+        _typeID = typeID;
         _itemName = itemName;
         _imagePath = imagePath;
         _modelPath = modelPath;
@@ -28,6 +29,7 @@ public class ItemType {
         _onSpawn = onSpawn;
     }
 
+    public string GetTypeID() => _typeID;
     public string GetItemName() => _itemName;
     public string GetImagePath() => _imagePath;
     public string GetModelPath() => _modelPath;
@@ -57,7 +59,7 @@ public class ItemType {
         return item;
     }
 
-    public static ItemType Create(string itemName, string imagePath, string modelPath, string description, int itemCost, Action<RigidBody3D> onSpawn = null) {
-        return new ItemType(itemName, imagePath, modelPath, description, itemCost, onSpawn);
+    public static ItemType Create(string typeID, string itemName, string imagePath, string modelPath, string description, int itemCost, Action<RigidBody3D> onSpawn = null) {
+        return new ItemType(typeID, itemName, imagePath, modelPath, description, itemCost, onSpawn);
     }
 }

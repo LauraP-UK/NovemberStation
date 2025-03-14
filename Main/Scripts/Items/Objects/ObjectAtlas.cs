@@ -7,12 +7,8 @@ using Godot;
 
 public static class ObjectAtlas {
     private static readonly SmartDictionary<string, Type> _registry = new();
-
-    private const string
-        OBJECT_TAG = "object_tag";
-    
+    public const string OBJECT_TAG = "object_tag";
     static ObjectAtlas() => RegisterAll();
-    
     private static void RegisterAll() {
         // Automatically registers all classes that inherit from ObjectBase<>
         IEnumerable<Type> objectTypes = Assembly.GetExecutingAssembly()
@@ -22,7 +18,6 @@ public static class ObjectAtlas {
         foreach (Type type in objectTypes)
             Register(type);
     }
-
     public static void Register([NotNull] Type clazz) {
         ArgumentNullException.ThrowIfNull(clazz);
         if (!typeof(IObjectBase).IsAssignableFrom(clazz)) 
@@ -42,7 +37,6 @@ public static class ObjectAtlas {
         }
     }
     public static Type GetObjectClass(string tag) => _registry.GetOrDefault(tag, null);
-
     private static string GetTag(Node3D node) {
         if (node.HasMeta(OBJECT_TAG))
             return node.GetMeta(OBJECT_TAG).AsString();
@@ -50,7 +44,6 @@ public static class ObjectAtlas {
         GD.PrintErr($"ERROR: ObjectAtlas.GetTag() : Node3D '{node.Name}' does not have the required meta tag '{OBJECT_TAG}'.");
         return "";
     }
-    
     public static IObjectBase CreateObject(Node3D node) {
         string tag = GetTag(node);
         if (tag == "") return null;
@@ -59,13 +52,11 @@ public static class ObjectAtlas {
         if (clazz == null) throw new Exception($"ERROR: ObjectAtlas.CreateObject() : Object class not found for tag '{tag}'.");
         return CreateObject(clazz, node);
     }
-    
     public static IObjectBase CreateObject(Type type, Node3D node) {
         object instance = Activator.CreateInstance(type, node);
         if (instance is not IObjectBase obj) throw new Exception($"ERROR: ObjectAtlas.CreateObject() : Created object is not of expected type 'IObjectBase'. Got '{instance?.GetType()}'.");
         return obj;
     }
-    
     public static T CreateObject<T, U>(U node) where T : ObjectBase<U> where U : Node3D {
         string tag = GetTag(node);
         Type clazz = GetObjectClass(tag);
@@ -74,11 +65,10 @@ public static class ObjectAtlas {
         if (instance is not T obj) throw new Exception($"ERROR: ObjectAtlas.CreateObject() : Created object is not of expected type '{typeof(T)}'. Got '{instance?.GetType()}'.");
         return obj;
     }
-
-    public static CreatedObject CreatedObjectFromData(string metaTag, string scenePath, Dictionary<string, object> serialiseData) {
+    public static CreatedObject CreatedObjectFromData(string metaTag, string typeID, Dictionary<string, object> serialiseData) {
         CreatedObject createdObject = new();
         try {
-            Node3D node = Loader.SafeInstantiate<Node3D>(scenePath, true);
+            RigidBody3D node = Items.GetViaID(typeID).CreateInstance();
             IObjectBase objectBase = CreateObject(GetObjectClass(metaTag), node);
             createdObject.Object = objectBase;
             createdObject.Node = node;
@@ -86,23 +76,25 @@ public static class ObjectAtlas {
         }
         catch (Exception e) {
             createdObject.Success = false;
+            createdObject.Node?.QueueFree();
             GD.PrintErr($"ERROR: ObjectAtlas.CreatedObjectFromData() : Failed to create object from data. Exception: {e.Message}");
         }
         return createdObject;
     }
-    
     public static CreatedObject CreatedObjectFromJson(string json) {
         Serialiser.ObjectSaveData data = DeserialiseObject(json);
-        return CreatedObjectFromData(data.MetaTag, data.ScenePath, data.Data);
+        return CreatedObjectFromData(data.MetaTag, data.TypeID, data.Data);
     }
-
     public static Serialiser.ObjectSaveData DeserialiseObject(string json) {
         Serialiser.ObjectSaveData obj = Serialiser.Deserialise<Serialiser.ObjectSaveData>(json);
         obj.SanitiseToObjects();
         return obj;
     }
-
-
+    public static IObjectBase DeserialiseDataWithoutNode(string json) {
+        GD.Print($"INFO: ObjectAtlas.DeserialiseDataWithoutNode() : Deserialising object from JSON for data use only! (This object SHOULD NOT be instantiated as it has no Node!)");
+        Serialiser.ObjectSaveData obj = DeserialiseObject(json);
+        return CreateObject(GetObjectClass(obj.MetaTag), null);
+    }
     public class CreatedObject {
         public bool Success { get; set; }
         public IObjectBase Object { get; set; }

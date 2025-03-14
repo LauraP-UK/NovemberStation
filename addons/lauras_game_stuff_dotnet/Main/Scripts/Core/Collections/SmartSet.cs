@@ -23,4 +23,9 @@ public class SmartSet<T> : HashSet<T> {
         if (items == null) throw new ArgumentNullException(nameof(items));
         RemoveAll((IEnumerable<T>)items);
     }
+    
+    public void ForEach(Action<T> action) {
+        if (action == null) return;
+        foreach (T item in this) action(item);
+    }
 }

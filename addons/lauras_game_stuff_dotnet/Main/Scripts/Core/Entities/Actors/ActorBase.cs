@@ -5,10 +5,10 @@ using Godot;
 public abstract class ActorBase : IActor {
     private readonly Guid _uuid = Guid.NewGuid();
     private readonly CharacterBody3D _model;
-    
+
     private ControllerBase _controller;
     private string _name;
-    
+
     protected ActorBase(CharacterBody3D model) {
         _model = model;
     }

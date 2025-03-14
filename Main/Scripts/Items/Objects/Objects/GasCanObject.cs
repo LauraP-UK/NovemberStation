@@ -8,6 +8,10 @@ public class GasCanObject : ObjectBase<RigidBody3D>, IGrabbable, IShovable, IDri
         RegisterAction<IGrabbable>((_,_) => true, Grab);
         RegisterAction<IShovable>((_,_) => true, Shove);
         RegisterAction<IDrinkable>((_,_) => _fuelAmount > 0, Drink);
+        RegisterArbitraryAction("Refill", 5, (_,_) => _fuelAmount <= 0, (_,ev) => {
+            if (ev is not KeyPressEvent) return;
+            _fuelAmount = 100;
+        });
     }
     public void Grab(ActorBase actorBase, IEventBase ev) => GrabActionDefault.Invoke(actorBase, GetBaseNode(), ev);
     public void Shove(ActorBase actorBase, IEventBase ev) => ShoveActionDefault.Invoke(actorBase, GetBaseNode(), ev);

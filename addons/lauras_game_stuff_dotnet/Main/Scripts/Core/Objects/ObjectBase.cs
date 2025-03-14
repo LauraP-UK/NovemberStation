@@ -59,6 +59,7 @@ public abstract class ObjectBase<T> : IObjectBase where T : Node3D {
         
         foreach ((string key, SmartSerialData serialData) in thisData) {
             if (!data.TryGetValue(key, out object v)) {
+                GD.Print($"WARN: ObjectBase<T>.BuildFromData() : Key not found in data: {key}");
                 serialData.GetFallback().Invoke();
                 continue;
             }
@@ -76,7 +77,7 @@ public abstract class ObjectBase<T> : IObjectBase where T : Node3D {
     public string Serialize() {
         Serialiser.ObjectSaveData data = new() {
             MetaTag = GetObjectTag(),
-            ScenePath = GameUtils.FindSceneFilePath(GetBaseNode3D()),
+            TypeID = Items.GetViaPath(GameUtils.FindSceneFilePath(GetBaseNode3D())).GetTypeID(),
             Data = GetSerialiseData().ToDictionary(kvp => kvp.Key, kvp => kvp.Value.GetData())
         };
         return Serialiser.Serialise(data);

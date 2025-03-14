@@ -87,8 +87,11 @@ public class GameManager {
             GD.PrintErr($"WARN: GameManager.RegisterObject() : Failed to find root Node3D for '{node.Name}'. Got '{root.GetType().Name}' instead.");
             return;
         }
-        TestScript activeScene = (TestScript)GetActiveScene();
         IObjectBase objBase = ObjectAtlas.CreateObject(rootNode);
+        RegisterObject(rootNode, objBase);
+    }
+    public void RegisterObject(Node3D rootNode, IObjectBase objBase) {
+        TestScript activeScene = (TestScript)GetActiveScene();
         if (objBase != null)
             activeScene.GetObjects().Add(rootNode.GetInstanceId(), objBase);
     }

@@ -56,6 +56,7 @@ public partial class TestScript : Node {
 
         Scheduler.ScheduleRepeating(0L, 1000L, _ => _objects.RemoveWhere(pair => GameUtils.IsNodeInvalid(pair.Value.GetBaseNode3D())));
 
+        //return;
         
         using FileAccess file = FileAccess.Open("user://SerialiseTest.json", FileAccess.ModeFlags.Read);
         string json = file.GetAsText();
@@ -63,10 +64,11 @@ public partial class TestScript : Node {
         ObjectAtlas.CreatedObject createdObjectFromJson = ObjectAtlas.CreatedObjectFromJson(json);
 
         if (createdObjectFromJson.Success) {
-            Vector3 spawn = player.GetLookingAt(2).GetEnd();
-            gameManager.GetSceneObjects().AddChild(createdObjectFromJson.Node);
-            ((Node3D)createdObjectFromJson.Node).SetGlobalPosition(spawn);
-            GetObjects().Add(createdObjectFromJson.Node.GetInstanceId(), createdObjectFromJson.Object);
+            foreach (IObjectBase objectBase in GetObjects().Values) {
+                if (objectBase is not CubeObject storageCrate) continue;
+                storageCrate.StoreItem(createdObjectFromJson.Object, createdObjectFromJson.Node);
+                break;
+            }
         }
         else {
             GD.PrintErr($"Failed to create object from JSON.\nGot: {createdObjectFromJson}");
@@ -83,7 +85,7 @@ public partial class TestScript : Node {
             player.SetPosition(new Vector3(5f, 0.2f, 0f), new Vector3(0.0f, 90.0f, 0.0f));
             Toast.Warn(player, "You fell off, you numpty. I'm respawning you...");
         }
-
+        
         if (!gameManager.GetTree().IsPaused()) EnvironmentManager.Process(delta);
 
         Node sceneObjects = gameManager.GetSceneObjects();
@@ -94,7 +96,7 @@ public partial class TestScript : Node {
             if (_objSpawns.TryGetValue(physicsObj, out Vector3 origPosition))
                 physicsObj.GlobalPosition = origPosition;
             else {
-                Toast.Error(player, $"Deleted {gameManager.GetObjectClass(physicsObj.GetInstanceId()).GetType()}");
+                Toast.Error(player, $"Deleted {gameManager.GetObjectClass(physicsObj.GetInstanceId()).GetDisplayName()}");
                 physicsObj.QueueFree();
             }
         }
