@@ -1,0 +1,130 @@
+[gd_scene load_steps=2 format=3 uid="uid://bhtw1hx8tr3yc"]
+
+[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_p7a01"]
+load_path = "res://.godot/imported/ContextNinePatch.png-1956a95d8fe2d1cd3bd043c483a8f7ae.ctex"
+
+[node name="Control" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 100
+theme_override_constants/margin_top = 100
+theme_override_constants/margin_right = 100
+theme_override_constants/margin_bottom = 100
+
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer"]
+layout_mode = 2
+theme_override_constants/separation = 0
+alignment = 1
+
+[node name="MainInv" type="Control" parent="MarginContainer/HBoxContainer"]
+custom_minimum_size = Vector2(200, 0)
+layout_mode = 2
+
+[node name="MainBG" type="ColorRect" parent="MarginContainer/HBoxContainer/MainInv"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.1482, 0.163527, 0.19, 1)
+
+[node name="NinePatchRect" type="NinePatchRect" parent="MarginContainer/HBoxContainer/MainInv"]
+z_index = 20
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = SubResource("CompressedTexture2D_p7a01")
+patch_margin_left = 7
+patch_margin_top = 7
+patch_margin_right = 7
+patch_margin_bottom = 7
+
+[node name="CentreControls" type="Control" parent="MarginContainer/HBoxContainer"]
+custom_minimum_size = Vector2(200, 0)
+layout_mode = 2
+
+[node name="CloseContainer" type="Control" parent="MarginContainer/HBoxContainer/CentreControls"]
+custom_minimum_size = Vector2(20, 20)
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -20.0
+offset_top = -20.0
+grow_horizontal = 0
+
+[node name="CentreBG" type="ColorRect" parent="MarginContainer/HBoxContainer/CentreControls"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_bottom = -148.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.13, 0.12376, 0.1222, 1)
+
+[node name="NinePatchRect" type="NinePatchRect" parent="MarginContainer/HBoxContainer/CentreControls"]
+z_index = 20
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_bottom = -148.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = SubResource("CompressedTexture2D_p7a01")
+patch_margin_left = 7
+patch_margin_top = 7
+patch_margin_right = 7
+patch_margin_bottom = 7
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/HBoxContainer/CentreControls"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="OtherInv" type="Control" parent="MarginContainer/HBoxContainer"]
+custom_minimum_size = Vector2(200, 0)
+layout_mode = 2
+
+[node name="OtherBG" type="ColorRect" parent="MarginContainer/HBoxContainer/OtherInv"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.14902, 0.164706, 0.188235, 1)
+
+[node name="NinePatchRect" type="NinePatchRect" parent="MarginContainer/HBoxContainer/OtherInv"]
+z_index = 20
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = SubResource("CompressedTexture2D_p7a01")
+patch_margin_left = 7
+patch_margin_top = 7
+patch_margin_right = 7
+patch_margin_bottom = 7

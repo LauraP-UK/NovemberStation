@@ -24,6 +24,9 @@ public class TimeDisplayForm : FormBase {
     }
     protected override List<IFormObject> GetAllElements() => new() { _hoursLabel, _minutesLabel, _dividerLabel };
     protected override void OnDestroy() {}
+    public LabelElement GetHours() => _hoursLabel;
+    public LabelElement GetMinutes() => _minutesLabel;
+    public LabelElement GetDivider() => _dividerLabel;
     
     public void SetTime(int hours, int minutes) {
         _hoursLabel.SetText($"{hours:00}");

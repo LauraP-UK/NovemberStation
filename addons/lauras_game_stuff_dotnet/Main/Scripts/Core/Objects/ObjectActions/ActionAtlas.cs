@@ -11,8 +11,9 @@ public static class ActionAtlas {
     static ActionAtlas() {
         Register<IGrabbable>("Grab", 0);
         Register<IShovable>("Shove", 1);
-        Register<IDrinkable>("Drink", 2);
+        Register<ICollectable>("Collect", 2);
         Register<IUsable>("Use", 3);
+        Register<IDrinkable>("Drink", 4);
     }
 
     private static void Register<T>(string actionName, int index) where T : IObjectAction => _registry.Add(typeof(T), (actionName, index));

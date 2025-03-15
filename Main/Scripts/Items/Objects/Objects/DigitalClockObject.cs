@@ -15,12 +15,8 @@ public class DigitalClockObject : ObjectBase<RigidBody3D>, IGrabbable, IProcess,
 
     public DigitalClockObject(RigidBody3D baseNode) : base(baseNode, "digitalclock_obj") {
         RegisterAction<IGrabbable>((_, _) => true, Grab);
-        RegisterArbitraryAction("Pick Up", 15, (actor, _) => actor is IContainer, (actor, ev) => {
-            if (ev is not KeyPressEvent) return;
-            bool success = ((IContainer)actor).StoreItem(this, GetBaseNode());
-            if (!success) Toast.Error((Player)actor, "Your inventory is full!");
-        });
-
+        RegisterAction<ICollectable>((_,_) => true, (actor,ev) => CollectActionDefault.Invoke(actor, this, ev));
+        
         string finding = "NULL";
         try {
             finding = SCREEN_VIEWPORT_PATH;
@@ -48,6 +44,13 @@ public class DigitalClockObject : ObjectBase<RigidBody3D>, IGrabbable, IProcess,
         if (GameUtils.IsNodeInvalid(GetBaseNode())) return;
 
         (int hours, int minutes) = EnvironmentManager.GetTimeAs24H();
+        /*if (hours == 0 && minutes == 0) {
+            _timeMenu.GetForm().GetHours().SetText(" 6");
+            _timeMenu.GetForm().GetMinutes().SetText("66");
+            _timeMenu.GetForm().ShowDivider(false);
+            return;
+        }*/
+        
         _timeMenu.GetForm().SetTime(hours, minutes);
         
         if (minutes == _lastMinute) return;

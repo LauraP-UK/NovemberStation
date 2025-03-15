@@ -1,7 +1,7 @@
 ﻿using System;
 using Godot;
 
-public class FloodlightObject : ObjectBase<RigidBody3D>, IGrabbable, IUsable, IProcess, IVolumetricObject {
+public class FloodlightObject : ObjectBase<RigidBody3D>, IGrabbable, IUsable, ICollectable, IProcess, IVolumetricObject {
     private readonly SpotLight3D _light;
     private readonly MeshInstance3D _lightTip;
 
@@ -19,12 +19,8 @@ public class FloodlightObject : ObjectBase<RigidBody3D>, IGrabbable, IUsable, IP
     public FloodlightObject(RigidBody3D baseNode) : base(baseNode, "floodlight_obj") {
         RegisterAction<IGrabbable>((_, _) => true, Grab);
         RegisterAction<IUsable>((_, _) => true, Use);
+        RegisterAction<ICollectable>((_, _) => true, Collect);
         RegisterArbitraryAction("Recharge", 10, (_,_) => _powerMillis <= 0, Recharge);
-        RegisterArbitraryAction("Pick Up", 15, (actor, _) => actor is IContainer, (actor, ev) => {
-            if (ev is not KeyPressEvent) return;
-            bool success = ((IContainer)actor).StoreItem(this, GetBaseNode());
-            if (!success) Toast.Error((Player)actor, "Your inventory is full!");
-        });
         RegisterArbitraryAction("Save to File", 20, (_,_) => true, SerialiseTest);
 
         string finding = "NULL";
@@ -124,4 +120,5 @@ public class FloodlightObject : ObjectBase<RigidBody3D>, IGrabbable, IUsable, IP
         };
     }
     public float GetSize() => 90.0f;
+    public void Collect(ActorBase actorBase, IEventBase ev) => CollectActionDefault.Invoke(actorBase, this, ev);
 }
