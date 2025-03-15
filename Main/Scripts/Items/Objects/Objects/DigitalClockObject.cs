@@ -1,7 +1,7 @@
 ﻿using System;
 using Godot;
 
-public class DigitalClockObject : ObjectBase<RigidBody3D>, IGrabbable, IProcess {
+public class DigitalClockObject : ObjectBase<RigidBody3D>, IGrabbable, IProcess, IVolumetricObject {
     private const string
         SCREEN_VIEWPORT_PATH = "Screen/ScreenViewport",
         SCREEN_PATH = "Screen";
@@ -10,11 +10,16 @@ public class DigitalClockObject : ObjectBase<RigidBody3D>, IGrabbable, IProcess 
     private readonly MeshInstance3D _screen;
     private readonly TimeDisplayMenu _timeMenu;
     
-    private float _time = 0.0f;
+    private int _lastMinute = -1;
     private bool _showDivider = false;
 
     public DigitalClockObject(RigidBody3D baseNode) : base(baseNode, "digitalclock_obj") {
         RegisterAction<IGrabbable>((_, _) => true, Grab);
+        RegisterArbitraryAction("Pick Up", 15, (actor, _) => actor is IContainer, (actor, ev) => {
+            if (ev is not KeyPressEvent) return;
+            bool success = ((IContainer)actor).StoreItem(this, GetBaseNode());
+            if (!success) Toast.Error((Player)actor, "Your inventory is full!");
+        });
 
         string finding = "NULL";
         try {
@@ -41,14 +46,16 @@ public class DigitalClockObject : ObjectBase<RigidBody3D>, IGrabbable, IProcess 
 
     public void Process(float delta) {
         if (GameUtils.IsNodeInvalid(GetBaseNode())) return;
-        _time += delta;
 
         (int hours, int minutes) = EnvironmentManager.GetTimeAs24H();
         _timeMenu.GetForm().SetTime(hours, minutes);
         
-        if (!(_time >= 1.0f)) return;
-        _time = 0.0f;
+        if (minutes == _lastMinute) return;
+        _lastMinute = minutes;
+        
         _timeMenu.GetForm().ShowDivider(_showDivider);
         _showDivider = !_showDivider;
     }
+
+    public float GetSize() => 2.0f;
 }
