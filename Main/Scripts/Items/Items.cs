@@ -47,8 +47,14 @@ public class Items {
         "res://Main/Prefabs/PhysicsObjects/Bed.tscn",
         "Eepy weepy ready for sleepy.",
         1000);
+    public static readonly ItemType DIGITAL_CLOCK = ItemType.Create("digital_clock",
+        "Digital Clock",
+        "res://Main/Textures/Items/ClockImage.png",
+        "res://Main/Prefabs/PhysicsObjects/DigitalClock.tscn",
+        "Stop. Hammer time.",
+        250);
     
-    private static readonly ItemType[] ALL_ITEMS = {GAS_CAN, WORK_DESK, STORAGE_CRATE, CROWBAR, FIRE_EXTINGUISHER, FLOODLIGHT, BED};
+    private static readonly ItemType[] ALL_ITEMS = {GAS_CAN, WORK_DESK, STORAGE_CRATE, CROWBAR, FIRE_EXTINGUISHER, FLOODLIGHT, BED, DIGITAL_CLOCK};
     public static List<ItemType> GetItems() => new(ALL_ITEMS);
     public static List<ShopItemDisplayButton> GetItemButtons() => GetItems().Select(item => item.CreateButton()).ToList();
     public static ItemType GetViaID(string id) => GetItems().FirstOrDefault(itemType => itemType.GetTypeID() == id);

@@ -1,0 +1,94 @@
+[gd_scene load_steps=13 format=3 uid="uid://behrpawhb313v"]
+
+[ext_resource type="Texture2D" uid="uid://c5q1hp1s028lo" path="res://Main/Textures/Sandbox/Noise1.png" id="1_ng22d"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_1e0ye"]
+albedo_color = Color(0.16, 0.16, 0.16, 1)
+albedo_texture = ExtResource("1_ng22d")
+metallic_specular = 0.2
+
+[sub_resource type="BoxMesh" id="BoxMesh_kkvxv"]
+material = SubResource("StandardMaterial3D_1e0ye")
+size = Vector3(0.25, 0.25, 0.55)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_gjvs5"]
+albedo_color = Color(0.06, 0.06, 0.06, 1)
+metallic_specular = 0.2
+
+[sub_resource type="BoxMesh" id="BoxMesh_n10us"]
+material = SubResource("StandardMaterial3D_gjvs5")
+size = Vector3(0.2, 0.2, 0.549)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_l6dsr"]
+albedo_color = Color(0.0552, 0.06016, 0.08, 1)
+metallic = 0.5
+metallic_specular = 1.0
+roughness = 0.25
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_hfuby"]
+size = Vector2(0.5, 0.2)
+
+[sub_resource type="ViewportTexture" id="ViewportTexture_mruhl"]
+viewport_path = NodePath("Screen/ScreenViewport")
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_al7ul"]
+resource_local_to_scene = true
+transparency = 1
+shading_mode = 0
+albedo_texture = SubResource("ViewportTexture_mruhl")
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_5wbtl"]
+size = Vector3(0.25002, 0.551427, 0.264018)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_6ae0r"]
+size = Vector3(0.25, 0.25, 0.55)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_ov3t6"]
+size = Vector3(0.2, 0.2, 0.549)
+
+[node name="RigidBody3D" type="RigidBody3D"]
+collision_layer = 4
+collision_mask = 7
+metadata/object_tag = "digitalclock_obj"
+
+[node name="Base" type="MeshInstance3D" parent="."]
+transform = Transform3D(-4.37114e-08, 0, 1, 0, 1, 0, -1, 0, -4.37114e-08, 0, 0, 0)
+mesh = SubResource("BoxMesh_kkvxv")
+
+[node name="BaseSlanted" type="MeshInstance3D" parent="."]
+transform = Transform3D(-4.30473e-08, 7.5904e-09, 1, 0.173648, 0.984808, 0, -0.984808, 0.173648, -4.37114e-08, -1.97403e-09, 0, -0.0451606)
+mesh = SubResource("BoxMesh_n10us")
+
+[node name="ScreenBack" type="MeshInstance3D" parent="."]
+transform = Transform3D(-1, -8.60946e-08, -1.51808e-08, 0, 0.173648, -0.984808, 8.74228e-08, -0.984808, -0.173648, -6.37458e-09, 0.0127514, -0.145833)
+material_override = SubResource("StandardMaterial3D_l6dsr")
+mesh = SubResource("PlaneMesh_hfuby")
+
+[node name="Screen" type="MeshInstance3D" parent="."]
+transform = Transform3D(-1, -8.60946e-08, -1.51808e-08, 0, 0.173648, -0.984808, 8.74228e-08, -0.984808, -0.173648, -6.42557e-09, 0.013, -0.147)
+material_override = SubResource("StandardMaterial3D_al7ul")
+mesh = SubResource("PlaneMesh_hfuby")
+
+[node name="ScreenViewport" type="SubViewport" parent="Screen"]
+transparent_bg = true
+size = Vector2i(1080, 640)
+
+[node name="Area3D" type="Area3D" parent="."]
+transform = Transform3D(4.37114e-08, 1, -8.74228e-08, 1, -4.37114e-08, 0, -3.82137e-15, -8.74228e-08, -1, 0, 0, 0)
+collision_layer = 128
+collision_mask = 128
+
+[node name="BBox" type="CollisionShape3D" parent="Area3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.001, 0.007)
+shape = SubResource("BoxShape3D_5wbtl")
+
+[node name="BaseCollision" type="CollisionShape3D" parent="."]
+transform = Transform3D(-4.37114e-08, 0, 1, 0, 1, 0, -1, 0, -4.37114e-08, 0, 0, 0)
+shape = SubResource("BoxShape3D_6ae0r")
+
+[node name="BaseSlantedCollision" type="CollisionShape3D" parent="."]
+transform = Transform3D(-4.30473e-08, 7.5904e-09, 1, 0.173648, 0.984808, 0, -0.984808, 0.173648, -4.37114e-08, -1.96701e-09, 0, -0.045)
+shape = SubResource("BoxShape3D_ov3t6")
+
+[node name="Node3D" type="Node3D" parent="."]
+transform = Transform3D(-4.37114e-08, 0, 1, 0, 1, 0, -1, 0, -4.37114e-08, 0, 0, 0)

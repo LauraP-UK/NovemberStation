@@ -15,14 +15,14 @@ roughness = 0.25
 [sub_resource type="PlaneMesh" id="PlaneMesh_wn8l4"]
 size = Vector2(13, 8.5)
 
-[sub_resource type="ViewportTexture" id="ViewportTexture_tvny1"]
+[sub_resource type="ViewportTexture" id="ViewportTexture_gc3dm"]
 viewport_path = NodePath("ScreenStatic/Screen/ScreenViewport")
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_muids"]
 resource_local_to_scene = true
 transparency = 1
 shading_mode = 0
-albedo_texture = SubResource("ViewportTexture_tvny1")
+albedo_texture = SubResource("ViewportTexture_gc3dm")
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_l6ujm"]
 size = Vector3(0.601898, 0.234619, 0.608765)

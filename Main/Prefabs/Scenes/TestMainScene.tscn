@@ -1,8 +1,9 @@
-[gd_scene load_steps=33 format=3 uid="uid://bea3c2ji0la15"]
+[gd_scene load_steps=34 format=3 uid="uid://bea3c2ji0la15"]
 
 [ext_resource type="Script" path="res://Main/TestScript.cs" id="1_htyov"]
 [ext_resource type="PackedScene" uid="uid://thihe8g234f1" path="res://Main/Prefabs/PhysicsObjects/Bed.tscn" id="2_f5v0u"]
 [ext_resource type="PackedScene" uid="uid://5meuarkmnj54" path="res://Main/Prefabs/PhysicsObjects/Floodlight.tscn" id="2_f38n5"]
+[ext_resource type="PackedScene" uid="uid://behrpawhb313v" path="res://Main/Prefabs/PhysicsObjects/DigitalClock.tscn" id="2_fdxr2"]
 [ext_resource type="PackedScene" uid="uid://cbyboln8qtkr5" path="res://Main/Prefabs/PhysicsObjects/FireExtinguisher.tscn" id="2_s7uom"]
 [ext_resource type="PackedScene" uid="uid://cqvhghgw72hrv" path="res://Main/Prefabs/Sandbox/Geometry/PhysicsCube.tscn" id="2_y3p7f"]
 [ext_resource type="PackedScene" uid="uid://5afg6a1f8nd3" path="res://Main/Prefabs/Sandbox/DeskTest.tscn" id="3_dkfcn"]
@@ -129,6 +130,9 @@ process_mode = 1
 
 [node name="SceneObjects" type="Node3D" parent="."]
 process_mode = 1
+
+[node name="RigidBody3D2" parent="SceneObjects" instance=ExtResource("2_fdxr2")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.28902, 1.2172, -3.02245)
 
 [node name="Bed" parent="SceneObjects" instance=ExtResource("2_f5v0u")]
 transform = Transform3D(-4.37114e-08, 0, 1, 0, 1, 0, -1, 0, -4.37114e-08, -11.3463, 0.463776, 10.6563)

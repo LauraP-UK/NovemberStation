@@ -67,9 +67,9 @@ public class ShopItemDisplayButton : FormBase, IFocusable {
     public ColorRectElement GetBgColor() => _bgColor;
     public ButtonElement GetButton() => _button;
     
-    public void SetName(string name) => _nameLabel.GetElement().SetText(name);
-    public void SetDescription(string description) => _descLabel.GetElement().SetText(description);
-    public void SetCost(int cost) => _costLabel.GetElement().SetText(cost + CREDITS_SYMBOL);
+    public void SetName(string name) => _nameLabel.SetText(name);
+    public void SetDescription(string description) => _descLabel.SetText(description);
+    public void SetCost(int cost) => _costLabel.SetText(cost + CREDITS_SYMBOL);
     public void SetTexture(Texture2D texture) => _objTexture.SetTexture(texture);
     public void SetTexture(string path) => _objTexture.SetTexture(path);
     public void SetBgColor(Color color) => _bgColor.SetColor(color);

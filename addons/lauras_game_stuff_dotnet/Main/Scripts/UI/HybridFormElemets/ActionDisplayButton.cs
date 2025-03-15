@@ -52,8 +52,8 @@ public class ActionDisplayButton : FormBase, IFocusable {
     
     public ActionKey? GetAction() => _action;
     
-    public void SetActionNum(string num) => _numLabel.GetElement().SetText(num);
-    public void SetActionName(string name) => _nameLabel.GetElement().SetText(name);
+    public void SetActionNum(string num) => _numLabel.SetText(num);
+    public void SetActionName(string name) => _nameLabel.SetText(name);
     public void SetBGColour(Color colour) => _bgColor.SetColor(colour);
     public void SetAlpha(float alpha) {
         _bgColor.SetAlpha(alpha);

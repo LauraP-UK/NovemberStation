@@ -1,0 +1,46 @@
+[gd_scene load_steps=2 format=3 uid="uid://ctkwlmb5712gm"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_r68s2"]
+font_size = 400
+font_color = Color(0.416667, 1, 0, 1)
+
+[node name="Main" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="CContainer" type="CenterContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="HContainer" type="HBoxContainer" parent="CContainer"]
+layout_mode = 2
+theme_override_constants/separation = 0
+alignment = 1
+
+[node name="Hours" type="Label" parent="CContainer/HContainer"]
+layout_mode = 2
+text = "00"
+label_settings = SubResource("LabelSettings_r68s2")
+horizontal_alignment = 2
+vertical_alignment = 1
+
+[node name="Divider" type="Label" parent="CContainer/HContainer"]
+layout_mode = 2
+text = ":"
+label_settings = SubResource("LabelSettings_r68s2")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Minutes" type="Label" parent="CContainer/HContainer"]
+layout_mode = 2
+text = "00"
+label_settings = SubResource("LabelSettings_r68s2")
+vertical_alignment = 1

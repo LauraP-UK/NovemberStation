@@ -1,4 +1,5 @@
 ﻿
+using System;
 using Godot;
 
 public static class EnvironmentManager {
@@ -76,6 +77,16 @@ public static class EnvironmentManager {
     }
     
     public static int GetDay() => _dayIndex;
+    public static (int hours, int minutes) GetTimeAs24H() {
+        double normalized = (double)_dayTime / EnvironmentSchedule.GetDayLength(GetDay());
+        normalized = Math.Clamp(normalized, 0.0, 1.0); // Just in case
+
+        double totalMinutes = normalized * 24 * 60;
+        int hour = (int)(totalMinutes / 60);
+        int minute = (int)(totalMinutes % 60);
+
+        return (hour, minute);
+    }
 
     private class EnvListeners {
         private const long TIME_ADD = 15000L;

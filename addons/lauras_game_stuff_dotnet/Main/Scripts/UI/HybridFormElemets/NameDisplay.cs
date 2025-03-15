@@ -30,7 +30,7 @@ public class NameDisplay : FormBase {
         _menuElement = new ControlElement(_menu);
         SetCaptureInput(false);
         
-        _nameLabel.GetElement().SetText(_displayName);
+        _nameLabel.SetText(_displayName);
         GetNode().SetCustomMinimumSize(new Vector2(0, minimumHeight));
         _bgColor.SetAlpha(BACKGROUND_ALPHA);
     }

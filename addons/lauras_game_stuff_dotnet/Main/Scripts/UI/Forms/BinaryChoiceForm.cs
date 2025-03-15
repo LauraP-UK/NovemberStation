@@ -74,8 +74,8 @@ public class BinaryChoiceForm : FormBase {
                 throw new ArgumentOutOfRangeException(nameof(backgroundType), backgroundType, null);
         }
     }
-    public void SetTitle(string title) => _title.GetElement().SetText(title);
-    public void SetDescription(string description) => _label.GetElement().SetText(description);
+    public void SetTitle(string title) => GetTitleLabel().SetText(title);
+    public void SetDescription(string description) => GetDescriptionLabel().SetText(description);
     public void SetBackgroundTexture(Texture2D texture, BackgroundType backgroundType = BackgroundType.IMAGE) {
         SetBackgroundType(backgroundType);
         switch (_backgroundType) {
