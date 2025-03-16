@@ -8,11 +8,12 @@ public class InventoryDisplayForm : FormBase {
         MAIN, OTHER, NONE
     }
     
-    private readonly ControlElement _mainContainer, _otherContainer, _centreContainer, _closeButtonContainer;
+    private readonly ControlElement _mainContainer, _otherContainer, _centreContainer;
+    private readonly VBoxContainerElement _closeContainer, _mainInfoContainer, _otherInfoContainer;
     private readonly ScrollDisplayList _mainScroll, _otherScroll, _actionsScroll;
 
     private readonly Action<Key, InventoryDisplayForm, bool> _keyboardBehaviour;
-    private readonly InvActionButton _moveActionBtn;
+    private readonly InvActionButton _moveActionBtn, _closeActionBtn;
 
     private IContainer _mainOwner, _otherOwner;
 
@@ -21,7 +22,9 @@ public class InventoryDisplayForm : FormBase {
         MAIN_CONTAINER = "MarginContainer/HBoxContainer/MainInv",
         OTHER_CONTAINER = "MarginContainer/HBoxContainer/OtherInv",
         CENTRE_CONTAINER = "MarginContainer/HBoxContainer/CentreControls",
-        CLOSE_BUTTON_CONTAINER = "MarginContainer/HBoxContainer/CentreControls/CloseContainer";
+        CLOSE_BUTTON_CONTAINER = "MarginContainer/Control/CloseBox/CloseContainer",
+        MAIN_INFO_CONTAINER = "MarginContainer/HBoxContainer/MainInv/MainInfoContainer",
+        OTHER_INFO_CONTAINER = "MarginContainer/HBoxContainer/OtherInv/OtherInfoContainer2";
 
 
     public InventoryDisplayForm(string formName, Action<Key, InventoryDisplayForm, bool> keyboardBehaviour = null) : base(formName, FORM_PATH) {
@@ -29,12 +32,16 @@ public class InventoryDisplayForm : FormBase {
         Control mainContainer = FindNode<Control>(MAIN_CONTAINER);
         Control otherContainer = FindNode<Control>(OTHER_CONTAINER);
         Control centreContainer = FindNode<Control>(CENTRE_CONTAINER);
-        Control closeButtonContainer = FindNode<Control>(CLOSE_BUTTON_CONTAINER);
+        VBoxContainer closeButtonContainer = FindNode<VBoxContainer>(CLOSE_BUTTON_CONTAINER);
+        VBoxContainer mainInfoContainer = FindNode<VBoxContainer>(MAIN_INFO_CONTAINER);
+        VBoxContainer otherInfoContainer = FindNode<VBoxContainer>(OTHER_INFO_CONTAINER);
 
         _mainContainer = new ControlElement(mainContainer);
         _otherContainer = new ControlElement(otherContainer);
         _centreContainer = new ControlElement(centreContainer);
-        _closeButtonContainer = new ControlElement(closeButtonContainer);
+        _closeContainer = new VBoxContainerElement(closeButtonContainer);
+        _mainInfoContainer = new VBoxContainerElement(mainInfoContainer);
+        _otherInfoContainer = new VBoxContainerElement(otherInfoContainer);
 
         _mainScroll = new ScrollDisplayList("main_inv");
         _otherScroll = new ScrollDisplayList("other_inv");
@@ -43,13 +50,27 @@ public class InventoryDisplayForm : FormBase {
         mainContainer.AddChild(_mainScroll.GetNode());
         otherContainer.AddChild(_otherScroll.GetNode());
         centreContainer.AddChild(_actionsScroll.GetNode());
+        _actionsScroll.GetScrollContainer().SetVScrollMode(ScrollContainer.ScrollMode.Disabled);
 
         _menuElement = new ControlElement(_menu);
 
         _keyboardBehaviour = keyboardBehaviour;
         SetRegisterListenerOnReady(true);
 
-        _moveActionBtn = new();
+        _closeActionBtn = new InvActionButton();
+        ButtonElement closeBtn = _closeActionBtn.GetButton();
+        closeBtn.OnPressed(_ => KeyboardBehaviour(Key.Escape, true));
+        _closeActionBtn.SetTake();
+        _closeActionBtn.SetActionName("X");
+        _closeActionBtn.ShowLeftArrow(false);
+        _closeActionBtn.ShowRightArrow(false);
+        Vector2 closeBtnSize = new(40, 40);
+        _closeActionBtn.GetActionLabel().GetElement().SetPosition(new Vector2(-20,-20));
+        _closeActionBtn.GetActionLabel().GetElement().SetSize(closeBtnSize);
+        _closeActionBtn.GetNode().SetCustomMinimumSize(closeBtnSize);
+        _closeContainer.AddChild(_closeActionBtn);
+        
+        _moveActionBtn = new InvActionButton();
         ButtonElement moveBtn = _moveActionBtn.GetButton();
 
         moveBtn.OnPressed(_ => {
@@ -63,7 +84,7 @@ public class InventoryDisplayForm : FormBase {
                 string metaTag = Serialiser.GetSpecificData<string>(Serialiser.ObjectSaveData.META_TAG, itemJson);
 
                 if (!_otherOwner.GetInventory().CanAddItem(itemJson)) {
-                    Toast.Error(GameManager.I().GetPlayer(), "This inventory is full!");
+                    Toast.Error(GameManager.I().GetPlayer(), $"{_otherOwner.GetName()} is full!");
                     return;
                 }
 
@@ -90,7 +111,7 @@ public class InventoryDisplayForm : FormBase {
         _actionsScroll.GetDisplayList().AddChild(_moveActionBtn);
     }
 
-    protected override List<IFormObject> GetAllElements() => new() { _mainContainer, _otherContainer, _centreContainer, _closeButtonContainer };
+    protected override List<IFormObject> GetAllElements() => new() { _mainContainer, _otherContainer, _centreContainer, _closeContainer };
 
     protected override void OnDestroy() {
         _mainScroll.Destroy();
@@ -104,12 +125,25 @@ public class InventoryDisplayForm : FormBase {
 
     public void SetMainInv(IContainer container) {
         _mainOwner = container;
-        GetMainScroll().GetDisplayList().SetChildren(GetButtons(container.GetInventory()));
+        IInventory inventory = container.GetInventory();
+        GetMainScroll().GetDisplayList().SetChildren(GetButtons(inventory));
+        InvHeaderInfo invHeaderInfo = new(container.GetName(), new Vector2(100, 40));
+
+        if (inventory is IVolumetricInventory volInv) invHeaderInfo.SetWeight(volInv.GetUsedSize(), volInv.GetMaxSize());
+        else invHeaderInfo.GetWeightLabel().SetAlpha(0.0f);
+        
+        _mainInfoContainer.SetChildren(invHeaderInfo);
     }
 
     public void SetOtherInv(IContainer container) {
         _otherOwner = container;
         GetOtherScroll().GetDisplayList().SetChildren(GetButtons(container.GetInventory()));
+        InvHeaderInfo invHeaderInfo = new(container.GetName(), new Vector2(100, 40));
+        
+        if (container.GetInventory() is IVolumetricInventory volInv) invHeaderInfo.SetWeight(volInv.GetUsedSize(), volInv.GetMaxSize());
+        else invHeaderInfo.GetWeightLabel().SetAlpha(0.0f);
+        
+        _otherInfoContainer.SetChildren(invHeaderInfo);
     }
 
     private InventorySide GetSide(InvItemDisplay btn) {
@@ -181,8 +215,8 @@ public class InventoryDisplayForm : FormBase {
     public override bool PausesGame() => false;
 
     private void Refresh(InvItemDisplay selectedBtn = null, InventorySide side = InventorySide.NONE) {
-        GetMainScroll().GetDisplayList().SetChildren(GetButtons(_mainOwner.GetInventory()));
-        GetOtherScroll().GetDisplayList().SetChildren(GetButtons(_otherOwner.GetInventory()));
+        SetMainInv(_mainOwner);
+        SetOtherInv(_otherOwner);
         SelectFirstItemOf(selectedBtn?.GetItemType(), side);
     }
 }

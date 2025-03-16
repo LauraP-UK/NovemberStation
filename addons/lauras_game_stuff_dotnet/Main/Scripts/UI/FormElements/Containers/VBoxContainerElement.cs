@@ -35,6 +35,8 @@ public class VBoxContainerElement : FormElement<VBoxContainer> {
         foreach (T child in children) AddChild(child);
     }
     
+    public void SetChildren<T>(params T[] children) where T : IFormObject => SetChildren(new List<T>(children));
+    
     public void ClearChildren() {
         foreach (IFormObject displayObject in _displayObjects) {
             displayObject.Destroy();

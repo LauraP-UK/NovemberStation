@@ -18,9 +18,9 @@ public class InvActionButton : FormBase {
         BG_COLOUR = "BGContainer/BGColour";
 
     private static readonly Color
-        DEFAULT_BG_COLOR = new(0.1f, 0.1f, 0.1f),
+        DEFAULT_BG_COLOR = new(0.05f, 0.05f, 0.05f),
         FOCUS_BG_COLOR = Colors.DimGray,
-        DISABLED_BG_COLOUR = new(0.05f, 0.05f, 0.05f);
+        SELECTED_BG_COLOR = Colors.Gray;
 
     public InvActionButton() : base("inv_action_btn", FORM_PATH) {
         Label actionLabel = FindNode<Label>(ACTION_LABEL);
@@ -35,13 +35,21 @@ public class InvActionButton : FormBase {
         _button = new ButtonElement(button);
         _bgColour = new ColorRectElement(bgColour);
         
-        _button.AddAction(Control.SignalName.FocusEntered, _ => {
+        _button.AddAction(Control.SignalName.MouseEntered, _ => {
             if (_isDisabled) return;
             _bgColour.SetColor(FOCUS_BG_COLOR);
         });
-        _button.AddAction(Control.SignalName.FocusExited, _ => {
+        _button.AddAction(Control.SignalName.MouseExited, _ => {
             if (_isDisabled) return;
             _bgColour.SetColor(DEFAULT_BG_COLOR);
+        });
+        _button.OnButtonDown(_ => {
+            if (_isDisabled) return;
+            VisualPress(true);
+        });
+        _button.OnButtonUp(_ => {
+            if (_isDisabled) return;
+            VisualPress(false);
         });
         
         _menuElement = new ControlElement(_menu);
@@ -53,14 +61,16 @@ public class InvActionButton : FormBase {
     protected override void OnDestroy() { }
     
     public ButtonElement GetButton() => _button;
+    public LabelElement GetActionLabel() => _actionLabel;
     
     public void SetActionName(string name) => _actionLabel.SetText(name);
     
-    private void ShowLeftArrow(bool show) => _leftArrow.SetAlpha(show ? 1.0f : 0.0f);
-    private void ShowRightArrow(bool show) => _rightArrow.SetAlpha(show ? 1.0f : 0.0f);
+    public void ShowLeftArrow(bool show) => _leftArrow.SetAlpha(show ? 1.0f : 0.0f);
+    public void ShowRightArrow(bool show) => _rightArrow.SetAlpha(show ? 1.0f : 0.0f);
 
     public void SetStore() {
         SetActionName("Store");
+        GetActionLabel().SetAlpha(1.0f);
         ShowLeftArrow(false);
         ShowRightArrow(true);
         _bgColour.SetColor(DEFAULT_BG_COLOR);
@@ -68,6 +78,7 @@ public class InvActionButton : FormBase {
     }
     public void SetTake() {
         SetActionName("Take");
+        GetActionLabel().SetAlpha(1.0f);
         ShowLeftArrow(true);
         ShowRightArrow(false);
         _bgColour.SetColor(DEFAULT_BG_COLOR);
@@ -75,9 +86,11 @@ public class InvActionButton : FormBase {
     }
     public void Disable() {
         SetActionName("Select an item");
+        GetActionLabel().SetAlpha(0.5f);
         ShowLeftArrow(false);
         ShowRightArrow(false);
-        _bgColour.SetColor(DISABLED_BG_COLOUR);
+        _bgColour.SetColor(DEFAULT_BG_COLOR);
         _isDisabled = true;
     }
+    public void VisualPress(bool pressed) => _bgColour.SetColor(pressed ? SELECTED_BG_COLOR : FOCUS_BG_COLOR);
 }

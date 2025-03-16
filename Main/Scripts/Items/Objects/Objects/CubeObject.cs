@@ -30,6 +30,7 @@ public class CubeObject : ObjectBase<RigidBody3D>, IGrabbable, IShovable, IConta
     public override string GetContext() => $"Contains: {_inventory.GetUsedSize()}/{_inventory.GetMaxSize()} kg";
     public override SmartDictionary<string, SmartSerialData> GetSerialiseData() => new();
     public IInventory GetInventory() => _inventory;
+    public string GetName() => GetDisplayName();
 
     public bool StoreItem(IObjectBase objectBase, Node node) {
         bool added = GetInventory().GetAs<VolumetricInventory>().AddItem(objectBase);

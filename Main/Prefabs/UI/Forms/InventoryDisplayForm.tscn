@@ -25,6 +25,32 @@ theme_override_constants/margin_top = 100
 theme_override_constants/margin_right = 100
 theme_override_constants/margin_bottom = 100
 
+[node name="Control" type="Control" parent="MarginContainer"]
+layout_mode = 2
+mouse_filter = 2
+
+[node name="CloseBox" type="Control" parent="MarginContainer/Control"]
+custom_minimum_size = Vector2(40, 40)
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -20.0
+offset_top = -40.0
+offset_right = 20.0
+grow_horizontal = 2
+mouse_filter = 2
+
+[node name="CloseContainer" type="VBoxContainer" parent="MarginContainer/Control/CloseBox"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_constants/separation = 0
+
 [node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer"]
 layout_mode = 2
 mouse_filter = 2
@@ -35,6 +61,17 @@ alignment = 1
 custom_minimum_size = Vector2(400, 0)
 layout_mode = 2
 mouse_filter = 2
+
+[node name="MainInfoContainer" type="VBoxContainer" parent="MarginContainer/HBoxContainer/MainInv"]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -200.0
+offset_top = -40.0
+offset_right = 200.0
+grow_horizontal = 2
+theme_override_constants/separation = 0
 
 [node name="MainBG" type="ColorRect" parent="MarginContainer/HBoxContainer/MainInv"]
 z_index = -50
@@ -93,21 +130,21 @@ patch_margin_top = 7
 patch_margin_right = 7
 patch_margin_bottom = 7
 
-[node name="CloseContainer" type="Control" parent="MarginContainer/HBoxContainer/CentreControls"]
-custom_minimum_size = Vector2(20, 20)
-layout_mode = 1
-anchors_preset = 1
-anchor_left = 1.0
-anchor_right = 1.0
-offset_left = -20.0
-offset_top = -20.0
-grow_horizontal = 0
-mouse_filter = 2
-
 [node name="OtherInv" type="Control" parent="MarginContainer/HBoxContainer"]
 custom_minimum_size = Vector2(400, 0)
 layout_mode = 2
 mouse_filter = 2
+
+[node name="OtherInfoContainer2" type="VBoxContainer" parent="MarginContainer/HBoxContainer/OtherInv"]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -200.0
+offset_top = -40.0
+offset_right = 200.0
+grow_horizontal = 2
+theme_override_constants/separation = 0
 
 [node name="OtherBG" type="ColorRect" parent="MarginContainer/HBoxContainer/OtherInv"]
 z_index = -50
