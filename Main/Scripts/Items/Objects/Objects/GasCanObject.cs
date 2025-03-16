@@ -1,13 +1,15 @@
 ﻿
+using System;
 using Godot;
 
-public class GasCanObject : ObjectBase<RigidBody3D>, IGrabbable, IShovable, IDrinkable {
+public class GasCanObject : ObjectBase<RigidBody3D>, IGrabbable, IShovable, IDrinkable, ICollectable, IVolumetricObject {
     private int _fuelAmount = 100;
 
     public GasCanObject(RigidBody3D baseNode) : base(baseNode, "gascan_obj") {
         RegisterAction<IGrabbable>((_,_) => true, Grab);
         RegisterAction<IShovable>((_,_) => true, Shove);
         RegisterAction<IDrinkable>((_,_) => _fuelAmount > 0, Drink);
+        RegisterAction<ICollectable>((_,_) => true, (actor,ev) => CollectActionDefault.Invoke(actor, this, ev));
         RegisterArbitraryAction("Refill", 5, (_,_) => _fuelAmount <= 0, (_,ev) => {
             if (ev is not KeyPressEvent) return;
             _fuelAmount = 100;
@@ -29,7 +31,9 @@ public class GasCanObject : ObjectBase<RigidBody3D>, IGrabbable, IShovable, IDri
     }
     public override SmartDictionary<string, SmartSerialData> GetSerialiseData() {
         return new SmartDictionary<string, SmartSerialData> {
-            { "fuelAmount", SmartSerialData.From(_fuelAmount, v => _fuelAmount = (int)v, () => _fuelAmount = 100) }
+            { "fuelAmount", SmartSerialData.From(_fuelAmount, v => _fuelAmount = Convert.ToInt32(v), () => _fuelAmount = 100) }
         };
     }
+    public void Collect(ActorBase actorBase, IEventBase ev) => CollectActionDefault.Invoke(actorBase, this, ev);
+    public float GetSize() => 15.0f;
 }

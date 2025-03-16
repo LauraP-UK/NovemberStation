@@ -89,6 +89,7 @@ public class InvItemDisplay : FormBase, IFocusable {
     public ButtonElement GetButton() => _button;
     public ItemType GetItemType() => _itemType;
     public void AddCount(int count) => _count += count;
+    public int GetCount() => _count;
     public void AddWeight(float weight) => _weight += weight;
 
     public void OnPressed(Action<InvItemDisplay> onPressed) => _button.OnPressed(_ => onPressed(this));

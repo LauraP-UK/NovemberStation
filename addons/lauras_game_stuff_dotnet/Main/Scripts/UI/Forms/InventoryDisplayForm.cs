@@ -4,6 +4,10 @@ using System.Linq;
 using Godot;
 
 public class InventoryDisplayForm : FormBase {
+    private enum InventorySide {
+        MAIN, OTHER, NONE
+    }
+    
     private readonly ControlElement _mainContainer, _otherContainer, _centreContainer, _closeButtonContainer;
     private readonly ScrollDisplayList _mainScroll, _otherScroll, _actionsScroll;
 
@@ -52,7 +56,9 @@ public class InventoryDisplayForm : FormBase {
             InvItemDisplay selected = GetSelectedItem();
             if (selected == null) return;
 
-            if (IsSelectedMain()) {
+            InventorySide side = GetSide(selected);
+
+            if (side == InventorySide.MAIN) {
                 string itemJson = GetItemJson(selected, _mainOwner.GetInventory());
                 string metaTag = Serialiser.GetSpecificData<string>(Serialiser.ObjectSaveData.META_TAG, itemJson);
 
@@ -76,7 +82,9 @@ public class InventoryDisplayForm : FormBase {
                 _mainOwner.StoreItem(metaTag, itemJson);
                 _otherOwner.RemoveItem(itemJson);
             }
-            Refresh();
+            
+            
+            Refresh(selected.GetCount() > 1 ? selected : null, side);
         });
 
         _actionsScroll.GetDisplayList().AddChild(_moveActionBtn);
@@ -104,7 +112,11 @@ public class InventoryDisplayForm : FormBase {
         GetOtherScroll().GetDisplayList().SetChildren(GetButtons(container.GetInventory()));
     }
 
-    public bool IsSelectedMain() => GetMainScroll().GetDisplayList().GetDisplayObjects().Any(b => ((InvItemDisplay)b).IsSelected());
+    private InventorySide GetSide(InvItemDisplay btn) {
+        if (GetMainScroll().GetDisplayList().GetDisplayObjects().Contains(btn)) return InventorySide.MAIN;
+        if (GetOtherScroll().GetDisplayList().GetDisplayObjects().Contains(btn)) return InventorySide.OTHER;
+        return InventorySide.NONE;
+    }
 
     private InvItemDisplay GetViaItem(ItemType itemType, List<InvItemDisplay> list) => list.FirstOrDefault(invItemDisplay => invItemDisplay.GetItemType().Equals(itemType));
     private string GetItemJson(InvItemDisplay invItemDisplay, IInventory inv) => inv.GetContents()
@@ -142,9 +154,20 @@ public class InventoryDisplayForm : FormBase {
         btns.AddRange(GetOtherScroll().GetDisplayList().GetDisplayObjects().Select(b => (InvItemDisplay)b).ToList());
         foreach (InvItemDisplay button in btns) button.Select(button.Equals(btn));
 
-        if (GetSelectedItem() == null) _moveActionBtn.Disable();
-        else if (IsSelectedMain()) _moveActionBtn.SetStore();
+        if (btn == null) _moveActionBtn.Disable();
+        else if (GetSide(btn) == InventorySide.MAIN) _moveActionBtn.SetStore();
         else _moveActionBtn.SetTake();
+    }
+
+    private void SelectFirstItemOf(ItemType itemType, InventorySide side) {
+        if (side == InventorySide.MAIN) {
+            InvItemDisplay btn = GetViaItem(itemType, GetMainScroll().GetDisplayList().GetDisplayObjects().Select(b => (InvItemDisplay)b).ToList());
+            SelectButton(btn);
+        }
+        else if (side == InventorySide.OTHER) {
+            InvItemDisplay btn = GetViaItem(itemType, GetOtherScroll().GetDisplayList().GetDisplayObjects().Select(b => (InvItemDisplay)b).ToList());
+            SelectButton(btn);
+        }
     }
 
     private InvItemDisplay GetSelectedItem() {
@@ -157,9 +180,9 @@ public class InventoryDisplayForm : FormBase {
     public override bool LockMovement() => true;
     public override bool PausesGame() => false;
 
-    private void Refresh() {
-        SelectButton(null);
+    private void Refresh(InvItemDisplay selectedBtn = null, InventorySide side = InventorySide.NONE) {
         GetMainScroll().GetDisplayList().SetChildren(GetButtons(_mainOwner.GetInventory()));
         GetOtherScroll().GetDisplayList().SetChildren(GetButtons(_otherOwner.GetInventory()));
+        SelectFirstItemOf(selectedBtn?.GetItemType(), side);
     }
 }

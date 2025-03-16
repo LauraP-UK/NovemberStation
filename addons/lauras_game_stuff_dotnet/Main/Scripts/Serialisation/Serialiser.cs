@@ -20,7 +20,7 @@ public static class Serialiser {
         try {
             return (T)Convert.ChangeType(raw, typeof(T));
         } catch {
-            GD.PrintErr($"WARN: GetSpecificData: Failed to convert {raw} to {typeof(T)}");
+            GD.PrintErr($"WARN: Serialiser.GetSpecificData() : Failed to convert {raw} to {typeof(T)}");
         }
         return default;
     }
