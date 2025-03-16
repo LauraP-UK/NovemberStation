@@ -103,7 +103,7 @@ public class ContextMenuForm : FormBase {
         }
         else if (listContainer.IsEmpty()) actionsAlpha = 0.0f;
 
-        if (!listContainer.IsEmpty()) GetAction(actionIndex)?.GrabFocus();
+        if (!listContainer.IsEmpty() && !UIManager.IsPrimaryMenuOpen()) GetAction(actionIndex)?.GrabFocus();
 
         Show();
 

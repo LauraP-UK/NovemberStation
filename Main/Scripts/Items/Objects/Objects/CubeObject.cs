@@ -25,6 +25,14 @@ public class CubeObject : ObjectBase<RigidBody3D>, IGrabbable, IShovable, IConta
             }
             actorContainer.RemoveItem(firstJson);
         });
+        RegisterArbitraryAction("Open", 20, (_,_) => true, (actor, ev) => {
+            if (ev is not KeyPressEvent) return;
+            InvDisplayMenu invDisplayMenu = new();
+            invDisplayMenu.ModifyForm(form => {
+                form.SetOtherInv(GetInventory());
+            });
+            invDisplayMenu.Open();
+        });
 
         _inventory = new VolumetricInventory(350.0f, this);
     }

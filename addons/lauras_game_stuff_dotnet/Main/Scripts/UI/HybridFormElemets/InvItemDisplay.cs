@@ -9,6 +9,9 @@ public class InvItemDisplay : FormBase, IFocusable {
     private readonly ButtonElement _button;
 
     private readonly ItemType _itemType;
+    private int _count = 0;
+    private float _weight = 0.0f;
+    private bool _isSelected = false;
 
     private const string
         FORM_PATH = "res://Main/Prefabs/UI/GameElements/InvItemDisplay.tscn",
@@ -45,14 +48,34 @@ public class InvItemDisplay : FormBase, IFocusable {
 
         _bgColor.SetColor(DEFAULT_BG_COLOR);
 
-        _button.AddAction(Control.SignalName.FocusEntered, _ => _bgColor.SetColor(FOCUS_BG_COLOR));
-        _button.AddAction(Control.SignalName.FocusExited, _ => _bgColor.SetColor(DEFAULT_BG_COLOR));
-        _button.AddAction(Control.SignalName.MouseEntered, _ => GrabFocus());
+        _button.AddAction(Control.SignalName.FocusEntered, _ => {
+            if (_isSelected) return;
+            GetBgColor().SetColor(FOCUS_BG_COLOR);
+        });
+        _button.AddAction(Control.SignalName.FocusExited, _ => {
+            if (_isSelected) return;
+            GetBgColor().SetColor(DEFAULT_BG_COLOR);
+        });
+        _button.AddAction(Control.SignalName.MouseEntered, _ => {
+            if (_isSelected) return;
+            GrabFocus();
+        });
+        
+        _button.OnButtonDown(_ => VisualPress(true));
+        _button.OnButtonUp(_ => {
+            if (_isSelected) return;
+            VisualPress(false);
+        });
 
-        _menuElement = new ControlElement(_menu);
+        _menuElement = new ControlElement(_menu, _ => {
+            GetCountLabel().SetText($"x{_count}");
+            GetWeightLabel().SetText($"{_weight:0.00} {WEIGHT_SYMBOL}");
+        });
         
         _nameLabel.SetText(item.GetItemName());
         _itemIcon.SetTexture(item.GetImage());
+        
+        _menuElement.GetElement().SetCustomMinimumSize(new Vector2(0, 50));
     }
 
     protected override List<IFormObject> GetAllElements() => new() { _nameLabel, _itemCount, _totalWeight, _itemIcon, _bgColor, _button };
@@ -64,14 +87,20 @@ public class InvItemDisplay : FormBase, IFocusable {
     public TextureRectElement GetItemTexture() => _itemIcon;
     public ColorRectElement GetBgColor() => _bgColor;
     public ButtonElement GetButton() => _button;
-    public void SetWeight(float weight) => _totalWeight.SetText($"{weight:000.00} {WEIGHT_SYMBOL}");
-    public void SetCount(int count) => _itemCount.SetText($"x{count}");
+    public ItemType GetItemType() => _itemType;
+    public void AddCount(int count) => _count += count;
+    public void AddWeight(float weight) => _weight += weight;
 
     public void OnPressed(Action<InvItemDisplay> onPressed) => _button.OnPressed(_ => onPressed(this));
+    public void Select(bool selected) {
+        _isSelected = selected;
+        GetBgColor().SetColor(selected ? SELECTED_BG_COLOR : DEFAULT_BG_COLOR);
+    }
+    public bool IsSelected() => _isSelected;
 
     public void GrabFocus() {
         if (!IsValid() || HasFocus()) return;
-        GetButton().GetElement().GrabFocus();
+        GetButton().GrabFocus();
     }
 
     public void ReleaseFocus() => GetButton().GetElement().ReleaseFocus();

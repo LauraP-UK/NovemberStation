@@ -52,20 +52,20 @@ collision_mask = 7
 metadata/object_tag = "digitalclock_obj"
 
 [node name="Base" type="MeshInstance3D" parent="."]
-transform = Transform3D(-4.37114e-08, 0, 1, 0, 1, 0, -1, 0, -4.37114e-08, 0, 0, 0)
+transform = Transform3D(1.31134e-07, 0, -1, 0, 1, 0, 1, 0, 1.31134e-07, 0, 0, 0)
 mesh = SubResource("BoxMesh_kkvxv")
 
 [node name="BaseSlanted" type="MeshInstance3D" parent="."]
-transform = Transform3D(-4.30473e-08, 7.5904e-09, 1, 0.173648, 0.984808, 0, -0.984808, 0.173648, -4.37114e-08, -1.97403e-09, 0, -0.0451606)
+transform = Transform3D(1.29142e-07, -2.27712e-08, -1, 0.173648, 0.984808, 0, 0.984808, -0.173648, 1.31134e-07, 5.92209e-09, 0, 0.0451606)
 mesh = SubResource("BoxMesh_n10us")
 
 [node name="ScreenBack" type="MeshInstance3D" parent="."]
-transform = Transform3D(-1, -8.60946e-08, -1.51808e-08, 0, 0.173648, -0.984808, 8.74228e-08, -0.984808, -0.173648, -6.37458e-09, 0.0127514, -0.145833)
+transform = Transform3D(1, 1.72189e-07, 3.03616e-08, 0, 0.173648, -0.984808, -1.74846e-07, 0.984808, 0.173648, 1.91237e-08, 0.0127514, 0.145833)
 material_override = SubResource("StandardMaterial3D_l6dsr")
 mesh = SubResource("PlaneMesh_hfuby")
 
 [node name="Screen" type="MeshInstance3D" parent="."]
-transform = Transform3D(-1, -8.60946e-08, -1.51808e-08, 0, 0.173648, -0.984808, 8.74228e-08, -0.984808, -0.173648, -6.42557e-09, 0.013, -0.147)
+transform = Transform3D(1, 1.72189e-07, 3.03616e-08, 0, 0.173648, -0.984808, -1.74846e-07, 0.984808, 0.173648, 1.92767e-08, 0.013, 0.147)
 material_override = SubResource("StandardMaterial3D_al7ul")
 mesh = SubResource("PlaneMesh_hfuby")
 
@@ -74,7 +74,7 @@ transparent_bg = true
 size = Vector2i(1000, 400)
 
 [node name="Area3D" type="Area3D" parent="."]
-transform = Transform3D(4.37114e-08, 1, -8.74228e-08, 1, -4.37114e-08, 0, -3.82137e-15, -8.74228e-08, -1, 0, 0, 0)
+transform = Transform3D(-4.37114e-08, -1, 1.74846e-07, 1, -4.37114e-08, 0, 7.64274e-15, 1.74846e-07, 1, 0, 0, 0)
 collision_layer = 128
 collision_mask = 128
 
@@ -83,16 +83,17 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.001, 0.007)
 shape = SubResource("BoxShape3D_5wbtl")
 
 [node name="BaseCollision" type="CollisionShape3D" parent="."]
-transform = Transform3D(-4.37114e-08, 0, 1, 0, 1, 0, -1, 0, -4.37114e-08, 0, 0, 0)
+transform = Transform3D(1.31134e-07, 0, -1, 0, 1, 0, 1, 0, 1.31134e-07, 0, 0, 0)
 shape = SubResource("BoxShape3D_6ae0r")
 
 [node name="BaseSlantedCollision" type="CollisionShape3D" parent="."]
-transform = Transform3D(-4.30473e-08, 7.5904e-09, 1, 0.173648, 0.984808, 0, -0.984808, 0.173648, -4.37114e-08, -1.96701e-09, 0, -0.045)
+transform = Transform3D(1.29142e-07, -2.27712e-08, -1, 0.173648, 0.984808, 0, 0.984808, -0.173648, 1.31134e-07, 5.90104e-09, 0, 0.045)
 shape = SubResource("BoxShape3D_ov3t6")
 
-[node name="Node3D" type="Node3D" parent="."]
+[node name="LightsContainer" type="Node3D" parent="."]
+transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, 0, 0, 0)
 
-[node name="SpotLight3D" type="SpotLight3D" parent="Node3D"]
+[node name="RedLight1" type="SpotLight3D" parent="LightsContainer"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.106031, 0, 0)
 light_color = Color(1, 0, 0, 1)
 light_energy = 0.2
@@ -101,7 +102,7 @@ spot_range = 0.4
 spot_attenuation = 2.0
 spot_angle = 68.0
 
-[node name="SpotLight3D2" type="SpotLight3D" parent="Node3D"]
+[node name="RedLight2" type="SpotLight3D" parent="LightsContainer"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.106, 0, 0)
 light_color = Color(1, 0, 0, 1)
 light_energy = 0.2

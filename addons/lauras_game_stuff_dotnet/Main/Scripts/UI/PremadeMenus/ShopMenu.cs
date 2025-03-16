@@ -5,6 +5,9 @@ public class ShopMenu : PreMadeMenu<TestDisplayForm> {
         GameManager gameManager = GameManager.I();
 
         TestDisplayForm testDisplayForm = new(GetFormName());
+        
+        testDisplayForm.SetPauseGame(true);
+        
         ScrollDisplayList scrollDisplay = testDisplayForm.GetScrollDisplay();
         scrollDisplay.SetKeyboardEnabled(true);
         scrollDisplay.SetOnSelectElement<ShopItemDisplayButton>(elem => elem.GetButton().ForcePressed());

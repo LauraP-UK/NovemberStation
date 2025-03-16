@@ -55,14 +55,14 @@ public class GameManager {
         MovementActionTracker.Process();
         UIManager.Process(delta);
         if (!GetTree().Paused) {
-            GetPlayer().GetController().Update((float)delta);
+            if (_player != null) GetPlayer().GetController().Update((float)delta);
             foreach ((ulong _, IObjectBase obj) in ((TestScript)GetActiveScene()).GetObjects())
                 if (obj is IProcess processObj) processObj.Process((float)delta);
         }
     }
     
     public void PhysicsProcess(double delta) {
-        if (!GetTree().Paused) GetPlayer().GetController().PhysicsUpdate((float)delta);
+        if (!GetTree().Paused && _player != null) GetPlayer().GetController().PhysicsUpdate((float)delta);
     }
 
     public static void SetEngineSpeed(float speed) => Engine.SetTimeScale(speed);

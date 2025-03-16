@@ -10,6 +10,8 @@ public class PauseMenu : PreMadeMenu<BinaryChoiceForm> {
         pauseMenu.SetUpperText("Resume");
         pauseMenu.SetLowerText("Quit");
         
+        pauseMenu.SetPauseGame(true);
+        
         pauseMenu.SetBackgroundType(BinaryChoiceForm.BackgroundType.IMAGE);
         pauseMenu.SetBackgroundAlpha(0.5f);
         pauseMenu.SetListener(FormListener.Default(pauseMenu));

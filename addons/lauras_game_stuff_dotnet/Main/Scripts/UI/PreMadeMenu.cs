@@ -16,7 +16,10 @@ public abstract class PreMadeMenu<T> where T : FormBase {
     }
 
     public void Close() {
-        if (!UIManager.HasMenu(GetFormName())) return;
+        if (!UIManager.HasMenu(GetFormName())) {
+            GD.PrintErr($"ERROR: PreMadeMenu.Close() : Form {GetType()} - {GetFormName()} does not exist.");
+            return;
+        }
         UIManager.CloseMenu(GetFormName());
     }
     

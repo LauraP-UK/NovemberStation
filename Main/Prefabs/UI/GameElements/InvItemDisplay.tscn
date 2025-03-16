@@ -6,13 +6,10 @@
 load_path = "res://.godot/imported/ContextNinePatch.png-1956a95d8fe2d1cd3bd043c483a8f7ae.ctex"
 
 [sub_resource type="LabelSettings" id="LabelSettings_bge0x"]
-font_size = 20
 
 [sub_resource type="LabelSettings" id="LabelSettings_4ioos"]
-font_size = 20
 
 [sub_resource type="LabelSettings" id="LabelSettings_usoxj"]
-font_size = 20
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_fyp1u"]
 
@@ -27,6 +24,7 @@ font_size = 20
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_3o8an"]
 
 [node name="InvItem" type="Control"]
+z_index = 5
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -34,6 +32,7 @@ anchor_bottom = 1.0
 offset_bottom = -598.0
 grow_horizontal = 2
 grow_vertical = 2
+mouse_filter = 2
 
 [node name="BGContainer" type="Control" parent="."]
 layout_mode = 1
@@ -42,6 +41,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+mouse_filter = 2
 
 [node name="BGColour" type="ColorRect" parent="BGContainer"]
 layout_mode = 1
@@ -50,6 +50,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+mouse_filter = 2
 color = Color(0.18, 0.18, 0.18, 1)
 
 [node name="NinePatchRect" type="NinePatchRect" parent="BGContainer"]
@@ -73,12 +74,14 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+mouse_filter = 2
 
 [node name="ObjName" type="Label" parent="Content"]
 z_index = 10
 z_as_relative = false
-offset_left = 160.0
-offset_right = 590.0
+layout_mode = 0
+offset_left = 120.0
+offset_right = 550.0
 offset_bottom = 50.0
 text = "OBJECT_NAME"
 label_settings = SubResource("LabelSettings_bge0x")
@@ -90,8 +93,8 @@ layout_mode = 1
 anchors_preset = 1
 anchor_left = 1.0
 anchor_right = 1.0
-offset_left = -132.0
-offset_right = -32.0
+offset_left = -107.0
+offset_right = -7.0
 offset_bottom = 50.0
 grow_horizontal = 0
 text = "000.00 Kg"
@@ -102,8 +105,8 @@ vertical_alignment = 1
 [node name="ObjCount" type="Label" parent="Content"]
 z_index = 10
 layout_mode = 1
-offset_left = 75.0
-offset_right = 150.0
+offset_left = 55.0
+offset_right = 130.0
 offset_bottom = 50.0
 text = "x000
 "
@@ -114,6 +117,7 @@ vertical_alignment = 1
 [node name="ObjImg" type="TextureRect" parent="Content"]
 z_index = 5
 z_as_relative = false
+layout_mode = 0
 offset_left = 20.0
 offset_right = 70.0
 offset_bottom = 50.0
@@ -123,6 +127,8 @@ expand_mode = 2
 stretch_mode = 5
 
 [node name="FocusButton" type="Button" parent="."]
+z_index = 200
+z_as_relative = false
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0

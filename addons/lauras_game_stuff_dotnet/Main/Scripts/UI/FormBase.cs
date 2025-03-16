@@ -13,7 +13,7 @@ public abstract class FormBase : IFormObject {
     private ICursor _cursorElement;
     private readonly SignalNode _onReadyAction;
     public bool _captureInput = true;
-    private bool _registerListenerOnReady = true;
+    private bool _registerListenerOnReady = true, _pauseGame = false;
 
     protected FormBase(string formName, string formPath) {
         _menu = Loader.SafeInstantiate<Control>(formPath, true);
@@ -89,6 +89,8 @@ public abstract class FormBase : IFormObject {
 
     public virtual void KeyboardBehaviour(Key key, bool isPressed) {}
     public virtual bool LockMovement() => true;
+    public virtual bool PausesGame() => _pauseGame;
+    public void SetPauseGame(bool value) => _pauseGame = value;
     public bool CaptureInput() {
         if (!IsValid()) return false;
         return GetTopLevelLayout().Equals(this) ? _captureInput : GetTopLevelLayout().CaptureInput();

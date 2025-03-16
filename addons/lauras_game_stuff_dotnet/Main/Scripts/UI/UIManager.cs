@@ -21,20 +21,32 @@ public static class UIManager {
     }
 
     public static bool HasMenu(string menuName) => GetUILayer().GetChildren().Any(child => child.Name.ToString() == menuName);
+    public static bool IsPrimaryMenuOpen() => _primaryUIOpen != null;
 
     public static void CloseMenu(string menuName) {
-        if (GetUILayer().GetChildren().FirstOrDefault(child => child.Name.ToString() == menuName) is not Control menu) return;
+        if (GetUILayer().GetChildren().FirstOrDefault(child => child.Name.ToString() == menuName) is not Control menu) {
+            GD.PrintErr($"ERROR: UIManager.CloseMenu() : Menu {menuName} does not exist.");
+            return;
+        }
 
-        if (menu == _primaryUIOpen) _primaryUIOpen = null;
+        GameManager gameManager = GameManager.I();
+        Player player = gameManager.GetPlayer();
+
+        if (menu == _primaryUIOpen) {
+            _primaryUIOpen = null;
+            player.GetController<PlayerController>().ShowUI(true);
+        }
 
         FormBase form = _menus[menu];
         _menus.Remove(menu);
         if (form != null && form.LockMovement()) {
-            GameManager gameManager = GameManager.I();
-            gameManager.GetPlayer().GetController().SetLocked(false);
-            gameManager.GetPlayer().GetController<PlayerController>().ShowUI(true);
-            gameManager.Pause(false);
+            player.GetController().SetLocked(false);
+            player.GetController<PlayerController>().ShowUI(true);
             gameManager.SetMouseControl(false);
+        }
+
+        if (form != null && form.PausesGame()) {
+            gameManager.Pause(false);
         }
 
         form?.RemoveFromScene();
@@ -42,16 +54,23 @@ public static class UIManager {
 
     public static void OpenMenu(FormBase menu, bool isPrimaryMenu = false) {
         if (HasMenu(menu.GetMenu().Name.ToString()) || _primaryUIOpen != null) return;
-        if (isPrimaryMenu) _primaryUIOpen = menu.GetMenu();
+        
+        GameManager gameManager = GameManager.I();
+
+        if (isPrimaryMenu) {
+            _primaryUIOpen = menu.GetMenu();
+            gameManager.GetPlayer().GetController<PlayerController>().ShowUI(false);
+        }
         menu.AddToScene(GetUILayer());
         _menus.Add(menu.GetMenu(), menu);
 
-        if (!menu.LockMovement()) return;
-        GameManager gameManager = GameManager.I();
-        gameManager.GetPlayer().GetController().SetLocked(true);
-        gameManager.GetPlayer().GetController<PlayerController>().ShowUI(false);
-        gameManager.Pause(true);
-        gameManager.SetMouseControl(true);
+        if (menu.LockMovement()) {
+            gameManager.GetPlayer().GetController().SetLocked(true);
+            gameManager.GetPlayer().GetController<PlayerController>().ShowUI(false);
+            gameManager.SetMouseControl(true);
+        }
+
+        if (menu.PausesGame()) gameManager.Pause(true);
     }
 
     public static void Process(double delta) {
