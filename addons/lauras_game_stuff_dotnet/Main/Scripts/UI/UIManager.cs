@@ -45,9 +45,7 @@ public static class UIManager {
             gameManager.SetMouseControl(false);
         }
 
-        if (form != null && form.PausesGame()) {
-            gameManager.Pause(false);
-        }
+        if (form != null && form.PausesGame()) gameManager.Pause(false);
 
         form?.RemoveFromScene();
     }

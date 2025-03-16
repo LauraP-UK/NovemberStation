@@ -36,6 +36,11 @@ public class VolumetricInventory : InventoryBase, IVolumetricInventory, IOwnable
         if (item is not IVolumetricObject volumetricObject) return false;
         return GetUsedSize() + volumetricObject.GetSize() <= GetMaxSize();
     }
+
+    public override bool CanAddItem(string jsonData) {
+        IObjectBase objectData = ObjectAtlas.DeserialiseDataWithoutNode(jsonData);
+        return CanAddItem(objectData);
+    }
     
     public float GetFilledPercentage() => Mathsf.Remap(0.0f, GetMaxSize(), GetUsedSize(), 0.0f, 100.0f);
 

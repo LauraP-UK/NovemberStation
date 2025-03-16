@@ -10,7 +10,7 @@ public class InvDisplayMenu : PreMadeMenu<InventoryDisplayForm> {
             Close();
         });
         
-        form.SetMainInv(GameManager.I().GetPlayer().GetInventory());
+        form.SetMainInv(GameManager.I().GetPlayer());
         form.SetListener(FormListener.Default(form));
         
         return form;

@@ -27,6 +27,7 @@ public abstract class InventoryBase : IInventory {
         return true;
     }
     public abstract bool CanAddItem(IObjectBase item);
+    public abstract bool CanAddItem(string jsonData);
 
     public void RemoveItem(string objectMetaTag, string jsonData) {
         List<string> group = GetGroup(objectMetaTag);
@@ -43,6 +44,8 @@ public abstract class InventoryBase : IInventory {
         foreach (List<string> group in _inventory.Values) contents.AddRange(group);
         return contents;
     }
+
+    public List<string> GetContentsOfType(string type) => GetGroup(type);
 
     public T GetAs<T>() where T : IInventory {
         if (this is T t) return t;

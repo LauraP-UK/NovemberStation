@@ -1,0 +1,140 @@
+[gd_scene load_steps=9 format=3 uid="uid://sgfc5tqgfx51"]
+
+[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_2u4k6"]
+load_path = "res://.godot/imported/ContextNinePatch.png-1956a95d8fe2d1cd3bd043c483a8f7ae.ctex"
+
+[sub_resource type="LabelSettings" id="LabelSettings_yykeq"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_j824a"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_lp6em"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_ncbx7"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_qcf2h"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_ehdq8"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_a6guh"]
+
+[node name="Control" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_bottom = -598.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="BGContainer" type="Control" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="BGColour" type="ColorRect" parent="BGContainer"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0.18, 0.18, 0.18, 1)
+
+[node name="NinePatchRect" type="NinePatchRect" parent="BGContainer"]
+z_index = 20
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = SubResource("CompressedTexture2D_2u4k6")
+patch_margin_left = 7
+patch_margin_top = 7
+patch_margin_right = 7
+patch_margin_bottom = 7
+
+[node name="Content" type="Control" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="ActionName" type="Label" parent="Content"]
+z_index = 10
+z_as_relative = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "STORE"
+label_settings = SubResource("LabelSettings_yykeq")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="LeftArrow" type="Label" parent="Content"]
+z_index = 10
+z_as_relative = false
+layout_mode = 1
+anchors_preset = 4
+anchor_top = 0.5
+anchor_bottom = 0.5
+offset_left = 10.0
+offset_top = -25.0
+offset_right = 30.0
+offset_bottom = 25.0
+grow_vertical = 2
+text = "<-"
+label_settings = SubResource("LabelSettings_yykeq")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="RightArrow" type="Label" parent="Content"]
+z_index = 10
+z_as_relative = false
+layout_mode = 1
+anchors_preset = 6
+anchor_left = 1.0
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 0.5
+offset_left = -30.0
+offset_top = -25.0
+offset_right = -10.0
+offset_bottom = 25.0
+grow_horizontal = 0
+grow_vertical = 2
+text = "->
+"
+label_settings = SubResource("LabelSettings_yykeq")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="SelectButton" type="Button" parent="."]
+z_index = 200
+z_as_relative = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/focus = SubResource("StyleBoxEmpty_j824a")
+theme_override_styles/disabled = SubResource("StyleBoxEmpty_lp6em")
+theme_override_styles/hover_pressed = SubResource("StyleBoxEmpty_ncbx7")
+theme_override_styles/hover = SubResource("StyleBoxEmpty_qcf2h")
+theme_override_styles/pressed = SubResource("StyleBoxEmpty_ehdq8")
+theme_override_styles/normal = SubResource("StyleBoxEmpty_a6guh")
+shortcut_feedback = false
+shortcut_in_tooltip = false

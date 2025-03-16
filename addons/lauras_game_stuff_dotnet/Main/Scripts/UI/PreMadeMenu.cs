@@ -6,8 +6,10 @@ public abstract class PreMadeMenu<T> where T : FormBase {
     private Action<T> _modify;
     private T _form;
     
-    public void Open() {
-        if (UIManager.HasMenu(GetFormName())) return;
+    public void Open(bool replace = false) {
+        if (UIManager.HasMenu(GetFormName()) && !replace) return;
+        
+        if (replace) UIManager.CloseMenu(GetFormName());
         
         _form = (T) Build();
         _modify?.Invoke(_form);

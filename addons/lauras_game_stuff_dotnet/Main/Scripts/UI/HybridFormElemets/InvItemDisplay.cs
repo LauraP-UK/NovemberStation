@@ -25,7 +25,7 @@ public class InvItemDisplay : FormBase, IFocusable {
     private static readonly Color
         DEFAULT_BG_COLOR = new(0.1f, 0.1f, 0.1f),
         FOCUS_BG_COLOR = Colors.DimGray,
-        SELECTED_BG_COLOR = Colors.Gold;
+        SELECTED_BG_COLOR = Colors.DarkGoldenrod;
 
     public const string WEIGHT_SYMBOL = "kg";
 

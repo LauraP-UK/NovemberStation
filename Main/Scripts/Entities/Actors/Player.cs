@@ -38,12 +38,10 @@ public class Player : ActorBase, IViewable, IContainer {
     public bool StoreItem(IObjectBase objectBase, Node node) {
         bool added = GetInventory().AddItem(objectBase);
         if (added) node.QueueFree();
-
-        VolumetricInventory inv = (VolumetricInventory)GetInventory();
-        inv.PrintContents();
-
         return added;
     }
+
+    public bool StoreItem(string objectMetaTag, string objectJson) => GetInventory().AddItem(objectMetaTag, objectJson);
 
     public bool DropItem(string objectJson) {
         ObjectAtlas.CreatedObject obj = ObjectAtlas.CreatedObjectFromJson(objectJson);
