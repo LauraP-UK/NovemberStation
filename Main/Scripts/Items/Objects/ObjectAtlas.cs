@@ -11,6 +11,7 @@ public static class ObjectAtlas {
     static ObjectAtlas() => RegisterAll();
     private static void RegisterAll() {
         // Automatically registers all classes that inherit from ObjectBase<>
+        GD.Print("INFO: ObjectAtlas.RegisterAll() : STARTUP. Registering all object classes...");
         IEnumerable<Type> objectTypes = Assembly.GetExecutingAssembly()
             .GetTypes()
             .Where(t => t.IsClass && !t.IsAbstract && typeof(IObjectBase).IsAssignableFrom(t));
@@ -26,7 +27,7 @@ public static class ObjectAtlas {
         GD.Print($"INFO: ObjectAtlas.Register() : Registering object class: {clazz.Name}...");
 
         try {
-            object dummy = Activator.CreateInstance(clazz, new object[] {null});
+            object dummy = CreateObject(clazz, null);
             if (dummy is not IObjectBase obj)
                 throw new Exception($"ERROR: ObjectAtlas.Register() : Created object is not of expected type 'IObjectBase'. Got '{dummy?.GetType()}'.");
             
@@ -53,18 +54,11 @@ public static class ObjectAtlas {
         return CreateObject(clazz, node);
     }
     public static IObjectBase CreateObject(Type type, Node3D node) {
-        object instance = Activator.CreateInstance(type, node);
+        object instance = Activator.CreateInstance(type, node, node == null); // Create a class of the given type with the given node. If the node is null, it's a data-only object and will not fully construct.
         if (instance is not IObjectBase obj) throw new Exception($"ERROR: ObjectAtlas.CreateObject() : Created object is not of expected type 'IObjectBase'. Got '{instance?.GetType()}'.");
         return obj;
     }
-    public static T CreateObject<T, U>(U node) where T : ObjectBase<U> where U : Node3D {
-        string tag = GetTag(node);
-        Type clazz = GetObjectClass(tag);
-        if (clazz == null) throw new Exception($"ERROR: ObjectAtlas.CreateObject() : Object class not found for tag '{tag}'.");
-        object instance = Activator.CreateInstance(clazz, node);
-        if (instance is not T obj) throw new Exception($"ERROR: ObjectAtlas.CreateObject() : Created object is not of expected type '{typeof(T)}'. Got '{instance?.GetType()}'.");
-        return obj;
-    }
+    
     public static CreatedObject CreatedObjectFromData(string metaTag, string typeID, Dictionary<string, object> serialiseData) {
         CreatedObject createdObject = new();
         try {
@@ -91,7 +85,6 @@ public static class ObjectAtlas {
         return obj;
     }
     public static IObjectBase DeserialiseDataWithoutNode(string json) {
-        GD.Print($"INFO: ObjectAtlas.DeserialiseDataWithoutNode() : Deserialising object from JSON for data use only! (This object SHOULD NOT be instantiated as it has no Node!)");
         Serialiser.ObjectSaveData obj = DeserialiseObject(json);
         return CreateObject(GetObjectClass(obj.MetaTag), null);
     }

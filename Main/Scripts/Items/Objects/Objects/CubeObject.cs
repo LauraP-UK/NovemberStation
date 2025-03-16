@@ -4,7 +4,8 @@ using Godot;
 public class CubeObject : ObjectBase<RigidBody3D>, IGrabbable, IShovable, IContainer {
     private readonly VolumetricInventory _inventory;
 
-    public CubeObject(RigidBody3D baseNode) : base(baseNode, "cube_obj") {
+    public CubeObject(RigidBody3D baseNode, bool dataOnly = false) : base(baseNode, "cube_obj") {
+        if (dataOnly) return;
         RegisterAction<IGrabbable>((_, _) => true, Grab);
         RegisterAction<IShovable>((_, _) => true, Shove);
         RegisterArbitraryAction("Extract Item", 5, (_, _) => !GetInventory().IsEmpty(), (_, ev) => {

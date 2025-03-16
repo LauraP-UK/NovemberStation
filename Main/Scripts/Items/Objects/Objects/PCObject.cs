@@ -16,7 +16,8 @@ public class PCObject : ObjectBase<Node3D>, IUsable {
     private readonly GameManager _gameManager = GameManager.I();
     private readonly ShopMenu _shopMenu;
 
-    public PCObject(Node3D pcNode) : base(pcNode, "pc_obj") {
+    public PCObject(Node3D pcNode, bool dataOnly = false) : base(pcNode, "pc_obj") {
+        if (dataOnly) return;
         RegisterAction<IUsable>((_,_) => true, Use);
 
         string finding = "NULL";

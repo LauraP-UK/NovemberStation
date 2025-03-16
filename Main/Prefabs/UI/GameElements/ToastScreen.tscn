@@ -9,6 +9,7 @@ grow_horizontal = 2
 grow_vertical = 2
 
 [node name="Display" type="VBoxContainer" parent="."]
+z_index = 500
 layout_mode = 1
 offset_left = 25.0
 offset_top = 25.0

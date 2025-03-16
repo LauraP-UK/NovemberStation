@@ -69,7 +69,7 @@ public class InvItemDisplay : FormBase, IFocusable {
 
         _menuElement = new ControlElement(_menu, _ => {
             GetCountLabel().SetText($"x{_count}");
-            GetWeightLabel().SetText($"{_weight:0.00} {WEIGHT_SYMBOL}");
+            GetWeightLabel().SetText($"{_weight} {WEIGHT_SYMBOL}");
         });
         
         _nameLabel.SetText(item.GetItemName());

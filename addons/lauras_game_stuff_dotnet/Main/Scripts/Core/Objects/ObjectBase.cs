@@ -9,7 +9,7 @@ public abstract class ObjectBase<T> : IObjectBase where T : Node3D {
     private readonly SmartDictionary<ActionKey, (Func<ActorBase, IEventBase, bool> test, Action<ActorBase, IEventBase> run)> _actions = new();
     private readonly string _objectTag;
     
-    protected ObjectBase(T baseNode, string objectTag) {
+    protected ObjectBase(T baseNode, string objectTag, bool dataOnly = false) {
         _baseNode = baseNode;
         _objectTag = objectTag;
     }

@@ -25,7 +25,7 @@ public class InvHeaderInfo : FormBase {
     protected override List<IFormObject> GetAllElements() => new() { _nameLabel, _weightLabel };
     protected override void OnDestroy() { }
     
-    public void SetWeight(float weight, float maxWeight) => _weightLabel.SetText($"{weight:0.00}/{maxWeight:0.00} kg");
+    public void SetWeight(float weight, float maxWeight) => _weightLabel.SetText($"{weight} / {maxWeight} kg");
     
     public LabelElement GetNameLabel() => _nameLabel;
     public LabelElement GetWeightLabel() => _weightLabel;

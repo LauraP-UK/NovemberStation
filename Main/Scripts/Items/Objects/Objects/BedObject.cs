@@ -1,7 +1,8 @@
 ﻿using Godot;
 
 public class BedObject : ObjectBase<RigidBody3D>, IGrabbable {
-    public BedObject(RigidBody3D baseNode) : base(baseNode, "bed_obj") {
+    public BedObject(RigidBody3D baseNode, bool dataOnly = false) : base(baseNode, "bed_obj") {
+        if (dataOnly) return;
         RegisterAction<IGrabbable>((_,_) => true, Grab);
         RegisterArbitraryAction("Sleep", 10, (_, _) => true, Sleep);
     }

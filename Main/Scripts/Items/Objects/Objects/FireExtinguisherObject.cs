@@ -2,7 +2,8 @@
 using Godot;
 
 public class FireExtinguisherObject : ObjectBase<RigidBody3D>, IGrabbable, ICollectable, IVolumetricObject {
-    public FireExtinguisherObject(RigidBody3D baseNode) : base(baseNode, "extinguisher_obj") {
+    public FireExtinguisherObject(RigidBody3D baseNode, bool dataOnly = false) : base(baseNode, "extinguisher_obj") {
+        if (dataOnly) return;
         RegisterAction<IGrabbable>((_,_) => true, Grab);
         RegisterAction<ICollectable>((_,_) => true, (actor,ev) => CollectActionDefault.Invoke(actor, this, ev));
     }

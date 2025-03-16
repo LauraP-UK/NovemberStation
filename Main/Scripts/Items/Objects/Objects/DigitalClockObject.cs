@@ -13,7 +13,8 @@ public class DigitalClockObject : ObjectBase<RigidBody3D>, IGrabbable, IProcess,
     private int _lastMinute = -1;
     private bool _showDivider = false;
 
-    public DigitalClockObject(RigidBody3D baseNode) : base(baseNode, "digitalclock_obj") {
+    public DigitalClockObject(RigidBody3D baseNode, bool dataOnly = false) : base(baseNode, "digitalclock_obj") {
+        if (dataOnly) return;
         RegisterAction<IGrabbable>((_, _) => true, Grab);
         RegisterAction<ICollectable>((_,_) => true, (actor,ev) => CollectActionDefault.Invoke(actor, this, ev));
         

@@ -5,7 +5,8 @@ using Godot;
 public class GasCanObject : ObjectBase<RigidBody3D>, IGrabbable, IShovable, IDrinkable, ICollectable, IVolumetricObject {
     private int _fuelAmount = 100;
 
-    public GasCanObject(RigidBody3D baseNode) : base(baseNode, "gascan_obj") {
+    public GasCanObject(RigidBody3D baseNode, bool dataOnly = false) : base(baseNode, "gascan_obj") {
+        if (dataOnly) return;
         RegisterAction<IGrabbable>((_,_) => true, Grab);
         RegisterAction<IShovable>((_,_) => true, Shove);
         RegisterAction<IDrinkable>((_,_) => _fuelAmount > 0, Drink);
