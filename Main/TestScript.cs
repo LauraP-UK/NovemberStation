@@ -65,7 +65,7 @@ public partial class TestScript : Node {
 
         if (createdObjectFromJson.Success) {
             foreach (IObjectBase objectBase in GetObjects().Values) {
-                if (objectBase is not CubeObject storageCrate) continue;
+                if (objectBase is not StorageCrateObject storageCrate) continue;
                 storageCrate.StoreItem(createdObjectFromJson.Object, createdObjectFromJson.Node);
                 break;
             }

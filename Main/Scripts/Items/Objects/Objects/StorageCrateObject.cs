@@ -1,19 +1,12 @@
-﻿using System.Linq;
-using Godot;
+﻿using Godot;
 
-public class CubeObject : ObjectBase<RigidBody3D>, IGrabbable, IShovable, IContainer {
+public class StorageCrateObject : ObjectBase<RigidBody3D>, IGrabbable, IShovable, IContainer {
     private readonly VolumetricInventory _inventory;
 
-    public CubeObject(RigidBody3D baseNode, bool dataOnly = false) : base(baseNode, "cube_obj") {
+    public StorageCrateObject(RigidBody3D baseNode, bool dataOnly = false) : base(baseNode, "cube_obj") {
         if (dataOnly) return;
         RegisterAction<IGrabbable>((_, _) => true, Grab);
         RegisterAction<IShovable>((_, _) => true, Shove);
-        RegisterArbitraryAction("Extract Item", 5, (_, _) => !GetInventory().IsEmpty(), (_, ev) => {
-            if (ev is not KeyPressEvent) return;
-            VolumetricInventory inv = GetInventory().GetAs<VolumetricInventory>();
-            string firstJson = inv.GetContents().First();
-            RemoveItemIntoWorld(firstJson);
-        });
         RegisterArbitraryAction("Open", 20, (_, _) => true, (actor, ev) => {
             if (ev is not KeyPressEvent) return;
             InvDisplayMenu invDisplayMenu = new();
@@ -45,22 +38,6 @@ public class CubeObject : ObjectBase<RigidBody3D>, IGrabbable, IShovable, IConta
         VolumetricInventory inv = GetInventory().GetAs<VolumetricInventory>();
         IObjectBase obj = ObjectAtlas.DeserialiseDataWithoutNode(objectJson);
         inv.RemoveItem(obj.GetObjectTag(), objectJson);
-        return true;
-    }
-
-    public bool RemoveItemIntoWorld(string objectJson) {
-        ObjectAtlas.CreatedObject obj = ObjectAtlas.CreatedObjectFromJson(objectJson);
-        if (!obj.Success) {
-            obj.Node?.QueueFree();
-            return false;
-        }
-
-        Vector3 spawn = GetBaseNode().GlobalPosition + new Vector3(0, 1, 0);
-        Node3D objNode = (Node3D)obj.Node;
-        GameManager.I().GetSceneObjects().AddChild(obj.Node);
-        objNode.SetGlobalPosition(spawn);
-        GameManager.I().RegisterObject(objNode, obj.Object);
-        RemoveItem(objectJson);
         return true;
     }
 }
