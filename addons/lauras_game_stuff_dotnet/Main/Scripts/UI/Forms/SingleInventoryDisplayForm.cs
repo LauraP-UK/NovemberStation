@@ -46,8 +46,6 @@ public class SingleInventoryDisplayForm : FormBase {
         ButtonElement placeBtn = _placeActionBtn.GetButton();
         placeBtn.OnPressed(_ => {
             InvItemDisplay selected = GetSelectedItem();
-            GD.Print($"Place action button pressed for item {(selected == null ? "null" : selected.GetItemType().GetTypeID())}");
-
             RaycastResult result = player.GetLookingAt(2.5f);
             Vector3 rotation = player.GetCamera().GetGlobalRotation();
 
@@ -63,8 +61,6 @@ public class SingleInventoryDisplayForm : FormBase {
         ButtonElement dropBtn = _dropActionBtn.GetButton();
         dropBtn.OnPressed(btn => {
             InvItemDisplay selected = GetSelectedItem();
-            GD.Print($"Drop action button pressed for item {(selected == null ? "null" : selected.GetItemType().GetTypeID())}");
-            
             Vector3 rotation = player.GetCamera().GetGlobalRotation();
             Vector3 spawn = player.GetPosition() + new Vector3(0f, 0.1f, 0f);
             string itemJson = GetItemJson(selected, _mainOwner.GetInventory());

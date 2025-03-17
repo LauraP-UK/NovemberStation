@@ -7,6 +7,7 @@ using Godot;
 
 public static class ObjectAtlas {
     private static readonly SmartDictionary<string, Type> _registry = new();
+    private static readonly SmartDictionary<Type, IObjectBase> _dataOnlyCache = new();
     public const string OBJECT_TAG = "object_tag";
     static ObjectAtlas() => RegisterAll();
     private static void RegisterAll() {
@@ -54,7 +55,15 @@ public static class ObjectAtlas {
         return CreateObject(clazz, node);
     }
     public static IObjectBase CreateObject(Type type, Node3D node) {
-        object instance = Activator.CreateInstance(type, node, node == null); // Create a class of the given type with the given node. If the node is null, it's a data-only object and will not fully construct.
+        object instance;
+        if (node == null) {
+            instance = _dataOnlyCache.GetOrCompute(type, () => {
+                object o = Activator.CreateInstance(type, null, true);
+                if (o is not IObjectBase obj) throw new Exception($"ERROR: ObjectAtlas.CreateObject() : Created object is not of expected type 'IObjectBase'. Got '{o?.GetType()}'.");
+                return obj;
+            });
+        } else instance = Activator.CreateInstance(type, node, false); // Create a class of the given type with the given node. If the node is null, it's a data-only object and will not fully construct.
+        
         if (instance is not IObjectBase obj) throw new Exception($"ERROR: ObjectAtlas.CreateObject() : Created object is not of expected type 'IObjectBase'. Got '{instance?.GetType()}'.");
         return obj;
     }

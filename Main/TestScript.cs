@@ -27,7 +27,8 @@ public partial class TestScript : Node {
 
         Player player = (Player)Characters.PLAYER.CreateActor();
         GetTree().Root.GetNode<Node>("Main/PlayerHolder").AddChild(player.GetModel());
-        player.SetPosition(new Vector3(5f, 0.2f, 0f), new Vector3(0.0f, 90.0f, 0.0f));
+        Vector3 spawnPoint = GetTree().Root.GetNode<Node3D>("Main/PlayerSpawn").GlobalPosition;
+        player.SetPosition(spawnPoint, new Vector3(0.0f, -90.0f, 0.0f));
         gameManager.SetPlayer(player);
 
         Node3D sceneObjects = GetTree().Root.GetNode<Node3D>("Main/SceneObjects");
@@ -55,8 +56,6 @@ public partial class TestScript : Node {
         GD.Print($"Dynamic Objects: {_objSpawns.Count}");
 
         Scheduler.ScheduleRepeating(0L, 1000L, _ => _objects.RemoveWhere(pair => GameUtils.IsNodeInvalid(pair.Value.GetBaseNode3D())));
-
-        //return;
         
         using FileAccess file = FileAccess.Open("user://SerialiseTest.json", FileAccess.ModeFlags.Read);
         string json = file.GetAsText();
@@ -82,7 +81,8 @@ public partial class TestScript : Node {
 
         Player player = gameManager.GetPlayer();
         if (player.GetModel().Position.Y < -20) {
-            player.SetPosition(new Vector3(5f, 0.2f, 0f), new Vector3(0.0f, 90.0f, 0.0f));
+            Vector3 spwan = GetTree().Root.GetNode<Node3D>("Main/PlayerSpawn").GlobalPosition;
+            player.SetPosition(spwan, new Vector3(0.0f, -90.0f, 0.0f));
             Toast.Warn(player, "You fell off, you numpty. I'm respawning you...");
         }
         
