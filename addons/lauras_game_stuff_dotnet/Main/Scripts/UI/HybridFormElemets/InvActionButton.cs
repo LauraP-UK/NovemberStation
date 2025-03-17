@@ -84,6 +84,14 @@ public class InvActionButton : FormBase {
         _bgColour.SetColor(DEFAULT_BG_COLOR);
         _isDisabled = false;
     }
+    public void SetMisc(string text) {
+        SetActionName(text);
+        GetActionLabel().SetAlpha(1.0f);
+        ShowLeftArrow(false);
+        ShowRightArrow(false);
+        _bgColour.SetColor(DEFAULT_BG_COLOR);
+        _isDisabled = false;
+    }
     public void Disable() {
         SetActionName("Select an item");
         GetActionLabel().SetAlpha(0.5f);

@@ -9,7 +9,7 @@ public class InventoryDisplayForm : FormBase {
     }
     
     private readonly ControlElement _mainContainer, _otherContainer, _centreContainer;
-    private readonly VBoxContainerElement _closeContainer, _mainInfoContainer, _otherInfoContainer;
+    private readonly VBoxContainerElement _mainInfoContainer, _otherInfoContainer;
     private readonly ScrollDisplayList _mainScroll, _otherScroll, _actionsScroll;
 
     private readonly Action<Key, InventoryDisplayForm, bool> _keyboardBehaviour;
@@ -22,9 +22,8 @@ public class InventoryDisplayForm : FormBase {
         MAIN_CONTAINER = "MarginContainer/HBoxContainer/MainInv",
         OTHER_CONTAINER = "MarginContainer/HBoxContainer/OtherInv",
         CENTRE_CONTAINER = "MarginContainer/HBoxContainer/CentreControls",
-        CLOSE_BUTTON_CONTAINER = "MarginContainer/Control/CloseBox/CloseContainer",
         MAIN_INFO_CONTAINER = "MarginContainer/HBoxContainer/MainInv/MainInfoContainer",
-        OTHER_INFO_CONTAINER = "MarginContainer/HBoxContainer/OtherInv/OtherInfoContainer2";
+        OTHER_INFO_CONTAINER = "MarginContainer/HBoxContainer/OtherInv/OtherInfoContainer";
 
 
     public InventoryDisplayForm(string formName, Action<Key, InventoryDisplayForm, bool> keyboardBehaviour = null) : base(formName, FORM_PATH) {
@@ -32,14 +31,12 @@ public class InventoryDisplayForm : FormBase {
         Control mainContainer = FindNode<Control>(MAIN_CONTAINER);
         Control otherContainer = FindNode<Control>(OTHER_CONTAINER);
         Control centreContainer = FindNode<Control>(CENTRE_CONTAINER);
-        VBoxContainer closeButtonContainer = FindNode<VBoxContainer>(CLOSE_BUTTON_CONTAINER);
         VBoxContainer mainInfoContainer = FindNode<VBoxContainer>(MAIN_INFO_CONTAINER);
         VBoxContainer otherInfoContainer = FindNode<VBoxContainer>(OTHER_INFO_CONTAINER);
 
         _mainContainer = new ControlElement(mainContainer);
         _otherContainer = new ControlElement(otherContainer);
         _centreContainer = new ControlElement(centreContainer);
-        _closeContainer = new VBoxContainerElement(closeButtonContainer);
         _mainInfoContainer = new VBoxContainerElement(mainInfoContainer);
         _otherInfoContainer = new VBoxContainerElement(otherInfoContainer);
 
@@ -60,15 +57,7 @@ public class InventoryDisplayForm : FormBase {
         _closeActionBtn = new InvActionButton();
         ButtonElement closeBtn = _closeActionBtn.GetButton();
         closeBtn.OnPressed(_ => KeyboardBehaviour(Key.Escape, true));
-        _closeActionBtn.SetTake();
-        _closeActionBtn.SetActionName("X");
-        _closeActionBtn.ShowLeftArrow(false);
-        _closeActionBtn.ShowRightArrow(false);
-        Vector2 closeBtnSize = new(40, 40);
-        _closeActionBtn.GetActionLabel().GetElement().SetPosition(new Vector2(-20,-20));
-        _closeActionBtn.GetActionLabel().GetElement().SetSize(closeBtnSize);
-        _closeActionBtn.GetNode().SetCustomMinimumSize(closeBtnSize);
-        _closeContainer.AddChild(_closeActionBtn);
+        _closeActionBtn.SetMisc("Close");
         
         _moveActionBtn = new InvActionButton();
         ButtonElement moveBtn = _moveActionBtn.GetButton();
@@ -108,10 +97,12 @@ public class InventoryDisplayForm : FormBase {
             Refresh(selected.GetCount() > 1 ? selected : null, side);
         });
 
-        _actionsScroll.GetDisplayList().AddChild(_moveActionBtn);
+        _actionsScroll.GetDisplayList().SetChildren(_moveActionBtn, _closeActionBtn);
     }
 
-    protected override List<IFormObject> GetAllElements() => new() { _mainContainer, _otherContainer, _centreContainer, _closeContainer };
+    protected override List<IFormObject> GetAllElements() => new() {
+        _mainContainer, _otherContainer, _centreContainer, _mainInfoContainer, _otherInfoContainer, _mainScroll, _otherScroll, _actionsScroll
+    };
 
     protected override void OnDestroy() {
         _mainScroll.Destroy();

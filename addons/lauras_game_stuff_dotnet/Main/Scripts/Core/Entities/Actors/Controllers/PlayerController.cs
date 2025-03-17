@@ -48,6 +48,13 @@ public class PlayerController : ControllerBase {
         ev.Capture();
         WakeUp();
     }
+
+    [EventListener]
+    private void OnInventoryOpen(KeyPressEvent ev, Key key) {
+        if (IsLocked() || key != Key.F) return;
+        ev.Capture();
+        new SingleInvDisplayMenu().Open();
+    }
     
     [EventListener]
     private void OnOpenShop(KeyPressEvent ev, Key key) {
@@ -366,6 +373,7 @@ public class PlayerController : ControllerBase {
     public ToastUI GetToastUI() => _toastUI;
     public void ShowUI(bool show) {
         _uiVisible = show;
+        _contextMenu.GetForm().GetMenu().SetVisible(show);
         _crosshair.GetForm().GetMenu().SetVisible(show);
     }
 }
