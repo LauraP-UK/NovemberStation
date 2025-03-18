@@ -35,13 +35,13 @@ public class Player : ActorBase, IViewable, IContainer {
 
     public IInventory GetInventory() => _inv;
 
-    public bool StoreItem(IObjectBase objectBase, Node node) {
-        bool added = GetInventory().AddItem(objectBase);
-        if (added) node.QueueFree();
-        return added;
+    public AddItemFailCause StoreItem(IObjectBase objectBase, Node node) {
+        AddItemFailCause result = GetInventory().AddItem(objectBase);
+        if (result == AddItemFailCause.SUCCESS) node.QueueFree();
+        return result;
     }
 
-    public bool StoreItem(string objectMetaTag, string objectJson) => GetInventory().AddItem(objectMetaTag, objectJson);
+    public AddItemFailCause StoreItem(string objectMetaTag, string objectJson) => GetInventory().AddItem(objectMetaTag, objectJson);
 
     public bool DropItem(string objectJson) {
         ObjectAtlas.CreatedObject obj = ObjectAtlas.CreatedObjectFromJson(objectJson);

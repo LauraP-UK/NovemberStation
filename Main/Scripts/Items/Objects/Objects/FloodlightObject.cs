@@ -1,13 +1,16 @@
 ﻿using System;
+using System.Collections.Generic;
 using Godot;
 
-public class FloodlightObject : ObjectBase<RigidBody3D>, IGrabbable, IUsable, ICollectable, IProcess, IVolumetricObject {
+public class FloodlightObject : ObjectBase<RigidBody3D>, IGrabbable, IUsable, ICollectable, IProcess, IVolumetricObject, IContainer {
     private readonly SpotLight3D _light;
     private readonly MeshInstance3D _lightTip;
 
     private const long MAX_POWER_MILLIS = 60000 * 2L;
     private const float FAIL_START_AT_PERCENT = 16.6f;
+    
     private readonly float _initialRange, _initialAngle, _initialEnergy;
+    private readonly QuantitativeInventory _inventory;
 
     private bool _isOn;
     private long _powerMillis = MAX_POWER_MILLIS;
@@ -21,8 +24,8 @@ public class FloodlightObject : ObjectBase<RigidBody3D>, IGrabbable, IUsable, IC
         RegisterAction<IGrabbable>((_, _) => true, Grab);
         RegisterAction<IUsable>((_, _) => true, Use);
         RegisterAction<ICollectable>((_, _) => true, Collect);
-        RegisterArbitraryAction("Recharge", 10, (_,_) => _powerMillis <= 0, Recharge);
-        RegisterArbitraryAction("Save to File", 20, (_,_) => true, SerialiseTest);
+        RegisterArbitraryAction("Recharge", 10, (_,_) => _powerMillis <= MAX_POWER_MILLIS, Recharge);
+        //RegisterArbitraryAction("Save to File", 20, (_,_) => true, SerialiseTest);
 
         string finding = "NULL";
         try {
@@ -40,6 +43,9 @@ public class FloodlightObject : ObjectBase<RigidBody3D>, IGrabbable, IUsable, IC
         _initialAngle = _light.SpotAngle;
         _initialRange = _light.SpotRange;
         _initialEnergy = _light.LightEnergy;
+        
+        _inventory = new QuantitativeInventory(4, this);
+        _inventory.AddFilter(FilterHelper.MakeItemTypeFilter(Items.BATTERY));
 
         ToggleLight(false);
     }
@@ -57,7 +63,44 @@ public class FloodlightObject : ObjectBase<RigidBody3D>, IGrabbable, IUsable, IC
         ToggleLight(!_isOn);
     }
 
-    public void Recharge(ActorBase actorBase, IEventBase ev) => _powerMillis = MAX_POWER_MILLIS;
+    public void Recharge(ActorBase actorBase, IEventBase ev) {
+        if (ev is not KeyPressEvent) return;
+        if (actorBase is not IContainer contActor) return;
+        
+        bool hasBattery = contActor.GetInventory().HasItem(Items.BATTERY);
+        if (!hasBattery) {
+            Toast.Error((Player)actorBase, "You need a battery to recharge the floodlight.");
+            return;
+        }
+
+        List<string> batteryJsons = contActor.GetInventory().GetContentsOfType(Items.BATTERY);
+        GD.Print($"Battery JSONs: {batteryJsons.Count}");
+        string firstBatteryJson = batteryJsons[0];
+        BatteryObject battery = (BatteryObject)ObjectAtlas.DeserialiseDataWithoutNode(firstBatteryJson);
+        if (battery == null) {
+            GD.PrintErr("ERROR: FloodlightObject.Recharge() : Failed to deserialise battery object.");
+            return;
+        }
+
+        AddItemFailCause result = _inventory.AddItem(Serialiser.GetSpecificData<string>(Serialiser.ObjectSaveData.META_TAG, firstBatteryJson), firstBatteryJson);
+        switch (result) {
+            case AddItemFailCause.SUCCESS:
+                contActor.RemoveItem(firstBatteryJson);
+                _powerMillis = Math.Min(_powerMillis + (MAX_POWER_MILLIS / _inventory.GetMaxQuantity()), MAX_POWER_MILLIS);
+                break;
+            case AddItemFailCause.SUBCLASS_FAIL:
+                Toast.Error((Player)actorBase, "The Floodlight is full!");
+                return;
+            case AddItemFailCause.FILTER_FAIL:
+                Toast.Error((Player)actorBase, "This can't go into the Floodlight!");
+                return;
+            default:
+                throw new ArgumentOutOfRangeException();
+        }
+
+        //_powerMillis = MAX_POWER_MILLIS;
+    }
+
     private void SerialiseTest(ActorBase actorBase, IEventBase ev) {
         if (ev is not KeyPressEvent) return;
         string savePath = "user://SerialiseTest.json";
@@ -117,9 +160,31 @@ public class FloodlightObject : ObjectBase<RigidBody3D>, IGrabbable, IUsable, IC
     public override SmartDictionary<string, SmartSerialData> GetSerialiseData() {
         return new SmartDictionary<string, SmartSerialData> {
             {"isOn", SmartSerialData.From(_isOn, v => ToggleLight(Convert.ToBoolean(v)), () => ToggleLight(false))},
-            {"powerMillis", SmartSerialData.From(_powerMillis, v => _powerMillis = Convert.ToInt64(v), () => _powerMillis = MAX_POWER_MILLIS)}
+            {"powerMillis", SmartSerialData.From(_powerMillis, v => _powerMillis = Convert.ToInt64(v), () => _powerMillis = MAX_POWER_MILLIS)},
+            {InventoryBase.INVENTORY_TAG, SmartSerialData.From(
+                _inventory.Serialise(),
+                v => {
+                    if (v is not string s) {
+                        GD.PrintErr($"ERROR: FloodlightObject.GetSerialiseData() : Failed to deserialise inventory data. Expected string, got {v ?? "null"}");
+                        return;
+                    }
+                    _inventory.Deserialise(s);
+                }, 
+                () => _inventory.ClearContents())
+            }
         };
     }
     public float GetSize() => 90.0f;
     public void Collect(ActorBase actorBase, IEventBase ev) => CollectActionDefault.Invoke(actorBase, this, ev);
+    public IInventory GetInventory() => _inventory;
+    public string GetName() => "Floodlight Battery Slots";
+    public AddItemFailCause StoreItem(IObjectBase objectBase, Node node) {
+        throw new NotImplementedException();
+    }
+    public AddItemFailCause StoreItem(string objectMetaTag, string objectJson) {
+        throw new NotImplementedException();
+    }
+    public bool RemoveItem(string objectJson) {
+        throw new NotImplementedException();
+    }
 }

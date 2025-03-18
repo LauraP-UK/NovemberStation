@@ -53,7 +53,7 @@ public class SingleInventoryDisplayForm : FormBase {
             string itemJson = GetItemJson(selected, _mainOwner.GetInventory());
             PlaceItemIntoWorld(itemJson, spawn, rotation);
             
-            Refresh();
+            Refresh(selected.GetCount() > 1 ? selected : null);
         });
         _placeActionBtn.Disable();
         
@@ -66,7 +66,7 @@ public class SingleInventoryDisplayForm : FormBase {
             string itemJson = GetItemJson(selected, _mainOwner.GetInventory());
             PlaceItemIntoWorld(itemJson, spawn, rotation);
             
-            Refresh();
+            Refresh(selected.GetCount() > 1 ? selected : null);
         });
         _dropActionBtn.Disable();
 

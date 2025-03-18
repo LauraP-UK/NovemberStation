@@ -1,33 +1,46 @@
-﻿
-using System;
+﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text.Json;
 using Godot;
 
 public abstract class InventoryBase : IInventory {
+    public const string INVENTORY_TAG = "inventory_data_tag";
+    
     private readonly SmartDictionary<string, List<string>> _inventory = new(); // ObjectMetaTag Type, List of Object Json
     private readonly SmartSet<Action> _onAdd = new(), _onRemove = new();
-    public bool AddItem(IObjectBase item) {
-        if (!CanAddItem(item)) return false;
-        string objectMetaTag = item.GetObjectTag();
+
+    public AddItemFailCause AddItem(Node3D node) => AddItem(GameManager.I().GetObjectClass(node.GetInstanceId()));
+    public AddItemFailCause AddItem(IObjectBase item) {
+        AddItemFailCause result = CanAddInternal(item);
+        if (result != AddItemFailCause.SUCCESS) return result;
         string jsonData = item.Serialize();
-        return AddItem(objectMetaTag, jsonData);
+        string objectMetaTag = item.GetObjectTag();
+        return AddItemUnchecked(objectMetaTag, jsonData);
     }
-    public bool AddItem(Node3D node) {
-        IObjectBase objectClass = GameManager.I().GetObjectClass(node.GetInstanceId());
-        if (!CanAddItem(objectClass)) return false;
-        string jsonData = objectClass.Serialize();
-        string objectMetaTag = objectClass.GetObjectTag();
-        return AddItem(objectMetaTag, jsonData);
-    }
-    public bool AddItem(string objectMetaTag, string jsonData) {
+    public AddItemFailCause AddItem(string objectMetaTag, string jsonData) {
         IObjectBase objectBase = ObjectAtlas.DeserialiseDataWithoutNode(jsonData);
-        if (!CanAddItem(objectBase)) return false;
+        AddItemFailCause result = CanAddInternal(objectBase);
+        return result != AddItemFailCause.SUCCESS ? result : AddItemUnchecked(objectMetaTag, jsonData);
+    }
+    
+    protected AddItemFailCause AddItemUnchecked(string objectMetaTag, string jsonData) {
         GetGroup(objectMetaTag).Add(jsonData);
         _onAdd.ForEach(a => a.Invoke());
-        return true;
+        return AddItemFailCause.SUCCESS;
     }
-    public abstract bool CanAddItem(IObjectBase item);
-    public abstract bool CanAddItem(string jsonData);
+
+    public AddItemFailCause CanAddItem(IObjectBase item) {
+        string itemJson = item.Serialize();
+        return CanAddItem(itemJson);
+    }
+    public AddItemFailCause CanAddItem(string jsonData) {
+        if (this is IFilteredInventory filtered && !filtered.PassesFilters(jsonData)) return AddItemFailCause.FILTER_FAIL;
+        return CanAddInternal(jsonData);
+    }
+
+    protected abstract AddItemFailCause CanAddInternal(IObjectBase item);
+    protected abstract AddItemFailCause CanAddInternal(string jsonData);
 
     public void RemoveItem(string objectMetaTag, string jsonData) {
         List<string> group = GetGroup(objectMetaTag);
@@ -35,10 +48,21 @@ public abstract class InventoryBase : IInventory {
             GD.PrintErr($"RemoveItem() : No items found with objectMetaTag '{objectMetaTag}'.");
             return;
         }
+
         group.Remove(jsonData);
         _onRemove.ForEach(a => a.Invoke());
     }
+
     public bool HasItem(string objectMetaTag) => CountItemType(objectMetaTag) > 0;
+
+    public bool HasItem(ItemType itemType) => GetContents()
+        .Select(json => Serialiser.GetSpecificData<string>(Serialiser.ObjectSaveData.TYPE_ID, json))
+        .Any(typeID => typeID == itemType.GetTypeID());
+
+    public List<string> GetContentsOfType(ItemType itemType) => GetContents()
+        .Where(json => itemType.GetTypeID() == Serialiser.GetSpecificData<string>(Serialiser.ObjectSaveData.TYPE_ID, json))
+        .ToList();
+
     public List<string> GetContents() {
         List<string> contents = new();
         foreach (List<string> group in _inventory.Values) contents.AddRange(group);
@@ -52,9 +76,42 @@ public abstract class InventoryBase : IInventory {
         GD.PrintErr($"ERROR: InventoryBase.GetAs<T>() : Could not be casted to {typeof(T).Name}!");
         return default;
     }
+
+    public string Serialise() {
+        Dictionary<string, string> inventoryContents = new();
+        List<string> items = GetContents();
+
+        for (int i = 0; i < items.Count; i++) inventoryContents[i.ToString()] = items[i];
+
+        Dictionary<string, object> wrapper = new() {
+            { INVENTORY_TAG, inventoryContents }
+        };
+
+        return JsonSerializer.Serialize(wrapper);
+    }
+    public void Deserialise(string json) {
+        using JsonDocument doc = JsonDocument.Parse(json);
+        JsonElement root = doc.RootElement;
+
+        if (root.TryGetProperty(INVENTORY_TAG, out JsonElement inventoryElement)) {
+            ClearContents();
+            foreach (JsonProperty itemProp in inventoryElement.EnumerateObject()) {
+                string itemJson = itemProp.Value.GetString();
+                if (string.IsNullOrEmpty(itemJson)) continue;
+
+                string metaTag = Serialiser.GetSpecificData<string>(Serialiser.ObjectSaveData.META_TAG, itemJson);
+                AddItemUnchecked(metaTag, itemJson);
+            }
+        }
+    }
+
     public bool IsEmpty() => GetContents().Count == 0;
     public int CountItemType(string objectMetaTag) => GetGroup(objectMetaTag).Count;
-    public void ClearContents() => _inventory.Clear();
+    public void ClearContents() {
+        _onRemove.ForEach(a => a.Invoke());
+        _inventory.Clear();
+    }
+
     private List<string> GetGroup(string key) => _inventory.GetOrCompute(key, () => new List<string>());
     public abstract string GetName();
     protected void OnAdd(Action onAdd) => _onAdd.Add(onAdd);

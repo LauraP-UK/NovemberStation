@@ -17,6 +17,7 @@ public class VolumetricInventory : InventoryBase, IVolumetricInventory, IOwnable
     
     public override string GetName() => "Volumetric Inventory";
     public float GetMaxSize() => _maxSize;
+    public void SetMaxSize(float size) => _maxSize = size;
     public float GetUsedSize() {
         if (!_changedSinceLastCheck) return _lastSize;
         float usedSize = 0;
@@ -25,21 +26,21 @@ public class VolumetricInventory : InventoryBase, IVolumetricInventory, IOwnable
         }
         _lastSize = usedSize;
         _changedSinceLastCheck = false;
-        return usedSize;
+        return Mathsf.Round(usedSize, 2);
     }
-    public float GetRemainingSize() => GetMaxSize() - GetUsedSize();
-    public bool CanAddItem(Node3D node) {
+    public float GetRemainingSize() => Mathsf.Round(GetMaxSize() - GetUsedSize(), 2);
+    public AddItemFailCause CanAddItem(Node3D node) {
         IObjectBase objectData = GameManager.I().GetObjectClass(node.GetInstanceId());
-        return CanAddItem(objectData);
+        return CanAddInternal(objectData);
     }
-    public override bool CanAddItem(IObjectBase item) {
-        if (item is not IVolumetricObject volumetricObject) return false;
-        return GetUsedSize() + volumetricObject.GetSize() <= GetMaxSize();
+    protected override AddItemFailCause CanAddInternal(IObjectBase item) {
+        if (item is not IVolumetricObject volumetricObject) return AddItemFailCause.SUBCLASS_FAIL;
+        return GetUsedSize() + volumetricObject.GetSize() <= GetMaxSize() ? AddItemFailCause.SUCCESS : AddItemFailCause.SUBCLASS_FAIL;
     }
 
-    public override bool CanAddItem(string jsonData) {
+    protected override AddItemFailCause CanAddInternal(string jsonData) {
         IObjectBase objectData = ObjectAtlas.DeserialiseDataWithoutNode(jsonData);
-        return CanAddItem(objectData);
+        return CanAddInternal(objectData);
     }
     
     public float GetFilledPercentage() => Mathsf.Remap(0.0f, GetMaxSize(), GetUsedSize(), 0.0f, 100.0f);

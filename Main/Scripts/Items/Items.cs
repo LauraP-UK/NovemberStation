@@ -51,10 +51,16 @@ public class Items {
         "Digital Clock",
         "res://Main/Textures/Items/ClockImage.png",
         "res://Main/Prefabs/PhysicsObjects/DigitalClock.tscn",
-        "Stop. Hammer time.",
+        "Letting the days go by. Let the water hold me down. Letting the days go by. Water flowing underground.",
         250);
+    public static readonly ItemType BATTERY = ItemType.Create("battery",
+        "Battery",
+        "res://Main/Textures/Items/BatteryImage.png",
+        "res://Main/Prefabs/PhysicsObjects/Battery.tscn",
+        "Do not eat.",
+        25);
     
-    private static readonly ItemType[] ALL_ITEMS = {GAS_CAN, WORK_DESK, STORAGE_CRATE, CROWBAR, FIRE_EXTINGUISHER, FLOODLIGHT, BED, DIGITAL_CLOCK};
+    private static readonly ItemType[] ALL_ITEMS = {GAS_CAN, WORK_DESK, STORAGE_CRATE, CROWBAR, FIRE_EXTINGUISHER, FLOODLIGHT, BED, DIGITAL_CLOCK, BATTERY};
     public static List<ItemType> GetItems() => new(ALL_ITEMS);
     public static List<ShopItemDisplayButton> GetItemButtons() => GetItems().Select(item => item.CreateButton()).ToList();
     public static ItemType GetViaID(string id) => GetItems().FirstOrDefault(itemType => itemType.GetTypeID() == id);

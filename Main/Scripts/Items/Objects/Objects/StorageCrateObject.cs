@@ -13,6 +13,13 @@ public class StorageCrateObject : ObjectBase<RigidBody3D>, IGrabbable, IShovable
             invDisplayMenu.ModifyForm(form => { form.SetOtherInv(this); });
             invDisplayMenu.Open();
         });
+        RegisterArbitraryAction("Show Serialised Data", 30, (_, _) => true, (_, ev) => {
+            if (ev is not KeyPressEvent) return;
+            string serialise = GetInventory().Serialise();
+            GetInventory().Deserialise(serialise);
+
+            GD.Print(serialise);
+        });
 
         _inventory = new VolumetricInventory(350.0f, this);
     }
@@ -26,13 +33,13 @@ public class StorageCrateObject : ObjectBase<RigidBody3D>, IGrabbable, IShovable
     public IInventory GetInventory() => _inventory;
     public string GetName() => GetDisplayName();
 
-    public bool StoreItem(IObjectBase objectBase, Node node) {
-        bool added = GetInventory().GetAs<VolumetricInventory>().AddItem(objectBase);
-        if (added) node.QueueFree();
-        return added;
+    public AddItemFailCause StoreItem(IObjectBase objectBase, Node node) {
+        AddItemFailCause result = GetInventory().GetAs<VolumetricInventory>().AddItem(objectBase);
+        if (result == AddItemFailCause.SUCCESS) node.QueueFree();
+        return result;
     }
 
-    public bool StoreItem(string objectMetaTag, string objectJson) => GetInventory().AddItem(objectMetaTag, objectJson);
+    public AddItemFailCause StoreItem(string objectMetaTag, string objectJson) => GetInventory().AddItem(objectMetaTag, objectJson);
 
     public bool RemoveItem(string objectJson) {
         VolumetricInventory inv = GetInventory().GetAs<VolumetricInventory>();

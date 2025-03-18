@@ -36,12 +36,19 @@ public class UseGameAction : GameActionBase {
         IObjectBase objectClass = GameManager.I().GetObjectClass(GameUtils.FindSceneRoot(obj).GetInstanceId());
         if (actionType == null || objectClass == null) return;
 
-        try {
+        if (true) {
             objectClass.TryGetAction((ActionKey)actionType, out Func<ActorBase, IEventBase, bool> test, out Action<ActorBase, IEventBase> method);
             if (test.Invoke(player, ev)) method.Invoke(player, ev);
             _lastAction = actionType;
-        } catch (Exception e) {
-            GD.PrintErr($"ERROR: UseGameAction.OnMouseUsePress() : Failed to invoke IObjectAction method '{actionType.GetType().Name}' on object '{objectClass.GetType().Name}'. Exception: {e.Message}");
+        }
+        else {
+            try {
+                objectClass.TryGetAction((ActionKey)actionType, out Func<ActorBase, IEventBase, bool> test, out Action<ActorBase, IEventBase> method);
+                if (test.Invoke(player, ev)) method.Invoke(player, ev);
+                _lastAction = actionType;
+            } catch (Exception e) {
+                GD.PrintErr($"ERROR: UseGameAction.OnMouseUsePress() : Failed to invoke IObjectAction method '{actionType.GetType().Name}' on object '{objectClass.GetType().Name}'. Exception: {e.Message}");
+            }
         }
     }
 }

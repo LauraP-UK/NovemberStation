@@ -1,0 +1,94 @@
+[gd_scene load_steps=10 format=3 uid="uid://d2yxfx6ojqjos"]
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_n7vfc"]
+height = 0.13
+radius = 0.025
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_vvcnv"]
+albedo_color = Color(0.25, 0.25, 0.25, 1)
+metallic_specular = 0.0
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_on7o7"]
+material = SubResource("StandardMaterial3D_vvcnv")
+top_radius = 0.025
+bottom_radius = 0.025
+height = 0.1
+radial_segments = 8
+rings = 0
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_7h1oc"]
+albedo_color = Color(0.76, 0.451947, 0.2736, 1)
+metallic_specular = 0.0
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_qouwb"]
+material = SubResource("StandardMaterial3D_7h1oc")
+top_radius = 0.025
+bottom_radius = 0.025
+height = 0.03
+radial_segments = 8
+rings = 0
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_6g2uh"]
+albedo_color = Color(0.78, 0.78, 0.78, 1)
+metallic_specular = 0.0
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_gt3el"]
+material = SubResource("StandardMaterial3D_6g2uh")
+top_radius = 0.02
+bottom_radius = 0.02
+height = 0.01
+radial_segments = 8
+rings = 0
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_y2evc"]
+material = SubResource("StandardMaterial3D_6g2uh")
+top_radius = 0.01
+bottom_radius = 0.01
+height = 0.01
+radial_segments = 8
+rings = 0
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_cpo0e"]
+size = Vector3(0.05, 0.13, 0.05)
+
+[node name="Battery" type="RigidBody3D"]
+collision_layer = 4
+collision_mask = 7
+metadata/object_tag = "battery_obj"
+
+[node name="CollisionMesh" type="CollisionShape3D" parent="."]
+shape = SubResource("CylinderShape3D_n7vfc")
+
+[node name="BatteryMeshes" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.015209, 0)
+
+[node name="BatteryBase" type="MeshInstance3D" parent="BatteryMeshes"]
+mesh = SubResource("CylinderMesh_on7o7")
+skeleton = NodePath("../..")
+
+[node name="BatteryOrange" type="MeshInstance3D" parent="BatteryMeshes"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.065, 0)
+mesh = SubResource("CylinderMesh_qouwb")
+skeleton = NodePath("../..")
+
+[node name="BatteryMetalCap" type="MeshInstance3D" parent="BatteryMeshes"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.0751652, 0)
+mesh = SubResource("CylinderMesh_gt3el")
+skeleton = NodePath("../..")
+
+[node name="BatteryMetalBase" type="MeshInstance3D" parent="BatteryMeshes"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.0451567, 0)
+mesh = SubResource("CylinderMesh_gt3el")
+skeleton = NodePath("../..")
+
+[node name="BatteryMetalNub" type="MeshInstance3D" parent="BatteryMeshes"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.081919, 0)
+mesh = SubResource("CylinderMesh_y2evc")
+skeleton = NodePath("../..")
+
+[node name="Area3D" type="Area3D" parent="."]
+collision_layer = 128
+collision_mask = 128
+
+[node name="BBox" type="CollisionShape3D" parent="Area3D"]
+shape = SubResource("BoxShape3D_cpo0e")
