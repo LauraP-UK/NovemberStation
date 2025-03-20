@@ -2,20 +2,20 @@
 
 using Godot;
 
-public class InvDisplayMenu : PreMadeMenu<InventoryDisplayForm> {
+public class DualInvDisplayMenu : PreMadeMenu<DualInventoryForm> {
     protected override FormBase Build() {
-        InventoryDisplayForm form = new(GetFormName(), (key, form, isPressed) => {
+        DualInventoryForm form = new(GetFormName(), (key, _, isPressed) => {
             if (!isPressed) return;
             if (key != Key.Escape) return;
             Close();
         });
         
-        form.SetMainInv(GameManager.I().GetPlayer());
+        form.SetPrimaryInventory(GameManager.I().GetPlayer());
         form.SetListener(FormListener.Default(form));
         
         return form;
     }
 
     protected override bool IsPrimary() => true;
-    protected override string GetFormName() => "inventory_display_menu";
+    protected override string GetFormName() => "dual_inventory_display_menu";
 }

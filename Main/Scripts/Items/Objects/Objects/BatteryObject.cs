@@ -12,6 +12,8 @@ public class BatteryObject : ObjectBase<RigidBody3D>, IGrabbable, ICollectable, 
     }
     public override string GetDisplayName() => Items.BATTERY.GetItemName();
     public override string GetContext() => $"{GetBatteryPower()}%";
+    public override string GetSummary() => $"Power: {GetBatteryPower()}%";
+
     public override SmartDictionary<string, SmartSerialData> GetSerialiseData() {
         return new SmartDictionary<string, SmartSerialData> {
             { "power", SmartSerialData.From(_power, v => _power = Convert.ToSingle(v), () => _power = MAX_POWER) }
@@ -20,6 +22,7 @@ public class BatteryObject : ObjectBase<RigidBody3D>, IGrabbable, ICollectable, 
     public void Grab(ActorBase actorBase, IEventBase ev) => GrabActionDefault.Invoke(actorBase, GetBaseNode(), ev);
     public void Collect(ActorBase actorBase, IEventBase ev) => CollectActionDefault.Invoke(actorBase, this, ev);
     public float GetBatteryPower() => Mathsf.Round(_power, 2);
+    public void SetBatteryPower(float power) => _power = power;
 
     public float GetSize() => 0.2f;
 }

@@ -1,14 +1,14 @@
 ﻿using Godot;
 
-public class SingleInvDisplayMenu : PreMadeMenu<SingleInventoryDisplayForm> {
+public class SingleInvDisplayMenu : PreMadeMenu<SingleInventoryForm> {
     protected override FormBase Build() {
-        SingleInventoryDisplayForm form = new(GetFormName(), (key, form, isPressed) => {
+        SingleInventoryForm form = new(GetFormName(), (key, _, isPressed) => {
             if (!isPressed) return;
             if (key != Key.Escape) return;
             Close();
         });
         
-        form.SetMainInv(GameManager.I().GetPlayer());
+        form.SetPrimaryInventory(GameManager.I().GetPlayer());
         form.SetListener(FormListener.Default(form));
         
         return form;

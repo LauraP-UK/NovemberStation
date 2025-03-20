@@ -100,6 +100,7 @@ public abstract class InventoryBase : IInventory {
                 if (string.IsNullOrEmpty(itemJson)) continue;
 
                 string metaTag = Serialiser.GetSpecificData<string>(Serialiser.ObjectSaveData.META_TAG, itemJson);
+                GD.Print($"Deserialising item with tag {metaTag} into {itemJson}");
                 AddItemUnchecked(metaTag, itemJson);
             }
         }

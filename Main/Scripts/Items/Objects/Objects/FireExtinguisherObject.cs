@@ -11,6 +11,7 @@ public class FireExtinguisherObject : ObjectBase<RigidBody3D>, IGrabbable, IColl
 
     public override string GetDisplayName() => Items.FIRE_EXTINGUISHER.GetItemName();
     public override string GetContext() => "";
+    public override string GetSummary() => "";
     public override SmartDictionary<string, SmartSerialData> GetSerialiseData() => new();
     public void Collect(ActorBase actorBase, IEventBase ev) => CollectActionDefault.Invoke(actorBase, this, ev);
     public float GetSize() => 7.5f;

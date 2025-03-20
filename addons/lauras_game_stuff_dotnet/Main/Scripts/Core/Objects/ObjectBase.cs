@@ -52,6 +52,7 @@ public abstract class ObjectBase<T> : IObjectBase where T : Node3D {
     public string GetObjectTag() => _objectTag;
     public abstract string GetDisplayName();
     public abstract string GetContext();
+    public abstract string GetSummary();
     public abstract SmartDictionary<string, SmartSerialData> GetSerialiseData();
     public bool BuildFromData(Dictionary<string, object> data) {
         SmartDictionary<string, SmartSerialData> thisData = GetSerialiseData();

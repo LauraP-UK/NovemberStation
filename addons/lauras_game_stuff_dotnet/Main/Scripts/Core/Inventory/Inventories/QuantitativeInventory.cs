@@ -14,12 +14,12 @@ public class QuantitativeInventory : InventoryBase, IQuantitativeInventory, IOwn
     }
     
     public override string GetName() => "Quantitative Inventory";
-    protected override AddItemFailCause CanAddInternal(IObjectBase item) => GetRemainingQuantity() > 0 ? AddItemFailCause.SUCCESS : AddItemFailCause.SUBCLASS_FAIL;
-    protected override AddItemFailCause CanAddInternal(string jsonData) => GetRemainingQuantity() > 0 ? AddItemFailCause.SUCCESS : AddItemFailCause.SUBCLASS_FAIL;
+    protected override AddItemFailCause CanAddInternal(IObjectBase item) => GetRemainingSlots() > 0 ? AddItemFailCause.SUCCESS : AddItemFailCause.SUBCLASS_FAIL;
+    protected override AddItemFailCause CanAddInternal(string jsonData) => GetRemainingSlots() > 0 ? AddItemFailCause.SUCCESS : AddItemFailCause.SUBCLASS_FAIL;
     public int GetMaxQuantity() => _maxQuantity;
     public void SetMaxQuantity(int maxQuantity) => _maxQuantity = maxQuantity;
     public int GetUsedQuantity() => GetContents().Count;
-    public int GetRemainingQuantity() => Math.Max(_maxQuantity - GetUsedQuantity(), 0);
+    public int GetRemainingSlots() => Math.Max(_maxQuantity - GetUsedQuantity(), 0);
     public IContainer GetOwner() => _owner;
     public void SetOwner(IContainer owner) => _owner = owner;
     

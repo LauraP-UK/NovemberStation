@@ -153,5 +153,6 @@ public class PC2Object : ObjectBase<Node3D>, IUsable {
 
     public override string GetDisplayName() => "PC";
     public override string GetContext() => "";
+    public override string GetSummary() => "";
     public override SmartDictionary<string, SmartSerialData> GetSerialiseData() => new();
 }

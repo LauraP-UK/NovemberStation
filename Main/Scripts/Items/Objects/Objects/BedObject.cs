@@ -14,6 +14,7 @@ public class BedObject : ObjectBase<RigidBody3D>, IGrabbable {
 
     public override string GetDisplayName() => Items.BED.GetItemName();
     public override string GetContext() => "";
+    public override string GetSummary() => "";
     public override SmartDictionary<string, SmartSerialData> GetSerialiseData() => new();
     public void Grab(ActorBase actorBase, IEventBase ev) => GrabActionDefault.Invoke(actorBase, GetBaseNode(), ev);
 }

@@ -20,11 +20,16 @@ public class FloodlightObject : ObjectBase<RigidBody3D>, IGrabbable, IUsable, IC
         LIGHT_TIP_PATH = "Light";
 
     public FloodlightObject(RigidBody3D baseNode, bool dataOnly = false) : base(baseNode, "floodlight_obj") {
+        
+        _inventory = new QuantitativeInventory(4, this);
+        _inventory.AddFilter(FilterHelper.MakeItemTypeFilter(Items.BATTERY));
+        
         if (dataOnly) return;
+        
         RegisterAction<IGrabbable>((_, _) => true, Grab);
         RegisterAction<IUsable>((_, _) => true, Use);
         RegisterAction<ICollectable>((_, _) => true, Collect);
-        RegisterArbitraryAction("Recharge", 10, (_,_) => _powerMillis <= MAX_POWER_MILLIS, Recharge);
+        RegisterArbitraryAction("Insert Battery", 10, (_,_) => _inventory.GetRemainingSlots() > 0 || _powerMillis < MAX_POWER_MILLIS, Recharge);
         //RegisterArbitraryAction("Save to File", 20, (_,_) => true, SerialiseTest);
 
         string finding = "NULL";
@@ -43,9 +48,6 @@ public class FloodlightObject : ObjectBase<RigidBody3D>, IGrabbable, IUsable, IC
         _initialAngle = _light.SpotAngle;
         _initialRange = _light.SpotRange;
         _initialEnergy = _light.LightEnergy;
-        
-        _inventory = new QuantitativeInventory(4, this);
-        _inventory.AddFilter(FilterHelper.MakeItemTypeFilter(Items.BATTERY));
 
         ToggleLight(false);
     }
@@ -114,6 +116,7 @@ public class FloodlightObject : ObjectBase<RigidBody3D>, IGrabbable, IUsable, IC
 
     private void ToggleLight(bool isOn) {
         _isOn = isOn;
+        if (_light == null) return;
         _light.Visible = isOn;
         HandleLighting();
     }
@@ -156,22 +159,13 @@ public class FloodlightObject : ObjectBase<RigidBody3D>, IGrabbable, IUsable, IC
         string secondLine = _powerMillis <= 0 ? "NO POWER" : $"Power: {GetPowerRemaining():00.00}%";
         return $"Status: {(_isOn ? "ON" : "OFF")}\n{secondLine}";
     }
+    public override string GetSummary() => GetContext().Replace("\n", " | ");
 
     public override SmartDictionary<string, SmartSerialData> GetSerialiseData() {
         return new SmartDictionary<string, SmartSerialData> {
             {"isOn", SmartSerialData.From(_isOn, v => ToggleLight(Convert.ToBoolean(v)), () => ToggleLight(false))},
             {"powerMillis", SmartSerialData.From(_powerMillis, v => _powerMillis = Convert.ToInt64(v), () => _powerMillis = MAX_POWER_MILLIS)},
-            {InventoryBase.INVENTORY_TAG, SmartSerialData.From(
-                _inventory.Serialise(),
-                v => {
-                    if (v is not string s) {
-                        GD.PrintErr($"ERROR: FloodlightObject.GetSerialiseData() : Failed to deserialise inventory data. Expected string, got {v ?? "null"}");
-                        return;
-                    }
-                    _inventory.Deserialise(s);
-                }, 
-                () => _inventory.ClearContents())
-            }
+            {InventoryBase.INVENTORY_TAG, SmartSerialData.FromInventory(_inventory)}
         };
     }
     public float GetSize() => 90.0f;

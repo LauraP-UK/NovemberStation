@@ -2,5 +2,5 @@
     public int GetMaxQuantity();
     public void SetMaxQuantity(int maxQuantity);
     public int GetUsedQuantity();
-    public int GetRemainingQuantity();
+    public int GetRemainingSlots();
 }

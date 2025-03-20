@@ -7,15 +7,16 @@ public class StorageCrateObject : ObjectBase<RigidBody3D>, IGrabbable, IShovable
         if (dataOnly) return;
         RegisterAction<IGrabbable>((_, _) => true, Grab);
         RegisterAction<IShovable>((_, _) => true, Shove);
-        RegisterArbitraryAction("Open", 20, (_, _) => true, (actor, ev) => {
+        RegisterArbitraryAction("Open", 20, (_, _) => true, (_, ev) => {
             if (ev is not KeyPressEvent) return;
-            InvDisplayMenu invDisplayMenu = new();
-            invDisplayMenu.ModifyForm(form => { form.SetOtherInv(this); });
-            invDisplayMenu.Open();
+            DualInvDisplayMenu dualInvDisplayMenu = new();
+            dualInvDisplayMenu.ModifyForm(form => form.SetOtherInventory(this));
+            dualInvDisplayMenu.Open();
         });
-        RegisterArbitraryAction("Show Serialised Data", 30, (_, _) => true, (_, ev) => {
+        RegisterArbitraryAction("Show Serialised Data", 30, (_, _) => _inventory.GetUsedSize() > 0.0f, (_, ev) => {
             if (ev is not KeyPressEvent) return;
             string serialise = GetInventory().Serialise();
+            GD.Print($"Crate serialised data: {serialise}");
             GetInventory().Deserialise(serialise);
 
             GD.Print(serialise);
@@ -29,7 +30,12 @@ public class StorageCrateObject : ObjectBase<RigidBody3D>, IGrabbable, IShovable
 
     public override string GetDisplayName() => Items.STORAGE_CRATE.GetItemName();
     public override string GetContext() => $"Contains: {_inventory.GetUsedSize()}/{_inventory.GetMaxSize()} kg";
-    public override SmartDictionary<string, SmartSerialData> GetSerialiseData() => new();
+    public override string GetSummary() => GetContext();
+    public override SmartDictionary<string, SmartSerialData> GetSerialiseData() {
+        return new SmartDictionary<string, SmartSerialData> {
+            {InventoryBase.INVENTORY_TAG, SmartSerialData.FromInventory(_inventory)}
+        };
+    }
     public IInventory GetInventory() => _inventory;
     public string GetName() => GetDisplayName();
 

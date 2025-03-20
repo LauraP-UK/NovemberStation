@@ -30,6 +30,9 @@ public class GasCanObject : ObjectBase<RigidBody3D>, IGrabbable, IShovable, IDri
             _ => "EMPTY"
         };
     }
+    
+    public override string GetSummary() => GetContext().Replace("\n", " | ");
+    
     public override SmartDictionary<string, SmartSerialData> GetSerialiseData() {
         return new SmartDictionary<string, SmartSerialData> {
             { "fuelAmount", SmartSerialData.From(_fuelAmount, v => _fuelAmount = Convert.ToInt32(v), () => _fuelAmount = 100) }

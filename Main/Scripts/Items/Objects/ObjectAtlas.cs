@@ -95,7 +95,8 @@ public static class ObjectAtlas {
     }
     public static IObjectBase DeserialiseDataWithoutNode(string json) {
         Serialiser.ObjectSaveData obj = DeserialiseObject(json);
-        return CreateObject(GetObjectClass(obj.MetaTag), null);
+        IObjectBase objBase = CreateObject(GetObjectClass(obj.MetaTag), null);
+        return objBase;
     }
     public class CreatedObject {
         public bool Success { get; set; }
