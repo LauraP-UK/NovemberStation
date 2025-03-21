@@ -58,7 +58,7 @@ public class DualInventoryForm : InventoryForm {
             if (selected == null) return;
 
             if (side == InventorySide.PRIMARY) {
-                string itemJson = GetItemJson(selected, _primaryOwner.GetInventory());
+                string itemJson = selected.GetJsonFromExpanded();
                 string metaTag = Serialiser.GetSpecificData<string>(Serialiser.ObjectSaveData.META_TAG, itemJson);
 
                 AddItemFailCause result = _otherOwner.GetInventory().CanAddItem(itemJson);
@@ -77,7 +77,7 @@ public class DualInventoryForm : InventoryForm {
                 }
             }
             else {
-                string itemJson = GetItemJson(selected, _otherOwner.GetInventory());
+                string itemJson = selected.GetJsonFromExpanded();
                 string metaTag = Serialiser.GetSpecificData<string>(Serialiser.ObjectSaveData.META_TAG, itemJson);
 
                 AddItemFailCause result = _primaryOwner.GetInventory().CanAddItem(itemJson);
@@ -96,7 +96,7 @@ public class DualInventoryForm : InventoryForm {
                 }
             }
 
-            RefreshFromButton(selected.GetCount() > 1 ? selected : null);
+            Refresh(selected.GetCount() > 1 ? selected : null);
         });
 
         return new List<InvActionButton> { _moveActionBtn, GetCloseButton() };
@@ -104,7 +104,10 @@ public class DualInventoryForm : InventoryForm {
 
     protected override void SelectItem(InventoryFormState state) {
         InvItemDisplay target = state.Target;
-        GetAllItemDisplays().ForEach(i => i.Select(false));
+        GetAllItemDisplays().ForEach(i => {
+            i.Select(false);
+            i.SetExpanded(false);
+        });
 
         List<InvItemDisplay> items = (state.Side == InventorySide.PRIMARY ? _primaryList : _otherList).GetDisplayObjects().Cast<InvItemDisplay>().ToList();
 
@@ -113,6 +116,10 @@ public class DualInventoryForm : InventoryForm {
             item.Select(thisSelected);
             if (thisSelected) item.SetExpanded(state.Expanded);
         }
+        
+        _primaryList.GetNode().QueueRedraw();
+        _otherList.GetNode().QueueRedraw();
+        _actionsList.GetNode().QueueRedraw();
         
         if (target == null)
             _moveActionBtn?.Disable();

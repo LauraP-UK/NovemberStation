@@ -101,11 +101,7 @@ public abstract class InventoryForm : FormBase {
             if (objData is IVolumetricObject volObj) invItemDisplay.AddWeight(volObj.GetSize());
             if (isNew) {
                 invItemDisplay.OnPressed(display => {
-                    InventorySide side = InventorySide.NONE;
-                    if (this is DualInventoryForm dualForm)
-                        side = dualForm.GetSide(display);
-                    
-                    InventoryFormState state = new(display, GetMode(), side, display.IsExpanded());
+                    InventoryFormState state = new(display, GetMode(), GetSide(display), display.IsExpanded());
                     SelectItem(state);
                 });
                 displayButtons.Add(invItemDisplay);
@@ -159,7 +155,7 @@ public abstract class InventoryForm : FormBase {
         SelectItem(state);
     }
 
-    public void RefreshFromButton(InvItemDisplay button) {
+    public void Refresh(InvItemDisplay button) {
         Refresh(button == null
             ? new InventoryFormState(null, GetMode(), InventorySide.NONE, false)
             : new InventoryFormState(button, GetMode(), GetSide(button), button.IsExpanded()));

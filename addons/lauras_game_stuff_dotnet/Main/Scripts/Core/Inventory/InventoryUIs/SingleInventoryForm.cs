@@ -49,10 +49,10 @@ public class SingleInventoryForm : InventoryForm {
             Vector3 rotation = player.GetCamera().GetGlobalRotation();
 
             Vector3 spawn = result.HasHit() ? result.GetClosestHit().HitAtPosition + (result.GetClosestHit().HitNormal * 0.1f) : result.GetEnd();
-            string itemJson = GetItemJson(selected, _primaryOwner.GetInventory());
+            string itemJson = selected.GetJsonFromExpanded();
             PlaceItemIntoWorld(_primaryOwner, itemJson, spawn, rotation);
             
-            RefreshFromButton(selected.GetCount() > 1 ? selected : null);
+            Refresh(selected.GetCount() > 1 ? selected : null);
         });
         _placeActionBtn.Disable();
         
@@ -62,10 +62,10 @@ public class SingleInventoryForm : InventoryForm {
             InvItemDisplay selected = GetSelectedItem().button;
             Vector3 rotation = player.GetCamera().GetGlobalRotation();
             Vector3 spawn = player.GetPosition() + new Vector3(0f, 0.1f, 0f);
-            string itemJson = GetItemJson(selected, _primaryOwner.GetInventory());
+            string itemJson = selected.GetJsonFromExpanded();
             PlaceItemIntoWorld(_primaryOwner, itemJson, spawn, rotation);
             
-            RefreshFromButton(selected.GetCount() > 1 ? selected : null);
+            Refresh(selected.GetCount() > 1 ? selected : null);
         });
         _dropActionBtn.Disable();
         
@@ -74,6 +74,11 @@ public class SingleInventoryForm : InventoryForm {
 
     protected override void SelectItem(InventoryFormState state) {
         InvItemDisplay target = state.Target;
+        GetAllItemDisplays().ForEach(i => {
+            i.Select(false);
+            i.SetExpanded(false);
+        });
+        
         foreach (InvItemDisplay item in GetAllItemDisplays()) {
             bool thisSelected = item.GetItemType().Equals(target?.GetItemType());
             item.Select(thisSelected);

@@ -64,9 +64,10 @@ public abstract class InventoryBase : IInventory {
         .ToList();
 
     public List<string> GetContents() {
-        List<string> contents = new();
-        foreach (List<string> group in _inventory.Values) contents.AddRange(group);
-        return contents;
+        return _inventory
+            .OrderBy(pair => pair.Key)
+            .SelectMany(pair => pair.Value)
+            .ToList();
     }
 
     public List<string> GetContentsOfType(string type) => GetGroup(type);

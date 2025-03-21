@@ -34,7 +34,32 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 
-[node name="BGContainer" type="Control" parent="."]
+[node name="Main" type="Control" parent="."]
+custom_minimum_size = Vector2(0, 50)
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_bottom = 50.0
+grow_horizontal = 2
+
+[node name="ExtraInfo" type="Control" parent="Main"]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 0
+mouse_filter = 2
+
+[node name="SubButtonList" type="VBoxContainer" parent="Main/ExtraInfo"]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+grow_horizontal = 2
+theme_override_constants/separation = 0
+
+[node name="BGContainer" type="Control" parent="Main"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -43,7 +68,7 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 
-[node name="BGColour" type="ColorRect" parent="BGContainer"]
+[node name="BGColour" type="ColorRect" parent="Main/BGContainer"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -53,7 +78,7 @@ grow_vertical = 2
 mouse_filter = 2
 color = Color(0.18, 0.18, 0.18, 1)
 
-[node name="NinePatchRect" type="NinePatchRect" parent="BGContainer"]
+[node name="NinePatchRect" type="NinePatchRect" parent="Main/BGContainer"]
 z_index = 20
 layout_mode = 1
 anchors_preset = 15
@@ -67,7 +92,7 @@ patch_margin_top = 7
 patch_margin_right = 7
 patch_margin_bottom = 7
 
-[node name="Content" type="Control" parent="."]
+[node name="Content" type="Control" parent="Main"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -76,7 +101,7 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 
-[node name="ObjName" type="Label" parent="Content"]
+[node name="ObjName" type="Label" parent="Main/Content"]
 z_index = 10
 z_as_relative = false
 layout_mode = 0
@@ -87,7 +112,7 @@ text = "OBJECT_NAME"
 label_settings = SubResource("LabelSettings_bge0x")
 vertical_alignment = 1
 
-[node name="ObjWeight" type="Label" parent="Content"]
+[node name="ObjWeight" type="Label" parent="Main/Content"]
 z_index = 10
 layout_mode = 1
 anchors_preset = 1
@@ -102,7 +127,7 @@ label_settings = SubResource("LabelSettings_4ioos")
 horizontal_alignment = 2
 vertical_alignment = 1
 
-[node name="ObjCount" type="Label" parent="Content"]
+[node name="ObjCount" type="Label" parent="Main/Content"]
 z_index = 10
 layout_mode = 1
 offset_left = 55.0
@@ -114,7 +139,7 @@ label_settings = SubResource("LabelSettings_usoxj")
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="ObjImg" type="TextureRect" parent="Content"]
+[node name="ObjImg" type="TextureRect" parent="Main/Content"]
 z_index = 5
 z_as_relative = false
 layout_mode = 0
@@ -126,7 +151,7 @@ texture = ExtResource("1_ol0x3")
 expand_mode = 2
 stretch_mode = 5
 
-[node name="FocusButton" type="Button" parent="Content"]
+[node name="FocusButton" type="Button" parent="Main/Content"]
 z_index = 200
 z_as_relative = false
 layout_mode = 1
@@ -144,7 +169,7 @@ theme_override_styles/normal = SubResource("StyleBoxEmpty_3o8an")
 shortcut_feedback = false
 shortcut_in_tooltip = false
 
-[node name="ExpandButton" type="Button" parent="Content"]
+[node name="ExpandButton" type="Button" parent="Main/Content"]
 layout_mode = 1
 anchors_preset = 6
 anchor_left = 1.0
@@ -158,12 +183,3 @@ offset_bottom = 25.0
 grow_horizontal = 0
 grow_vertical = 2
 text = "[V]"
-
-[node name="ExtraInfo" type="Control" parent="Content"]
-layout_mode = 1
-anchors_preset = 12
-anchor_top = 1.0
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 0

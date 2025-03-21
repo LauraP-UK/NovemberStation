@@ -1,10 +1,13 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using Godot;
 
 public class InvItemSummary : FormBase, IFocusable {
     private readonly LabelElement _numberLabel, _summaryLabel;
     private readonly ColorRectElement _bgColor;
     private readonly ButtonElement _focusBtn;
+
+    private readonly InvItemDisplay _owningBtn;
     
     private readonly string _json;
     private bool _isSelected = false;
@@ -17,12 +20,14 @@ public class InvItemSummary : FormBase, IFocusable {
         FOCUS_BUTTON = "Content/FocusButton";
 
     private static readonly Color
-        DEFAULT_BG_COLOR = new(0.1f, 0.1f, 0.1f),
+        DEFAULT_BG_COLOR = ColourHelper.GetFrom255(46,46,46,1.0f),
         FOCUS_BG_COLOR = Colors.DimGray,
         SELECTED_BG_COLOR = Colors.DarkGoldenrod;
 
-    public InvItemSummary(int index, string json, Vector2 size) : base("summary_button_"+index, FORM_PATH) {
+    public InvItemSummary(int index, string json, Vector2 size, InvItemDisplay owningBtn) : base("summary_button_"+index, FORM_PATH) {
         _json = json;
+        _owningBtn = owningBtn;
+        
         Label numberLabel = FindNode<Label>(NUMBER_LABEL);
         Label summaryLabel = FindNode<Label>(SUMMARY_LABEL);
         ColorRect bgColor = FindNode<ColorRect>(BG_COLOUR);
@@ -32,6 +37,8 @@ public class InvItemSummary : FormBase, IFocusable {
         _summaryLabel = new LabelElement(summaryLabel);
         _bgColor = new ColorRectElement(bgColor);
         _focusBtn = new ButtonElement(focusBtn);
+        
+        _bgColor.SetColor(DEFAULT_BG_COLOR);
         
         _focusBtn.AddAction(Control.SignalName.FocusEntered, _ => {
             if (_isSelected) return;
@@ -45,7 +52,13 @@ public class InvItemSummary : FormBase, IFocusable {
             if (_isSelected) return;
             GrabFocus();
         });
-        _focusBtn.OnButtonDown(_ => VisualPress(true));
+        _focusBtn.OnButtonDown(_ => {
+            GrabFocus();
+            List<InvItemSummary> btns = _owningBtn.GetSubListVBox().GetDisplayObjects().Cast<InvItemSummary>().ToList();
+            foreach (InvItemSummary btn in btns) btn.SetSelected(false);
+            SetSelected(true);
+            VisualPress(true);
+        });
         _focusBtn.OnButtonUp(_ => {
             if (_isSelected) return;
             VisualPress(false);
@@ -64,9 +77,18 @@ public class InvItemSummary : FormBase, IFocusable {
     protected override void OnDestroy() { }
     public ButtonElement GetButton() => _focusBtn;
     public ColorRectElement GetBgColor() => _bgColor;
+    public string GetJson() => _json;
+    
+    public void SetSelected(bool selected) {
+        _isSelected = selected;
+        GetBgColor().SetColor(selected ? SELECTED_BG_COLOR : DEFAULT_BG_COLOR);
+    }
+    public bool IsSelected() => _isSelected;
+
     public void GrabFocus() {
         if (!IsValid() || HasFocus()) return;
         GetButton().GrabFocus();
+        GD.Print($"Grabbing focus for {_json}");
     }
 
     public void ReleaseFocus() => GetButton().GetElement().ReleaseFocus();
