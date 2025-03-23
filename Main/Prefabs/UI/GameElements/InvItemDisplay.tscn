@@ -168,18 +168,3 @@ theme_override_styles/pressed = SubResource("StyleBoxEmpty_h62ai")
 theme_override_styles/normal = SubResource("StyleBoxEmpty_3o8an")
 shortcut_feedback = false
 shortcut_in_tooltip = false
-
-[node name="ExpandButton" type="Button" parent="Main/Content"]
-layout_mode = 1
-anchors_preset = 6
-anchor_left = 1.0
-anchor_top = 0.5
-anchor_right = 1.0
-anchor_bottom = 0.5
-offset_left = -142.0
-offset_top = -25.0
-offset_right = -92.0
-offset_bottom = 25.0
-grow_horizontal = 0
-grow_vertical = 2
-text = "[V]"

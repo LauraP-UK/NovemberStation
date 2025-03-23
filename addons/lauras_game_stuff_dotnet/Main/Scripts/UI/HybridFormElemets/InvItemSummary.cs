@@ -10,7 +10,8 @@ public class InvItemSummary : FormBase, IFocusable {
     private readonly InvItemDisplay _owningBtn;
     
     private readonly string _json;
-    private bool _isSelected = false;
+    private bool _isSelected;
+    private int _index;
 
     private const string
         FORM_PATH = "res://Main/Prefabs/UI/GameElements/InvItemSummary.tscn",
@@ -27,6 +28,7 @@ public class InvItemSummary : FormBase, IFocusable {
     public InvItemSummary(int index, string json, Vector2 size, InvItemDisplay owningBtn) : base("summary_button_"+index, FORM_PATH) {
         _json = json;
         _owningBtn = owningBtn;
+        _index = index;
         
         Label numberLabel = FindNode<Label>(NUMBER_LABEL);
         Label summaryLabel = FindNode<Label>(SUMMARY_LABEL);
@@ -56,7 +58,7 @@ public class InvItemSummary : FormBase, IFocusable {
             GrabFocus();
             List<InvItemSummary> btns = _owningBtn.GetSubListVBox().GetDisplayObjects().Cast<InvItemSummary>().ToList();
             foreach (InvItemSummary btn in btns) btn.SetSelected(false);
-            SetSelected(true);
+            SelectAndAlert(true);
             VisualPress(true);
         });
         _focusBtn.OnButtonUp(_ => {
@@ -78,7 +80,12 @@ public class InvItemSummary : FormBase, IFocusable {
     public ButtonElement GetButton() => _focusBtn;
     public ColorRectElement GetBgColor() => _bgColor;
     public string GetJson() => _json;
-    
+    public int GetIndex() => _index;
+
+    public void SelectAndAlert(bool selected) {
+        SetSelected(selected);
+        if (selected) _owningBtn.SelectAndAlert(true, this);
+    }
     public void SetSelected(bool selected) {
         _isSelected = selected;
         GetBgColor().SetColor(selected ? SELECTED_BG_COLOR : DEFAULT_BG_COLOR);
@@ -88,7 +95,6 @@ public class InvItemSummary : FormBase, IFocusable {
     public void GrabFocus() {
         if (!IsValid() || HasFocus()) return;
         GetButton().GrabFocus();
-        GD.Print($"Grabbing focus for {_json}");
     }
 
     public void ReleaseFocus() => GetButton().GetElement().ReleaseFocus();

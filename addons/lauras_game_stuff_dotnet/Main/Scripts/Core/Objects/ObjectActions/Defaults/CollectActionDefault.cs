@@ -4,5 +4,6 @@
         AddItemFailCause result = ((IContainer)actor).StoreItem(obj, obj.GetBaseNode3D());
         if (result == AddItemFailCause.SUBCLASS_FAIL) Toast.Error((Player)actor, "Your inventory is full!");
         else if (result == AddItemFailCause.FILTER_FAIL) Toast.Error((Player)actor, "You can't pick up this item!");
+        else GameManager.I().WakeObjects();
     }
 }

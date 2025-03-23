@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using Godot;
 
 public class DualInventoryForm : InventoryForm {
-
     private InvActionButton _moveActionBtn;
 
     private const string
@@ -53,93 +51,75 @@ public class DualInventoryForm : InventoryForm {
         _moveActionBtn = new InvActionButton();
         ButtonElement moveBtn = _moveActionBtn.GetButton();
 
-        moveBtn.OnPressed(_ => {
-            (InvItemDisplay selected, InventorySide side) = GetSelectedItem();
-            if (selected == null) return;
+        moveBtn.OnPressed(
+            _ => {
+                SelectedInfo primarySelected = GetSelectedItem(InventorySide.PRIMARY);
+                SelectedInfo otherSelected = GetSelectedItem(InventorySide.OTHER);
 
-            if (side == InventorySide.PRIMARY) {
-                string itemJson = selected.GetJsonFromExpanded();
-                string metaTag = Serialiser.GetSpecificData<string>(Serialiser.ObjectSaveData.META_TAG, itemJson);
+                InventorySide side = InventorySide.NONE;
+                InvItemDisplay selected = null;
+                InvItemSummary summary = null;
 
-                AddItemFailCause result = _otherOwner.GetInventory().CanAddItem(itemJson);
-                switch (result) {
-                    case AddItemFailCause.SUBCLASS_FAIL:
-                        Toast.Error(GameManager.I().GetPlayer(), $"{_otherOwner.GetName()} is full!");
-                        return;
-                    case AddItemFailCause.FILTER_FAIL:
-                        Toast.Error(GameManager.I().GetPlayer(), "You can't put that item in there!");
-                        return;
-                    case AddItemFailCause.SUCCESS:
-                    default:
-                        _otherOwner.StoreItem(metaTag, itemJson);
-                        _primaryOwner.RemoveItem(itemJson);
-                        break;
+                if (primarySelected.IsLastSelected()) {
+                    side = InventorySide.PRIMARY;
+                    selected = primarySelected.GetItem();
+                    summary = primarySelected.GetSummary();
+                } else if (otherSelected.IsLastSelected()) {
+                    side = InventorySide.OTHER;
+                    selected = otherSelected.GetItem();
+                    summary = otherSelected.GetSummary();
                 }
-            }
-            else {
-                string itemJson = selected.GetJsonFromExpanded();
-                string metaTag = Serialiser.GetSpecificData<string>(Serialiser.ObjectSaveData.META_TAG, itemJson);
 
-                AddItemFailCause result = _primaryOwner.GetInventory().CanAddItem(itemJson);
-                switch (result) {
-                    case AddItemFailCause.SUBCLASS_FAIL:
-                        Toast.Error(GameManager.I().GetPlayer(), "Your inventory is full!");
-                        return;
-                    case AddItemFailCause.FILTER_FAIL:
-                        Toast.Error(GameManager.I().GetPlayer(), "You can't pick this up!");
-                        return;
-                    case AddItemFailCause.SUCCESS:
-                    default:
-                        _primaryOwner.StoreItem(metaTag, itemJson);
-                        _otherOwner.RemoveItem(itemJson);
-                        break;
-                }
-            }
+                if (side == InventorySide.NONE || selected == null) return;
+                selected = GetNewBtnOf(selected, side);
+                
+                string json = summary != null ? summary.GetJson() : selected.GetFirstJson();
+                bool success = side == InventorySide.PRIMARY
+                    ? TransferItem(json, _primaryOwner, _otherOwner, "You can't put that item in there!", $"{_otherOwner.GetName()} is full!")
+                    : TransferItem(json, _otherOwner, _primaryOwner, "You can't pick this up!", "Your inventory is full!");
 
-            Refresh(selected.GetCount() > 1 ? selected : null);
-        });
+                if (!success) return;
+                
+                selected.AddCount(-1);
+                InvItemDisplay refreshSelected = selected.GetCount() > 0 ? selected : null;
+                InventorySide otherSide = side == InventorySide.PRIMARY ? InventorySide.OTHER : InventorySide.PRIMARY;
+
+                SelectedInfo otherSideItem = GetSelectedItem(otherSide);
+
+                UpdateSelectedItem(otherSide, otherSideItem.GetItem(), otherSideItem.GetSummary());
+                UpdateSelectedItem(side, refreshSelected, null);
+            }
+        );
 
         return new List<InvActionButton> { _moveActionBtn, GetCloseButton() };
     }
 
-    protected override void SelectItem(InventoryFormState state) {
-        InvItemDisplay target = state.Target;
-        GetAllItemDisplays().ForEach(i => {
-            i.Select(false);
-            i.SetExpanded(false);
-        });
-
-        List<InvItemDisplay> items = (state.Side == InventorySide.PRIMARY ? _primaryList : _otherList).GetDisplayObjects().Cast<InvItemDisplay>().ToList();
-
-        foreach (InvItemDisplay item in items) {
-            bool thisSelected = item.GetItemType().Equals(target?.GetItemType());
-            item.Select(thisSelected);
-            if (thisSelected) item.SetExpanded(state.Expanded);
+    private bool TransferItem(string json, IContainer from, IContainer to, string filterFailMessage, string subclassFailMessage) {
+        string metaTag = Serialiser.GetSpecificData<string>(Serialiser.ObjectSaveData.META_TAG, json);
+        AddItemFailCause result = to.GetInventory().CanAddItem(json);
+        switch (result) {
+            case AddItemFailCause.SUBCLASS_FAIL:
+                Toast.Error(GameManager.I().GetPlayer(), subclassFailMessage);
+                return false;
+            case AddItemFailCause.FILTER_FAIL:
+                Toast.Error(GameManager.I().GetPlayer(), filterFailMessage);
+                return false;
+            case AddItemFailCause.SUCCESS:
+            default:
+                to.StoreItem(metaTag, json);
+                from.RemoveItem(json);
+                break;
         }
-        
-        _primaryList.GetNode().QueueRedraw();
-        _otherList.GetNode().QueueRedraw();
-        _actionsList.GetNode().QueueRedraw();
-        
-        if (target == null)
-            _moveActionBtn?.Disable();
-        else {
-            switch (state.Side) {
-                case InventorySide.PRIMARY:
-                    _moveActionBtn.SetStore();
-                    break;
-                case InventorySide.OTHER:
-                    _moveActionBtn.SetTake();
-                    break;
-                default:
-                    _moveActionBtn.Disable();
-                    break;
-            }
-        }
+
+        return true;
     }
 
-    protected override (InvItemDisplay button, InventorySide side) GetSelectedItem() {
-        foreach (InvItemDisplay item in GetAllItemDisplays().Where(item => item.IsSelected())) return (item, GetSide(item));
-        return (null, InventorySide.NONE);
+    protected override void UpdateActionsList() {
+        SelectedInfo primarySelected = GetSelectedItem(InventorySide.PRIMARY);
+        SelectedInfo otherSelected = GetSelectedItem(InventorySide.OTHER);
+
+        if (primarySelected.IsLastSelected()) _moveActionBtn.SetStore();
+        else if (otherSelected.IsLastSelected()) _moveActionBtn.SetTake();
+        else  _moveActionBtn?.Disable();
     }
 }

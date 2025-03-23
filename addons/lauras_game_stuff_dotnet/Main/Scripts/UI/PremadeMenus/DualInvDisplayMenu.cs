@@ -1,18 +1,20 @@
-﻿
-
-using Godot;
+﻿using Godot;
 
 public class DualInvDisplayMenu : PreMadeMenu<DualInventoryForm> {
     protected override FormBase Build() {
         DualInventoryForm form = new(GetFormName(), (key, _, isPressed) => {
             if (!isPressed) return;
-            if (key != Key.Escape) return;
-            Close();
+            switch (key) {
+                case Key.Escape:
+                case Key.Tab:
+                    Close();
+                    return;
+            }
         });
-        
+
         form.SetPrimaryInventory(GameManager.I().GetPlayer());
         form.SetListener(FormListener.Default(form));
-        
+
         return form;
     }
 

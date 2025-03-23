@@ -4,8 +4,12 @@ public class SingleInvDisplayMenu : PreMadeMenu<SingleInventoryForm> {
     protected override FormBase Build() {
         SingleInventoryForm form = new(GetFormName(), (key, _, isPressed) => {
             if (!isPressed) return;
-            if (key != Key.Escape) return;
-            Close();
+            switch (key) {
+                case Key.Escape:
+                case Key.Tab:
+                    Close();
+                    return;
+            }
         });
         
         form.SetPrimaryInventory(GameManager.I().GetPlayer());

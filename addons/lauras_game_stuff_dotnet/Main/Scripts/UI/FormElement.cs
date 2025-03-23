@@ -1,5 +1,4 @@
 using System;
-using System.Linq;
 using Godot;
 
 public abstract class FormElement<T> : IFormElement where T : Control {
@@ -42,7 +41,7 @@ public abstract class FormElement<T> : IFormElement where T : Control {
     public void Destroy() {
         if (!IsValid() || _element.IsQueuedForDeletion()) return;
         OnDestroy();
-        //EventManager.UnregisterListeners(this);
+        
         foreach (SignalNode action in _actions.Values) action.QueueFree();
         _actions.Clear();
         _element.QueueFree();

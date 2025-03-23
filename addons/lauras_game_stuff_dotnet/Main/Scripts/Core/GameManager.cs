@@ -100,6 +100,13 @@ public class GameManager {
         TestScript activeScene = (TestScript)GetActiveScene();
         if (objBase != null) activeScene.GetObjects().Add(rootNode.GetInstanceId(), objBase);
     }
+
+    public void WakeObjects() {
+        foreach (IObjectBase obj in ((TestScript)GetActiveScene()).GetObjects().Values) {
+            Node3D node = obj.GetBaseNode3D();
+            if (!GameUtils.IsNodeInvalid(node) && node is RigidBody3D body) body.ApplyImpulse(Vector3.Up * 0.001f);
+        }
+    }
     
     public void Pause(bool pause) => GetTree().Paused = pause;
     public void SetMouseControl(bool mouseAvailable) => Input.MouseMode = mouseAvailable ? Input.MouseModeEnum.Visible : Input.MouseModeEnum.Captured;

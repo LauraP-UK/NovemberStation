@@ -93,10 +93,10 @@ public abstract class FormBase : IFormObject {
     public void SetPauseGame(bool value) => _pauseGame = value;
     public bool CaptureInput() {
         if (!IsValid()) return false;
-        return GetTopLevelLayout().Equals(this) ? _captureInput : GetTopLevelLayout().CaptureInput();
+        return Equals(GetTopLevelLayout()) ? _captureInput : GetTopLevelLayout().CaptureInput();
     }
     public void SetCaptureInput(bool value) {
-        if (GetTopLevelLayout().Equals(this)) _captureInput = value;
+        if (Equals(GetTopLevelLayout())) _captureInput = value;
         else GetTopLevelLayout().SetCaptureInput(value);
     }
     

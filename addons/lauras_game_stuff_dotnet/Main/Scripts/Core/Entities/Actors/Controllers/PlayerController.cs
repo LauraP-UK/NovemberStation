@@ -51,7 +51,7 @@ public class PlayerController : ControllerBase {
 
     [EventListener]
     private void OnInventoryOpen(KeyPressEvent ev, Key key) {
-        if (IsLocked() || key != Key.Tab) return;
+        if (IsLocked() || ev.IsCaptured() || key != Key.Tab) return;
         ev.Capture();
         new SingleInvDisplayMenu().Open();
     }

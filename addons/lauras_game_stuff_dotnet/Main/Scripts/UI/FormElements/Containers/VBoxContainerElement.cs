@@ -11,6 +11,7 @@ public class VBoxContainerElement : FormElement<VBoxContainer> {
     public void SetUniquesOnly(bool value) => _uniquesOnly = value;
     public List<IFormObject> GetDisplayObjects() => _displayObjects;
     public bool IsEmpty() => _displayObjects.Count == 0;
+    protected override void OnDestroy() => _displayObjects.ForEach(obj => obj.Destroy());
     public int GetChildCount() => _displayObjects.Count;
     public void AddChild(IFormObject child, int childIndex = -1) {
         if (_uniquesOnly && _displayObjects.Contains(child)) {

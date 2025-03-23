@@ -7,7 +7,7 @@ public class InvItemDisplay : FormBase, IFocusable {
     private readonly LabelElement _nameLabel, _itemCount, _totalWeight;
     private readonly TextureRectElement _itemIcon;
     private readonly ColorRectElement _bgColor;
-    private readonly ButtonElement _focusBtn, _expandBtn;
+    private readonly ButtonElement _focusBtn;
     private readonly ControlElement _extraInfoControl;
     private readonly VBoxContainerElement _subListVBox;
 
@@ -15,9 +15,9 @@ public class InvItemDisplay : FormBase, IFocusable {
     private readonly InventoryForm _ownerForm;
     private readonly List<string> _itemJsons = new();
 
-    private int _count = 0;
-    private float _weight = 0.0f;
-    private bool _isSelected = false, _isExpanded = false;
+    private int _count;
+    private float _weight;
+    private bool _isSelected, _isExpanded;
 
     private const string
         FORM_PATH = "res://Main/Prefabs/UI/GameElements/InvItemDisplay.tscn",
@@ -26,7 +26,6 @@ public class InvItemDisplay : FormBase, IFocusable {
         TOTAL_WEIGHT_LABEL = "Main/Content/ObjWeight",
         ITEM_IMG_TEXTURE = "Main/Content/ObjImg",
         BUTTON = "Main/Content/FocusButton",
-        EXPAND_BUTTON = "Main/Content/ExpandButton",
         EXTRA_INFO = "Main/ExtraInfo",
         SUB_BUTTON_LIST = "Main/ExtraInfo/SubButtonList",
         BG_COLOUR = "Main/BGContainer/BGColour";
@@ -53,7 +52,6 @@ public class InvItemDisplay : FormBase, IFocusable {
         TextureRect itemIcon = FindNode<TextureRect>(ITEM_IMG_TEXTURE);
         ColorRect bgColor = FindNode<ColorRect>(BG_COLOUR);
         Button button = FindNode<Button>(BUTTON);
-        Button expandBtn = FindNode<Button>(EXPAND_BUTTON);
         Control extraInfo = FindNode<Control>(EXTRA_INFO);
         VBoxContainer subButtonList = FindNode<VBoxContainer>(SUB_BUTTON_LIST);
 
@@ -63,7 +61,6 @@ public class InvItemDisplay : FormBase, IFocusable {
         _itemIcon = new TextureRectElement(itemIcon);
         _bgColor = new ColorRectElement(bgColor);
         _focusBtn = new ButtonElement(button);
-        _expandBtn = new ButtonElement(expandBtn);
         _extraInfoControl = new ControlElement(extraInfo);
         _subListVBox = new VBoxContainerElement(subButtonList);
 
@@ -86,10 +83,11 @@ public class InvItemDisplay : FormBase, IFocusable {
             if (_isSelected) return;
             VisualPress(false);
         });
-
-        _expandBtn.OnPressed(_ => {
-            SetExpanded(!IsExpanded());
-            _ownerForm.Refresh(this);
+        
+        OnPressed(_ => {
+            SetExpanded(true);
+            SelectAndAlert(true, null);
+            VisualPress(true);
         });
 
         _menuElement = new ControlElement(_menu, _ => {
@@ -97,7 +95,6 @@ public class InvItemDisplay : FormBase, IFocusable {
             GetWeightLabel().SetText($"{Mathsf.Round(_weight, 2)} {WEIGHT_SYMBOL}");
 
             _isExpanded = false;
-            _expandBtn.GetElement().SetText("+");
             _extraInfoControl.GetElement().SetVisible(false);
 
             List<string> itemJsons = GetItemJsons();
@@ -114,8 +111,9 @@ public class InvItemDisplay : FormBase, IFocusable {
         _menu.SetCustomMinimumSize(new Vector2(0, 50));
     }
 
-    protected override List<IFormObject> GetAllElements() => new() { _nameLabel, _itemCount, _totalWeight, _itemIcon, _bgColor, _focusBtn };
-    protected override void OnDestroy() { }
+    protected override List<IFormObject> GetAllElements() => new() { _nameLabel, _itemCount, _totalWeight, _itemIcon, _bgColor, _focusBtn, _extraInfoControl, _subListVBox };
+
+    protected override void OnDestroy() => _subListVBox.Destroy();
 
     public LabelElement GetNameLabel() => _nameLabel;
     public LabelElement GetCountLabel() => _itemCount;
@@ -136,8 +134,14 @@ public class InvItemDisplay : FormBase, IFocusable {
 
     public List<string> GetItemJsons() => _itemJsons;
 
+    public List<InvItemSummary> GetSummaries() => GetSubListVBox().GetDisplayObjects().Cast<InvItemSummary>().ToList();
+
     public void OnPressed(Action<InvItemDisplay> onPressed) => _focusBtn.OnPressed(_ => onPressed(this));
 
+    public void SelectAndAlert(bool selected, InvItemSummary selectedSummary) {
+        Select(selected);
+        if (selected) _ownerForm.SetSelectedItem(this, selectedSummary);
+    }
     public void Select(bool selected) {
         _isSelected = selected;
         GetBgColor().SetColor(selected ? SELECTED_BG_COLOR : DEFAULT_BG_COLOR);
@@ -147,23 +151,23 @@ public class InvItemDisplay : FormBase, IFocusable {
 
     public void SetExpanded(bool expanded) {
         _isExpanded = expanded;
-        _expandBtn.GetElement().SetText(expanded ? "-" : "+");
         _extraInfoControl.GetElement().SetVisible(expanded);
 
         if (expanded) {
             _extraInfoControl.GetNode().QueueRedraw();
             _menu.SetCustomMinimumSize(new Vector2(0, 50 + (GetItemJsons().Count) * 40));
-            _menu.QueueRedraw();
         }
         else {
             _extraInfoControl.GetNode().SetCustomMinimumSize(Vector2.Zero);
-            _menu.SetCustomMinimumSize(new Vector2(0, 50));
             _extraInfoControl.GetNode().QueueRedraw();
-            _menu.QueueRedraw();
+            _menu.SetCustomMinimumSize(new Vector2(0, 50));
         }
+        _menu.QueueRedraw();
     }
 
     public bool IsExpanded() => _isExpanded;
+    
+    public string GetFirstJson() => _itemJsons[0];
 
     public string GetJsonFromExpanded() {
         if (IsExpanded()) {
