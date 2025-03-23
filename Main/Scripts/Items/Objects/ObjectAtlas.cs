@@ -59,7 +59,7 @@ public static class ObjectAtlas {
         if (node == null) {
             instance = _dataOnlyCache.GetOrCompute(type, () => {
                 object o = Activator.CreateInstance(type, null, true);
-                if (o is not IObjectBase obj) throw new Exception($"ERROR: ObjectAtlas.CreateObject() : Created object is not of expected type 'IObjectBase'. Got '{o?.GetType()}'.");
+                if (o is not IObjectBase obj) throw new Exception($"ERROR: ObjectAtlas.CreateObject().GetOrCompute() : Created object is not of expected type 'IObjectBase'. Got '{o?.GetType()}'.");
                 return obj;
             });
         } else instance = Activator.CreateInstance(type, node, false); // Create a class of the given type with the given node. If the node is null, it's a data-only object and will not fully construct.

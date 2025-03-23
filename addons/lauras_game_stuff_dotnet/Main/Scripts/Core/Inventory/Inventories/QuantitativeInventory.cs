@@ -1,5 +1,6 @@
 ﻿
 using System;
+using System.Collections.Generic;
 using System.Linq;
 
 public class QuantitativeInventory : InventoryBase, IQuantitativeInventory, IOwnableInventory, IFilteredInventory {
@@ -24,6 +25,7 @@ public class QuantitativeInventory : InventoryBase, IQuantitativeInventory, IOwn
     public void SetOwner(IContainer owner) => _owner = owner;
     
     public void AddFilter(Func<object, bool> predicate) => _filters.Add(predicate);
+    public void AddFilters(IEnumerable<Func<object, bool>> predicates) => _filters.UnionWith(predicates);
     public void RemoveFilter(Func<object, bool> predicate) => _filters.Remove(predicate);
     public void ClearFilters() => _filters.Clear();
     public bool PassesFilters(object obj) => _filters.Cast<Func<object, bool>>().All(filter => filter(obj));

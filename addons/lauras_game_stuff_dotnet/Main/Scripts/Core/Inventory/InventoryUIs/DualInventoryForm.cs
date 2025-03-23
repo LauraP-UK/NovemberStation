@@ -95,7 +95,7 @@ public class DualInventoryForm : InventoryForm {
     }
 
     private bool TransferItem(string json, IContainer from, IContainer to, string filterFailMessage, string subclassFailMessage) {
-        string metaTag = Serialiser.GetSpecificData<string>(Serialiser.ObjectSaveData.META_TAG, json);
+        string metaTag = Serialiser.GetSpecificTag<string>(Serialiser.ObjectSaveData.META_TAG, json);
         AddItemFailCause result = to.GetInventory().CanAddItem(json);
         switch (result) {
             case AddItemFailCause.SUBCLASS_FAIL:

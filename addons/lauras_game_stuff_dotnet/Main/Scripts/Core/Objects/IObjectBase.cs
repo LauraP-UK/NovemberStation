@@ -12,5 +12,5 @@ public interface IObjectBase {
     public string GetSummary();
     public SmartDictionary<string, SmartSerialData> GetSerialiseData();
     public bool BuildFromData(Dictionary<string, object> data);
-    public string Serialize();
+    public string Serialise();
 }

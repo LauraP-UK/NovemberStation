@@ -74,7 +74,7 @@ public abstract class ObjectBase<T> : IObjectBase where T : Node3D {
         
         return true;
     }
-    public string Serialize() {
+    public string Serialise() {
         Serialiser.ObjectSaveData data = new() {
             MetaTag = GetObjectTag(),
             TypeID = Items.GetViaPath(GameUtils.FindSceneFilePath(GetBaseNode3D())).GetTypeID(),

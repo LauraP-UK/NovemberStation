@@ -144,9 +144,11 @@ public abstract class InventoryForm : FormBase {
         InvHeaderInfo invHeaderInfo = new(container.GetName(), new Vector2(100, 40));
 
         if (inventory is IVolumetricInventory volInv)
-            invHeaderInfo.SetWeight(volInv.GetUsedSize(), volInv.GetMaxSize());
+            invHeaderInfo.SetWeightInfo(volInv.GetUsedSize(), volInv.GetMaxSize());
+        else if (inventory is IQuantitativeInventory qInv)
+            invHeaderInfo.SetCapacityInfo(qInv.GetUsedQuantity(), qInv.GetMaxQuantity());
         else
-            invHeaderInfo.GetWeightLabel().SetAlpha(0.0f);
+            invHeaderInfo.GetInfoLabel().SetAlpha(0.0f);
 
         (side == InventorySide.PRIMARY ? _primaryHeader : _otherHeader).SetChildren(invHeaderInfo);
 
@@ -170,7 +172,10 @@ public abstract class InventoryForm : FormBase {
     public void SetPrimaryInventory(IContainer container) => SetInventory(container, InventorySide.PRIMARY);
     public void SetOtherInventory(IContainer container) => SetInventory(container, InventorySide.OTHER);
 
-    protected InvItemDisplay GetNewBtnOf(InvItemDisplay item, InventorySide side) => GetInventory(side).GetDisplayObjects().Cast<InvItemDisplay>().FirstOrDefault(i => i.GetItemType().Equals(item.GetItemType()));
+    protected InvItemDisplay GetNewBtnOf(InvItemDisplay item, InventorySide side) => GetInventory(side)
+        .GetDisplayObjects()
+        .Cast<InvItemDisplay>()
+        .FirstOrDefault(i => i.GetItemType().Equals(item.GetItemType()));
 
 
     private List<InvItemDisplay> GetButtons(IInventory inv) {
@@ -178,7 +183,7 @@ public abstract class InventoryForm : FormBase {
         List<InvItemDisplay> displayButtons = new();
 
         foreach (string itemJson in contents) {
-            string itemID = Serialiser.GetSpecificData<string>(Serialiser.ObjectSaveData.TYPE_ID, itemJson);
+            string itemID = Serialiser.GetSpecificTag<string>(Serialiser.ObjectSaveData.TYPE_ID, itemJson);
             IObjectBase objData = ObjectAtlas.DeserialiseDataWithoutNode(itemJson);
             ItemType itemType = Items.GetViaID(itemID);
             InvItemDisplay itemBtn = GetViaItem(itemType, displayButtons);

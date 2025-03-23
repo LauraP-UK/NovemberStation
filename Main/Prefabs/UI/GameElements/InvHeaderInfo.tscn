@@ -55,7 +55,7 @@ text = "INV_NAME"
 label_settings = SubResource("LabelSettings_3ew12")
 vertical_alignment = 1
 
-[node name="WeightLabel" type="Label" parent="."]
+[node name="InfoLabel" type="Label" parent="."]
 layout_mode = 1
 anchors_preset = 6
 anchor_left = 1.0

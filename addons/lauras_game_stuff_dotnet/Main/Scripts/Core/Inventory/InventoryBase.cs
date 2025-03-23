@@ -14,7 +14,7 @@ public abstract class InventoryBase : IInventory {
     public AddItemFailCause AddItem(IObjectBase item) {
         AddItemFailCause result = CanAddInternal(item);
         if (result != AddItemFailCause.SUCCESS) return result;
-        string jsonData = item.Serialize();
+        string jsonData = item.Serialise();
         string objectMetaTag = item.GetObjectTag();
         return AddItemUnchecked(objectMetaTag, jsonData);
     }
@@ -31,7 +31,7 @@ public abstract class InventoryBase : IInventory {
     }
 
     public AddItemFailCause CanAddItem(IObjectBase item) {
-        string itemJson = item.Serialize();
+        string itemJson = item.Serialise();
         return CanAddItem(itemJson);
     }
     public AddItemFailCause CanAddItem(string jsonData) {
@@ -45,7 +45,7 @@ public abstract class InventoryBase : IInventory {
     public void RemoveItem(string objectMetaTag, string jsonData) {
         List<string> group = GetGroup(objectMetaTag);
         if (group.Count == 0) {
-            GD.PrintErr($"RemoveItem() : No items found with objectMetaTag '{objectMetaTag}'.");
+            GD.PrintErr($"WARN: InventoryBase.RemoveItem() : No items found with objectMetaTag '{objectMetaTag}'.");
             return;
         }
 
@@ -56,11 +56,11 @@ public abstract class InventoryBase : IInventory {
     public bool HasItem(string objectMetaTag) => CountItemType(objectMetaTag) > 0;
 
     public bool HasItem(ItemType itemType) => GetContents()
-        .Select(json => Serialiser.GetSpecificData<string>(Serialiser.ObjectSaveData.TYPE_ID, json))
+        .Select(json => Serialiser.GetSpecificTag<string>(Serialiser.ObjectSaveData.TYPE_ID, json))
         .Any(typeID => typeID == itemType.GetTypeID());
 
     public List<string> GetContentsOfType(ItemType itemType) => GetContents()
-        .Where(json => itemType.GetTypeID() == Serialiser.GetSpecificData<string>(Serialiser.ObjectSaveData.TYPE_ID, json))
+        .Where(json => itemType.GetTypeID() == Serialiser.GetSpecificTag<string>(Serialiser.ObjectSaveData.TYPE_ID, json))
         .ToList();
 
     public List<string> GetContents() {
@@ -100,8 +100,7 @@ public abstract class InventoryBase : IInventory {
                 string itemJson = itemProp.Value.GetString();
                 if (string.IsNullOrEmpty(itemJson)) continue;
 
-                string metaTag = Serialiser.GetSpecificData<string>(Serialiser.ObjectSaveData.META_TAG, itemJson);
-                GD.Print($"Deserialising item with tag {metaTag} into {itemJson}");
+                string metaTag = Serialiser.GetSpecificTag<string>(Serialiser.ObjectSaveData.META_TAG, itemJson);
                 AddItemUnchecked(metaTag, itemJson);
             }
         }

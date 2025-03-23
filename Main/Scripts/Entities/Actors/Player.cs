@@ -58,7 +58,7 @@ public class Player : ActorBase, IViewable, IContainer {
 
     public bool RemoveItem(string objectJson) {
         VolumetricInventory inv = GetInventory().GetAs<VolumetricInventory>();
-        string tag = Serialiser.GetSpecificData<string>(Serialiser.ObjectSaveData.META_TAG, objectJson);
+        string tag = Serialiser.GetSpecificTag<string>(Serialiser.ObjectSaveData.META_TAG, objectJson);
         inv.RemoveItem(tag, objectJson);
         return true;
     }
