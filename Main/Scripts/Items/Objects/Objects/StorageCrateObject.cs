@@ -1,10 +1,13 @@
 ﻿using Godot;
 
 public class StorageCrateObject : ObjectBase<RigidBody3D>, IGrabbable, IShovable, IContainer {
+    [InventorySerialise]
     private readonly VolumetricInventory _inventory;
 
     public StorageCrateObject(RigidBody3D baseNode, bool dataOnly = false) : base(baseNode, "cube_obj") {
+        _inventory = new VolumetricInventory(350.0f, this);
         if (dataOnly) return;
+        
         RegisterAction<IGrabbable>((_, _) => true, Grab);
         RegisterAction<IShovable>((_, _) => true, Shove);
         RegisterArbitraryAction("Open", 20, (_, _) => true, (_, ev) => {
@@ -21,8 +24,6 @@ public class StorageCrateObject : ObjectBase<RigidBody3D>, IGrabbable, IShovable
 
             GD.Print(serialise);
         });
-
-        _inventory = new VolumetricInventory(350.0f, this);
     }
 
     public void Grab(ActorBase actorBase, IEventBase ev) => GrabActionDefault.Invoke(actorBase, GetBaseNode(), ev);
@@ -31,11 +32,11 @@ public class StorageCrateObject : ObjectBase<RigidBody3D>, IGrabbable, IShovable
     public override string GetDisplayName() => Items.STORAGE_CRATE.GetItemName();
     public override string GetContext() => $"Contains: {_inventory.GetUsedSize()}/{_inventory.GetMaxSize()} kg";
     public override string GetSummary() => GetContext();
-    public override SmartDictionary<string, SmartSerialData> GetSerialiseData() {
+    /*public override SmartDictionary<string, SmartSerialData> GetSerialiseData() {
         return new SmartDictionary<string, SmartSerialData> {
             {InventoryBase.INVENTORY_TAG, SmartSerialData.FromInventory(_inventory)}
         };
-    }
+    }*/
     public IInventory GetInventory() => _inventory;
     public string GetName() => GetDisplayName();
 

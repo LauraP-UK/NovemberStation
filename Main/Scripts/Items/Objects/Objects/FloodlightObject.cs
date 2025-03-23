@@ -10,8 +10,13 @@ public class FloodlightObject : ObjectBase<RigidBody3D>, IGrabbable, IUsable, IC
     private const float FAIL_START_AT_PERCENT = 16.6f;
 
     private readonly float _initialRange, _initialAngle, _initialEnergy;
+    
+    [InventorySerialise]
     private readonly QuantitativeInventory _inventory;
 
+    public const string IS_ON_KEY = "isOn";
+    
+    [SerialiseData(IS_ON_KEY, nameof(ToggleLight), nameof(TurnOff))]
     private bool _isOn;
 
     private const string
@@ -103,6 +108,8 @@ public class FloodlightObject : ObjectBase<RigidBody3D>, IGrabbable, IUsable, IC
         HandleLighting();
     }
 
+    private void TurnOff() => ToggleLight(false);
+
     private void HandleLighting() {
         if (_lightTip.MaterialOverride is not StandardMaterial3D mat) {
             GD.PrintErr("WARN: FloodlightObject.HandleLighting() : Failed to get material override.");
@@ -161,13 +168,13 @@ public class FloodlightObject : ObjectBase<RigidBody3D>, IGrabbable, IUsable, IC
 
     public override string GetSummary() => GetContext().Replace("\n", " | ");
 
-    public override SmartDictionary<string, SmartSerialData> GetSerialiseData() {
+    /*public override SmartDictionary<string, SmartSerialData> GetSerialiseData() {
         return new SmartDictionary<string, SmartSerialData> {
             { "isOn", SmartSerialData.From(_isOn, v => ToggleLight(Convert.ToBoolean(v)), () => ToggleLight(false)) },
             { "powerMillis", SmartSerialData.From(GetPowerRemaining(), _ => { }, () => { })},
             { InventoryBase.INVENTORY_TAG, SmartSerialData.FromInventory(_inventory) }
         };
-    }
+    }*/
 
     public float GetSize() => 90.0f;
     public void Collect(ActorBase actorBase, IEventBase ev) => CollectActionDefault.Invoke(actorBase, this, ev);

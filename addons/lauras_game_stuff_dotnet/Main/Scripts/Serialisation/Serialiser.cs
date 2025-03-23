@@ -4,7 +4,13 @@ using System.Text.Json;
 using Godot;
 
 public static class Serialiser {
-    public static string Serialise<T>(T obj) => JsonSerializer.Serialize(obj);
+    public static string Serialise<T>(T obj) {
+        return JsonSerializer.Serialize(obj, new JsonSerializerOptions {
+            WriteIndented = true,
+            IncludeFields = false
+        });
+    }
+
     public static T Deserialise<T>(string json) => JsonSerializer.Deserialize<T>(json);
 
     public static T GetSpecificTag<T>(string dataTag, string json) {

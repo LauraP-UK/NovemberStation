@@ -3,6 +3,8 @@ using System;
 using Godot;
 
 public class GasCanObject : ObjectBase<RigidBody3D>, IGrabbable, IShovable, IDrinkable, ICollectable, IVolumetricObject {
+    public const string FUEL_AMOUNT_KEY = "fuelAmount";
+    [SerialiseData(FUEL_AMOUNT_KEY, nameof(SetFuelAmount), nameof(SetFuelDefault))]
     private int _fuelAmount = 100;
 
     public GasCanObject(RigidBody3D baseNode, bool dataOnly = false) : base(baseNode, "gascan_obj") {
@@ -30,14 +32,10 @@ public class GasCanObject : ObjectBase<RigidBody3D>, IGrabbable, IShovable, IDri
             _ => "EMPTY"
         };
     }
+    public void SetFuelAmount(int amount) => _fuelAmount = amount;
+    public void SetFuelDefault() => _fuelAmount = 100;
     
     public override string GetSummary() => GetContext().Replace("\n", " | ");
-    
-    public override SmartDictionary<string, SmartSerialData> GetSerialiseData() {
-        return new SmartDictionary<string, SmartSerialData> {
-            { "fuelAmount", SmartSerialData.From(_fuelAmount, v => _fuelAmount = Convert.ToInt32(v), () => _fuelAmount = 100) }
-        };
-    }
     public void Collect(ActorBase actorBase, IEventBase ev) => CollectActionDefault.Invoke(actorBase, this, ev);
     public float GetSize() => 15.0f;
 }
