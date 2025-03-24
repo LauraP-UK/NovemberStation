@@ -53,22 +53,24 @@ public abstract class ObjectBase<T> : IObjectBase where T : Node3D {
     public abstract string GetDisplayName();
     public abstract string GetContext();
     public abstract string GetSummary();
-    public abstract SmartDictionary<string, SmartSerialData> GetSerialiseData();
+
+    public SmartDictionary<string, SmartSerialData> GetSerialiseData() => ObjectAtlas.GetSerialiseData(GetType());
+
     public bool BuildFromData(Dictionary<string, object> data) {
         SmartDictionary<string, SmartSerialData> thisData = GetSerialiseData();
-        
+
         foreach ((string key, SmartSerialData serialData) in thisData) {
             if (!data.TryGetValue(key, out object v)) {
                 GD.Print($"WARN: ObjectBase<T>.BuildFromData() : Key not found in data: {key}");
-                serialData.GetFallback().Invoke();
+                serialData.InvokeInstanceFallback(this);
                 continue;
             }
 
             try {
-                serialData.GetSetter().Invoke(v);
+                serialData.InvokeInstanceSetter(this, v);
             } catch (Exception e) {
                 GD.PrintErr($"WARN: ObjectBase<T>.BuildFromData() : Failed to set {key} to {v} on object {GetDisplayName()}. Using fallback setting...\n{e}");
-                serialData.GetFallback().Invoke();
+                serialData.InvokeInstanceFallback(this);
             }
         }
         
@@ -78,7 +80,7 @@ public abstract class ObjectBase<T> : IObjectBase where T : Node3D {
         Serialiser.ObjectSaveData data = new() {
             MetaTag = GetObjectTag(),
             TypeID = Items.GetViaPath(GameUtils.FindSceneFilePath(GetBaseNode3D())).GetTypeID(),
-            Data = GetSerialiseData().ToDictionary(kvp => kvp.Key, kvp => kvp.Value.GetData())
+            Data = GetSerialiseData().ToDictionary(kvp => kvp.Key, kvp => kvp.Value.InvokeInstanceGetter(this) ?? kvp.Value.GetData())
         };
         return Serialiser.Serialise(data);
     }

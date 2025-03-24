@@ -10,8 +10,13 @@ public class FloodlightObject : ObjectBase<RigidBody3D>, IGrabbable, IUsable, IC
     private const float FAIL_START_AT_PERCENT = 16.6f;
 
     private readonly float _initialRange, _initialAngle, _initialEnergy;
+    
+    [InventorySerialise]
     private readonly QuantitativeInventory _inventory;
 
+    public const string IS_ON_KEY = "isOn";
+    
+    [SerialiseData(IS_ON_KEY, nameof(ToggleLight), nameof(TurnOff))]
     private bool _isOn;
 
     private const string
@@ -88,6 +93,10 @@ public class FloodlightObject : ObjectBase<RigidBody3D>, IGrabbable, IUsable, IC
     private void SerialiseTest(ActorBase actorBase, IEventBase ev) {
         if (ev is not KeyPressEvent) return;
         string savePath = "user://SerialiseTest.json";
+
+        List<string> contents = _inventory.GetContents();
+        GD.Print($"Serialising these contents: {string.Join(", ", contents)}");
+
         string jsonData = Serialise();
 
         using FileAccess file = FileAccess.Open(savePath, FileAccess.ModeFlags.Write);
@@ -102,6 +111,8 @@ public class FloodlightObject : ObjectBase<RigidBody3D>, IGrabbable, IUsable, IC
         _light.Visible = isOn;
         HandleLighting();
     }
+
+    private void TurnOff() => ToggleLight(false);
 
     private void HandleLighting() {
         if (_lightTip.MaterialOverride is not StandardMaterial3D mat) {
@@ -127,7 +138,7 @@ public class FloodlightObject : ObjectBase<RigidBody3D>, IGrabbable, IUsable, IC
         if (GameUtils.IsNodeInvalid(_lightTip) || !_isOn || GetPowerRemaining() <= 0.0f) return;
 
         List<string> oldJsons = _inventory.GetContents();
-        List<string> newJsons = oldJsons.Select(json => Serialiser.ModifySpecificData<float>("power", p => Math.Max(p - (delta * 0.5f), 0.0f), json)).ToList();
+        List<string> newJsons = oldJsons.Select(json => Serialiser.ModifySpecificData<float>(BatteryObject.POWER_KEY, p => Math.Max(p - (delta * 0.5f), 0.0f), json)).ToList();
 
         string tag = Serialiser.GetSpecificTag<string>(Serialiser.ObjectSaveData.META_TAG, newJsons[0]);
 
@@ -141,7 +152,7 @@ public class FloodlightObject : ObjectBase<RigidBody3D>, IGrabbable, IUsable, IC
         float totalCount =
             GetInventory()
             .GetContents()
-            .Select(json => Serialiser.GetSpecificData<float>("power", json))
+            .Select(json => Serialiser.GetSpecificData<float>(BatteryObject.POWER_KEY, json))
             .Sum();
         
         float maxPower =
@@ -160,14 +171,6 @@ public class FloodlightObject : ObjectBase<RigidBody3D>, IGrabbable, IUsable, IC
     }
 
     public override string GetSummary() => GetContext().Replace("\n", " | ");
-
-    public override SmartDictionary<string, SmartSerialData> GetSerialiseData() {
-        return new SmartDictionary<string, SmartSerialData> {
-            { "isOn", SmartSerialData.From(_isOn, v => ToggleLight(Convert.ToBoolean(v)), () => ToggleLight(false)) },
-            { "powerMillis", SmartSerialData.From(GetPowerRemaining(), _ => { }, () => { })},
-            { InventoryBase.INVENTORY_TAG, SmartSerialData.FromInventory(_inventory) }
-        };
-    }
 
     public float GetSize() => 90.0f;
     public void Collect(ActorBase actorBase, IEventBase ev) => CollectActionDefault.Invoke(actorBase, this, ev);

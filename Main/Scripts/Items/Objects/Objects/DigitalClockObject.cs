@@ -38,7 +38,6 @@ public class DigitalClockObject : ObjectBase<RigidBody3D>, IGrabbable, IProcess,
     public override string GetDisplayName() => Items.DIGITAL_CLOCK.GetItemName();
     public override string GetContext() => $"Day: {EnvironmentManager.GetDay()+1}";
     public override string GetSummary() => "";
-    public override SmartDictionary<string, SmartSerialData> GetSerialiseData() => new();
 
     public void Grab(ActorBase actorBase, IEventBase ev) => GrabActionDefault.Invoke(actorBase, GetBaseNode(), ev);
 
