@@ -177,6 +177,14 @@ public class FloodlightObject : ObjectBase<RigidBody3D>, IGrabbable, IUsable, IC
     public IInventory GetInventory() => _inventory;
     public string GetName() => "Floodlight Battery Slots";
 
+    public AddItemFailCause StoreItem(ItemType itemType) {
+        RigidBody3D node = itemType.CreateInstance();
+        IObjectBase obj = GameManager.I().RegisterObject(node);
+        AddItemFailCause result = StoreItem(obj, node);
+        node.QueueFree();
+        return result;
+    }
+
     public AddItemFailCause StoreItem(IObjectBase objectBase, Node node) {
         AddItemFailCause result = GetInventory().GetAs<QuantitativeInventory>().AddItem(objectBase);
         if (result == AddItemFailCause.SUCCESS) node.QueueFree();

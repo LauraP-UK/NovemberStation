@@ -5,7 +5,8 @@ using Godot;
 public class ItemType {
     private readonly string _typeID, _itemName, _imagePath, _modelPath, _description;
     private readonly int _itemCost;
-    private readonly Action<RigidBody3D> _onSpawn;
+    private readonly Action<RigidBody3D> _onNodeSpawn;
+    private readonly Action<IObjectBase> _onDataSpawn;
 
     private static readonly List<KeyValuePair<int, bool>>
         _collisionMasks = new() {
@@ -19,14 +20,15 @@ public class ItemType {
             new KeyValuePair<int, bool>(4, true)
         };
 
-    private ItemType(string typeID, string itemName, string imagePath, string modelPath, string description, int itemCost, Action<RigidBody3D> onSpawn) {
+    private ItemType(string typeID, string itemName, string imagePath, string modelPath, string description, int itemCost, Action<RigidBody3D> onNodeSpawn, Action<IObjectBase> onDataSpawn) {
         _typeID = typeID;
         _itemName = itemName;
         _imagePath = imagePath;
         _modelPath = modelPath;
         _description = description;
         _itemCost = itemCost;
-        _onSpawn = onSpawn;
+        _onNodeSpawn = onNodeSpawn;
+        _onDataSpawn = onDataSpawn;
     }
 
     public string GetTypeID() => _typeID;
@@ -35,14 +37,15 @@ public class ItemType {
     public string GetModelPath() => _modelPath;
     public string GetDescription() => _description;
     public int GetItemCost() => _itemCost;
-
     public Texture2D GetImage() => ResourceLoader.Load<Texture2D>(GetImagePath());
+    
+    public void TryOnDataSpawn(IObjectBase objBase) => _onDataSpawn?.Invoke(objBase);
 
     public RigidBody3D CreateInstance() {
         RigidBody3D rigidBody3D = Loader.SafeInstantiate<RigidBody3D>(GetModelPath());
         _collisionLayers.ForEach(pair => rigidBody3D.SetCollisionLayerValue(pair.Key, pair.Value));
         _collisionMasks.ForEach(pair => rigidBody3D.SetCollisionMaskValue(pair.Key, pair.Value));
-        _onSpawn?.Invoke(rigidBody3D);
+        _onNodeSpawn?.Invoke(rigidBody3D);
         return rigidBody3D;
     }
 
@@ -59,7 +62,7 @@ public class ItemType {
         return item;
     }
 
-    public static ItemType Create(string typeID, string itemName, string imagePath, string modelPath, string description, int itemCost, Action<RigidBody3D> onSpawn = null) {
-        return new ItemType(typeID, itemName, imagePath, modelPath, description, itemCost, onSpawn);
+    public static ItemType Create(string typeID, string itemName, string imagePath, string modelPath, string description, int itemCost, Action<RigidBody3D> onNodeSpawn = null, Action<IObjectBase> onDataSpawn = null) {
+        return new ItemType(typeID, itemName, imagePath, modelPath, description, itemCost, onNodeSpawn, onDataSpawn);
     }
 }

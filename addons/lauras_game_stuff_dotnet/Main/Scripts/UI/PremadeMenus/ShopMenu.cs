@@ -21,7 +21,8 @@ public class ShopMenu : PreMadeMenu<TestDisplayForm> {
                     Vector3 spawn = Raycast.Trace(gameManager.GetPlayer(), 2.0f).GetEnd();
                     rigidBody3D.SetPosition(spawn);
                     rigidBody3D.SetRotation(gameManager.GetPlayer().GetModel().GetRotation());
-                    GameManager.I().RegisterObject(rigidBody3D);
+                    IObjectBase objData = GameManager.I().RegisterObject(rigidBody3D);
+                    itemType.TryOnDataSpawn(objData);
                     Close();
                 });
                 btn.SetTopLevelLayout(form.GetTopLevelLayout());

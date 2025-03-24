@@ -1,6 +1,4 @@
-﻿
-using System;
-using Godot;
+﻿using Godot;
 
 public class GasCanObject : ObjectBase<RigidBody3D>, IGrabbable, IShovable, IDrinkable, ICollectable, IVolumetricObject {
     public const string FUEL_AMOUNT_KEY = "fuelAmount";

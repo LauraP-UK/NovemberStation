@@ -34,6 +34,13 @@ public class StorageCrateObject : ObjectBase<RigidBody3D>, IGrabbable, IShovable
     public override string GetSummary() => GetContext();
     public IInventory GetInventory() => _inventory;
     public string GetName() => GetDisplayName();
+    public AddItemFailCause StoreItem(ItemType itemType) {
+        RigidBody3D node = itemType.CreateInstance();
+        IObjectBase obj = GameManager.I().RegisterObject(node);
+        AddItemFailCause result = StoreItem(obj, node);
+        node.QueueFree();
+        return result;
+    }
 
     public AddItemFailCause StoreItem(IObjectBase objectBase, Node node) {
         AddItemFailCause result = _inventory.AddItem(objectBase);

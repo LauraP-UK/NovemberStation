@@ -22,7 +22,7 @@ public class Items {
         "res://Main/Prefabs/Sandbox/Geometry/PhysicsCube.tscn",
         "A wooden storage crate.",
         130,
-        cube => cube.Mass = Math.Max(Randf.Random(0, 10) * 5, 1));
+        crate => crate.Mass = Math.Max(Randf.Random(0, 10) * 5, 1));
     public static readonly ItemType CROWBAR = ItemType.Create("crowbar",
         "Crowbar",
         "res://Main/Textures/Items/Crowbar.png",
@@ -40,7 +40,11 @@ public class Items {
         "res://Main/Textures/Items/Floodlight.png",
         "res://Main/Prefabs/PhysicsObjects/Floodlight.tscn",
         "I love lamp.",
-        300);
+        300,
+        null,
+        data => {
+            for (int i = 0; i < 4; i++) ((FloodlightObject)data).StoreItem(BATTERY);
+        });
     public static readonly ItemType BED = ItemType.Create("bed",
         "Bed",
         "res://Main/Textures/Items/BedImage.png",

@@ -50,8 +50,10 @@ public class PC2Object : ObjectBase<Node3D>, IUsable {
                         RigidBody3D rigidBody3D = itemType.CreateInstance();
                         gameManager.GetSceneObjects().AddChild(rigidBody3D);
                         rigidBody3D.SetPosition(_spawnPoint.GlobalPosition + new Vector3(0,0.5f,0));
-                    
-                        gameManager.RegisterObject(rigidBody3D);
+
+                        IObjectBase objData = gameManager.RegisterObject(rigidBody3D);
+                        itemType.TryOnDataSpawn(objData);
+                        
                         Toast.Info(gameManager.GetPlayer(), $"Purchased {itemType.GetItemName()} for {itemType.GetItemCost()}{ShopItemDisplayButton.CREDITS_SYMBOL}");
                     });
 

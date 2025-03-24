@@ -34,7 +34,9 @@ public partial class TestScript : Node {
         Node3D sceneObjects = GetTree().Root.GetNode<Node3D>("Main/SceneObjects");
         foreach (Node child in sceneObjects.GetChildren()) {
             if (child is not Node3D obj) continue;
-            gameManager.RegisterObject(obj);
+            IObjectBase objData = gameManager.RegisterObject(obj);
+            if (objData is StorageCrateObject crate)
+                crate.StoreItem(Randf.Random(Items.CROWBAR, Items.BATTERY, Items.FLOODLIGHT, Items.GAS_CAN, Items.DIGITAL_CLOCK, Items.FIRE_EXTINGUISHER));
         }
 
         foreach (Node child in gameManager.GetSceneObjects().GetChildren()) {
@@ -56,10 +58,10 @@ public partial class TestScript : Node {
         GD.Print($"Dynamic Objects: {_objSpawns.Count}");
 
         Scheduler.ScheduleRepeating(0L, 1000L, _ => _objects.RemoveWhere(pair => GameUtils.IsNodeInvalid(pair.Value.GetBaseNode3D())));
-        
+
         using FileAccess file = FileAccess.Open("user://SerialiseTest.json", FileAccess.ModeFlags.Read);
         string json = file.GetAsText();
-        
+
         ObjectAtlas.CreatedObject createdObjectFromJson = ObjectAtlas.CreatedObjectFromJson(json);
 
         if (createdObjectFromJson.Success) {
@@ -68,8 +70,7 @@ public partial class TestScript : Node {
                 storageCrate.StoreItem(createdObjectFromJson.Object, createdObjectFromJson.Node);
                 break;
             }
-        }
-        else {
+        } else {
             GD.PrintErr($"Failed to create object from JSON.\nGot: {createdObjectFromJson}");
         }
     }
@@ -85,7 +86,7 @@ public partial class TestScript : Node {
             player.SetPosition(spwan, new Vector3(0.0f, -90.0f, 0.0f));
             Toast.Warn(player, "You fell off, you numpty. I'm respawning you...");
         }
-        
+
         if (!gameManager.GetTree().IsPaused()) EnvironmentManager.Process(delta);
 
         Node sceneObjects = gameManager.GetSceneObjects();
