@@ -89,9 +89,7 @@ public static class ObjectAtlas {
                 }
             );
         }
-
-        foreach (KeyValuePair<string, SmartSerialData> data in serialiseData) GD.Print($"For {clazz.Name} : {data.Key} : {data.Value}");
-
+        
         _serialiseDataCache.Add(clazz, serialiseData);
     }
 

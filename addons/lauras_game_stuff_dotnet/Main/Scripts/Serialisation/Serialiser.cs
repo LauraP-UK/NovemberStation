@@ -85,6 +85,8 @@ public static class Serialiser {
             JsonValueKind.True => true,
             JsonValueKind.False => false,
             JsonValueKind.String => elem.GetString(),
+            JsonValueKind.Object => elem,
+            JsonValueKind.Array => elem,
             _ => null
         };
     }

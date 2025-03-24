@@ -1,5 +1,4 @@
 ﻿using System;
-using Godot;
 
 public class SmartSerialData {
     private readonly Func<object> _getter;

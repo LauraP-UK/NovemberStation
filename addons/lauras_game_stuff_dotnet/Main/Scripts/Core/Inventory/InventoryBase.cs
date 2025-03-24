@@ -90,6 +90,7 @@ public abstract class InventoryBase : IInventory {
 
         return JsonSerializer.Serialize(wrapper);
     }
+
     public void Deserialise(string json) {
         using JsonDocument doc = JsonDocument.Parse(json);
         JsonElement root = doc.RootElement;
@@ -103,6 +104,23 @@ public abstract class InventoryBase : IInventory {
                 string metaTag = Serialiser.GetSpecificTag<string>(Serialiser.ObjectSaveData.META_TAG, itemJson);
                 AddItemUnchecked(metaTag, itemJson);
             }
+        }
+    }
+
+    public Dictionary<string, string> SerialiseToDict() {
+        Dictionary<string, string> inventoryContents = new();
+        List<string> items = GetContents();
+
+        for (int i = 0; i < items.Count; i++) inventoryContents[i.ToString()] = items[i];
+
+        return inventoryContents;
+    }
+    public void DeserialiseFromDict(Dictionary<string, string> data) {
+        ClearContents();
+        foreach (KeyValuePair<string, string> entry in data) {
+            ObjectAtlas.CreatedObject created = ObjectAtlas.CreatedObjectFromJson(entry.Value);
+            if (created.Success) AddItem(created.Object);
+            created.Node.QueueFree();
         }
     }
 

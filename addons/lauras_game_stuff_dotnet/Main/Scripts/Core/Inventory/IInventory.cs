@@ -21,4 +21,6 @@ public interface IInventory {
     public T GetAs<T>() where T : IInventory;
     public string Serialise();
     public void Deserialise(string json);
+    public Dictionary<string, string> SerialiseToDict();
+    public void DeserialiseFromDict(Dictionary<string, string> data);
 }
