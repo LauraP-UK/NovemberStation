@@ -2,52 +2,61 @@
 using Godot;
 
 public class SmartSerialData {
-    private readonly object _data;
+    private readonly Func<object> _getter;
     private readonly Action<object> _setter;
     private readonly Action _fallback;
+    private Func<object, object> _instanceGetter;
     private Action<object, object> _instanceSetter;
     private Action<object> _instanceFallback;
 
-    private SmartSerialData(object data, Action<object> setter, Action fallback) {
-        _data = data;
+    private SmartSerialData(Func<object> getter, Action<object> setter, Action fallback) {
+        _getter = getter;
         _setter = setter;
         _fallback = fallback;
     }
 
-    public object GetData() => _data;
+    public object GetData() {
+        object value = _getter();
+        if (value is Delegate)
+            throw new Exception("ERROR: SmartSerialData.GetData() returned a delegate! This is not allowed.");
+        return value;
+    }
+
     public Action<object> GetSetter() => _setter;
     public Action GetFallback() => _fallback;
-    public override string ToString() => $"[ Data : {_data} , Setter : {_setter} , Fallback : {_fallback} ]";
+
+    public SmartSerialData WithInstanceGetter(Func<object, object> getter) {
+        _instanceGetter = getter;
+        return this;
+    }
+
+    public object InvokeInstanceGetter(object targetInstance) => _instanceGetter?.Invoke(targetInstance);
 
     public SmartSerialData WithInstanceSetter(Action<object, object> setter) {
         _instanceSetter = setter;
         return this;
     }
+
     public void InvokeInstanceSetter(object targetInstance, object value) => _instanceSetter?.Invoke(targetInstance, value);
 
     public SmartSerialData WithInstanceFallback(Action<object> fallback) {
         _instanceFallback = fallback;
         return this;
     }
+
     public void InvokeInstanceFallback(object targetInstance) => _instanceFallback?.Invoke(targetInstance);
 
-    public static SmartSerialData From(object data, Action<object> setter, Action fallback) {
-        return new SmartSerialData(data, setter, fallback);
+    public static SmartSerialData From(Func<object> getter, Action<object> setter, Action fallback) {
+        return new SmartSerialData(getter, setter, fallback);
     }
 
-    public static SmartSerialData FromInventory(IInventory inventory, Action fallbackOverride = null) {
-        string json = inventory.Serialise();
-        return From(json,
-            v => {
-                if (v is not string s) {
-                    GD.PrintErr($"ERROR: FloodlightObject.GetSerialiseData() : Failed to deserialise inventory data. Expected string, got {v ?? "null"}");
-                    return;
-                }
-                inventory.Deserialise(s);
-            },
-            () => {
-                if (fallbackOverride == null) inventory.ClearContents();
-                else fallbackOverride();
-            });
+    public static SmartSerialData FromInventory() {
+        return From(
+                () => throw new InvalidOperationException("Use instance-aware getter"),
+                v => throw new InvalidOperationException("Use instance-aware setter"),
+                () => throw new InvalidOperationException("Use instance-aware fallback")
+            ).WithInstanceSetter(InventorySerialiseHandlers.SetInventory)
+            .WithInstanceFallback(InventorySerialiseHandlers.FallbackInventory)
+            .WithInstanceGetter(InventorySerialiseHandlers.GetInventory);
     }
 }

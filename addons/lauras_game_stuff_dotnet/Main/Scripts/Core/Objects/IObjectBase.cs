@@ -10,7 +10,7 @@ public interface IObjectBase {
     public string GetDisplayName();
     public string GetContext();
     public string GetSummary();
-    public SmartDictionary<string, SmartSerialData> GetNEWSerialiseData();
+    public SmartDictionary<string, SmartSerialData> GetSerialiseData();
     public bool BuildFromData(Dictionary<string, object> data);
     public string Serialise();
 }

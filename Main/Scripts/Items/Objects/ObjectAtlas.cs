@@ -57,12 +57,12 @@ public static class ObjectAtlas {
             }
 
             if (attr.Handler == SerialiseDataAttribute.SerialiseHandler.INVENTORY || typeof(IInventory).IsAssignableFrom(field.FieldType)) {
-                if (field.GetValue(dummyObj) is not IInventory inv) {
+                if (field.GetValue(dummyObj) is not IInventory) {
                     GD.PrintErr($"WARN: Serialiser.RegisterSerialiseData() : Expected IInventory but got {field.FieldType}.");
                     continue;
                 }
-                
-                serialiseData[attr.Key] = SmartSerialData.FromInventory(inv);
+
+                serialiseData[attr.Key] = SmartSerialData.FromInventory();
                 continue;
             }
 
@@ -73,14 +73,12 @@ public static class ObjectAtlas {
                 GD.PrintErr($"WARN: Serialiser.RegisterSerialiseData() : Missing setter or fallback method for {clazz.Name}.{field.Name}");
                 continue;
             }
-
-            GD.Print($"For {clazz.Name} : {attr.Key} : Value: {field.Name}  Setter: {setterMethod.Name} Fallback: {fallbackMethod.Name}");
-
+            
             serialiseData[attr.Key] = SmartSerialData.From(
-                () => field.GetValue(dummyObj),
+                () => throw new InvalidOperationException("Use the overload that accepts the instance for the GETTER."),
                 value => throw new InvalidOperationException("Use the overload that accepts the instance for the SETTER."),
                 () => throw new InvalidOperationException("Use the overload that accepts the instance for the FALLBACK.")
-            ).WithInstanceSetter(
+            ).WithInstanceGetter((instance) => field.GetValue(instance)).WithInstanceSetter(
                 (instance, value) => {
                     object convertedValue = Convert.ChangeType(value, setterMethod.GetParameters()[0].ParameterType);
                     setterMethod.Invoke(instance, new[] { convertedValue });
@@ -118,6 +116,8 @@ public static class ObjectAtlas {
 
     public static IObjectBase CreateObject(Type type, Node3D node) {
         object instance;
+
+        // Create a class of the given type with the given node. If the node is null, it's a data-only object and will not fully construct.
         if (node == null) {
             instance = _dataOnlyCache.GetOrCompute(
                 type, () => {
@@ -127,10 +127,7 @@ public static class ObjectAtlas {
                     return obj;
                 }
             );
-        } else
-            instance = Activator.CreateInstance(
-                type, node, false
-            ); // Create a class of the given type with the given node. If the node is null, it's a data-only object and will not fully construct.
+        } else instance = Activator.CreateInstance(type, node, false);
 
         if (instance is not IObjectBase obj)
             throw new Exception($"ERROR: ObjectAtlas.CreateObject() : Created object is not of expected type 'IObjectBase'. Got '{instance?.GetType()}'.");

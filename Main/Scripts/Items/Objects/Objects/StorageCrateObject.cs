@@ -32,16 +32,11 @@ public class StorageCrateObject : ObjectBase<RigidBody3D>, IGrabbable, IShovable
     public override string GetDisplayName() => Items.STORAGE_CRATE.GetItemName();
     public override string GetContext() => $"Contains: {_inventory.GetUsedSize()}/{_inventory.GetMaxSize()} kg";
     public override string GetSummary() => GetContext();
-    /*public override SmartDictionary<string, SmartSerialData> GetSerialiseData() {
-        return new SmartDictionary<string, SmartSerialData> {
-            {InventoryBase.INVENTORY_TAG, SmartSerialData.FromInventory(_inventory)}
-        };
-    }*/
     public IInventory GetInventory() => _inventory;
     public string GetName() => GetDisplayName();
 
     public AddItemFailCause StoreItem(IObjectBase objectBase, Node node) {
-        AddItemFailCause result = GetInventory().GetAs<VolumetricInventory>().AddItem(objectBase);
+        AddItemFailCause result = _inventory.AddItem(objectBase);
         if (result == AddItemFailCause.SUCCESS) node.QueueFree();
         return result;
     }

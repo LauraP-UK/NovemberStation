@@ -93,6 +93,10 @@ public class FloodlightObject : ObjectBase<RigidBody3D>, IGrabbable, IUsable, IC
     private void SerialiseTest(ActorBase actorBase, IEventBase ev) {
         if (ev is not KeyPressEvent) return;
         string savePath = "user://SerialiseTest.json";
+
+        List<string> contents = _inventory.GetContents();
+        GD.Print($"Serialising these contents: {string.Join(", ", contents)}");
+
         string jsonData = Serialise();
 
         using FileAccess file = FileAccess.Open(savePath, FileAccess.ModeFlags.Write);
@@ -167,14 +171,6 @@ public class FloodlightObject : ObjectBase<RigidBody3D>, IGrabbable, IUsable, IC
     }
 
     public override string GetSummary() => GetContext().Replace("\n", " | ");
-
-    /*public override SmartDictionary<string, SmartSerialData> GetSerialiseData() {
-        return new SmartDictionary<string, SmartSerialData> {
-            { "isOn", SmartSerialData.From(_isOn, v => ToggleLight(Convert.ToBoolean(v)), () => ToggleLight(false)) },
-            { "powerMillis", SmartSerialData.From(GetPowerRemaining(), _ => { }, () => { })},
-            { InventoryBase.INVENTORY_TAG, SmartSerialData.FromInventory(_inventory) }
-        };
-    }*/
 
     public float GetSize() => 90.0f;
     public void Collect(ActorBase actorBase, IEventBase ev) => CollectActionDefault.Invoke(actorBase, this, ev);
