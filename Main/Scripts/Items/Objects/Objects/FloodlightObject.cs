@@ -138,7 +138,7 @@ public class FloodlightObject : ObjectBase<RigidBody3D>, IGrabbable, IUsable, IC
         if (GameUtils.IsNodeInvalid(_lightTip) || !_isOn || GetPowerRemaining() <= 0.0f) return;
 
         List<string> oldJsons = _inventory.GetContents();
-        List<string> newJsons = oldJsons.Select(json => Serialiser.ModifySpecificData<float>("power", p => Math.Max(p - (delta * 0.5f), 0.0f), json)).ToList();
+        List<string> newJsons = oldJsons.Select(json => Serialiser.ModifySpecificData<float>(BatteryObject.POWER_KEY, p => Math.Max(p - (delta * 0.5f), 0.0f), json)).ToList();
 
         string tag = Serialiser.GetSpecificTag<string>(Serialiser.ObjectSaveData.META_TAG, newJsons[0]);
 
@@ -152,7 +152,7 @@ public class FloodlightObject : ObjectBase<RigidBody3D>, IGrabbable, IUsable, IC
         float totalCount =
             GetInventory()
             .GetContents()
-            .Select(json => Serialiser.GetSpecificData<float>("power", json))
+            .Select(json => Serialiser.GetSpecificData<float>(BatteryObject.POWER_KEY, json))
             .Sum();
         
         float maxPower =
