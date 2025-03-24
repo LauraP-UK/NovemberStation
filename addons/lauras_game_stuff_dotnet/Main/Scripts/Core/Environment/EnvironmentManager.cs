@@ -36,6 +36,8 @@ public static class EnvironmentManager {
             if (GameManager.IsDebugMode()) Toast.Error(player, "Day cycle reset!");
             _dayTime = 0L;
             _dayIndex++;
+            _daySpeed = 0.0f;
+            Scheduler.ScheduleOnce(30000L, _ => _daySpeed = 1.0f);
             EnvironmentSchedule.SetSchedule(GetDay() + 1, EnvironmentSchedule.GetRandomPhases(EnvironmentSchedule.GetSchedule(_dayIndex)[^1].Item2));
             dayLength = EnvironmentSchedule.GetDayLength(GetDay());
         }

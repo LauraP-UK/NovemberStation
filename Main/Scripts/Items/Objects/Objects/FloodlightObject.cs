@@ -6,19 +6,15 @@ using Godot;
 public class FloodlightObject : ObjectBase<RigidBody3D>, IGrabbable, IUsable, ICollectable, IProcess, IVolumetricObject, IContainer {
     private readonly SpotLight3D _light;
     private readonly MeshInstance3D _lightTip;
-
-    private const float FAIL_START_AT_PERCENT = 16.6f;
-
     private readonly float _initialRange, _initialAngle, _initialEnergy;
-    
-    [InventorySerialise]
-    private readonly QuantitativeInventory _inventory;
+
+    [InventorySerialise] private readonly QuantitativeInventory _inventory;
 
     public const string IS_ON_KEY = "isOn";
-    
     [SerialiseData(IS_ON_KEY, nameof(ToggleLight), nameof(TurnOff))]
     private bool _isOn;
 
+    private const float FAIL_START_AT_PERCENT = 16.6f, POWER_DRAW = 0.5f;
     private const string
         SPOTLIGHT_PATH = "SpotLight3D",
         LIGHT_TIP_PATH = "Light";
@@ -76,7 +72,7 @@ public class FloodlightObject : ObjectBase<RigidBody3D>, IGrabbable, IUsable, IC
     public void Recharge(ActorBase actorBase, IEventBase ev) {
         if (ev is not KeyPressEvent) return;
         if (actorBase is not IContainer contActor) return;
-        
+
         ToggleLight(false);
 
         bool hasBattery = contActor.GetInventory().HasItem(Items.BATTERY);
@@ -135,12 +131,24 @@ public class FloodlightObject : ObjectBase<RigidBody3D>, IGrabbable, IUsable, IC
     }
 
     public void Process(float delta) {
-        if (GameUtils.IsNodeInvalid(_lightTip) || !_isOn || GetPowerRemaining() <= 0.0f) return;
-
+        if (!_isOn || GameUtils.IsNodeInvalid(_lightTip) || GetPowerRemaining() <= 0.0f) return;
+        
         List<string> oldJsons = _inventory.GetContents();
-        List<string> newJsons = oldJsons.Select(json => Serialiser.ModifySpecificData<float>(BatteryObject.POWER_KEY, p => Math.Max(p - (delta * 0.5f), 0.0f), json)).ToList();
+        int activeBatteries = oldJsons.Count(json => Serialiser.GetSpecificData<float>(BatteryObject.POWER_KEY, json) > 0.0f);
 
-        string tag = Serialiser.GetSpecificTag<string>(Serialiser.ObjectSaveData.META_TAG, newJsons[0]);
+        if (activeBatteries == 0) {
+            ToggleLight(false);
+            return;
+        }
+
+        float toDraw = delta * POWER_DRAW;
+        float perBattery = toDraw / activeBatteries;
+
+        List<string> newJsons = oldJsons
+            .Select(json => Serialiser.ModifySpecificData<float>(BatteryObject.POWER_KEY, p => p < 0.01f ? 0.0f : Math.Max(p - perBattery, 0.0f), json))
+            .ToList();
+
+        string tag = Serialiser.GetSpecificTag<string>(Serialiser.ObjectSaveData.META_TAG, oldJsons[0]);
 
         _inventory.ClearContents();
         foreach (string newJson in newJsons) _inventory.AddItem(tag, newJson);
@@ -151,14 +159,14 @@ public class FloodlightObject : ObjectBase<RigidBody3D>, IGrabbable, IUsable, IC
     private float GetPowerRemaining() {
         float totalCount =
             GetInventory()
-            .GetContents()
-            .Select(json => Serialiser.GetSpecificData<float>(BatteryObject.POWER_KEY, json))
-            .Sum();
-        
+                .GetContents()
+                .Select(json => Serialiser.GetSpecificData<float>(BatteryObject.POWER_KEY, json))
+                .Sum();
+
         float maxPower =
             ((BatteryObject)ObjectAtlas.CreateObject(typeof(BatteryObject), null)).GetMaxPower() *
             _inventory.GetMaxQuantity();
-        
+
         return Mathsf.Round(Mathsf.Remap(0f, maxPower, totalCount, 0f, 100f), 2);
     }
 
