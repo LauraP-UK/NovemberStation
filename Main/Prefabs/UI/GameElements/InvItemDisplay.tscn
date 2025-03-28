@@ -1,6 +1,7 @@
-[gd_scene load_steps=12 format=3 uid="uid://3etmw1oeffkt"]
+[gd_scene load_steps=13 format=3 uid="uid://3etmw1oeffkt"]
 
 [ext_resource type="Texture2D" uid="uid://cnafjpoh1lxps" path="res://Main/Textures/Sandbox/Checkerboard1.png" id="1_ol0x3"]
+[ext_resource type="Texture2D" uid="uid://bnbxqu3kkmc2y" path="res://Main/Textures/UI/HighlightNinePatch.png" id="2_vnaej"]
 
 [sub_resource type="CompressedTexture2D" id="CompressedTexture2D_6pky5"]
 load_path = "res://.godot/imported/ContextNinePatch.png-1956a95d8fe2d1cd3bd043c483a8f7ae.ctex"
@@ -168,3 +169,16 @@ theme_override_styles/pressed = SubResource("StyleBoxEmpty_h62ai")
 theme_override_styles/normal = SubResource("StyleBoxEmpty_3o8an")
 shortcut_feedback = false
 shortcut_in_tooltip = false
+
+[node name="Highlight" type="NinePatchRect" parent="Main/Content"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("2_vnaej")
+patch_margin_left = 10
+patch_margin_top = 10
+patch_margin_right = 10
+patch_margin_bottom = 10

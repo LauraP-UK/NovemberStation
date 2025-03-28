@@ -5,7 +5,7 @@ using Godot;
 public class ContextInfoElement : FormBase {
     private readonly LabelElement _textLabel;
     private readonly ColorRectElement _bgColor;
-    private readonly string _contextText;
+    private string _contextText;
 
     private const string
         FORM_PATH = "res://Main/Prefabs/UI/GameElements/ContextInfoElement.tscn",
@@ -14,7 +14,7 @@ public class ContextInfoElement : FormBase {
     
     private const float BACKGROUND_ALPHA = 0.5f;
 
-    public ContextInfoElement(string contextText, float minimumSize) : base("contextText_txt", FORM_PATH) {
+    public ContextInfoElement(string contextText) : base("contextText_txt", FORM_PATH) {
         _contextText = contextText;
         
         Label contextLabel = FindNode<Label>(DISPLAY_LABEL_NAME);

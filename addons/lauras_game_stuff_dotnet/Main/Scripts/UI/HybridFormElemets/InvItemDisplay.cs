@@ -10,6 +10,7 @@ public class InvItemDisplay : FormBase, IFocusable {
     private readonly ButtonElement _focusBtn;
     private readonly ControlElement _extraInfoControl;
     private readonly VBoxContainerElement _subListVBox;
+    private readonly NinePatchRectElement _highlightRect;
 
     private readonly ItemType _itemType;
     private readonly InventoryForm _ownerForm;
@@ -28,7 +29,8 @@ public class InvItemDisplay : FormBase, IFocusable {
         BUTTON = "Main/Content/FocusButton",
         EXTRA_INFO = "Main/ExtraInfo",
         SUB_BUTTON_LIST = "Main/ExtraInfo/SubButtonList",
-        BG_COLOUR = "Main/BGContainer/BGColour";
+        BG_COLOUR = "Main/BGContainer/BGColour",
+        HIGHLIGHT_RECT = "Main/Content/Highlight";
 
     public const string
         UP_ARROW = "\u25b2",
@@ -54,6 +56,7 @@ public class InvItemDisplay : FormBase, IFocusable {
         Button button = FindNode<Button>(BUTTON);
         Control extraInfo = FindNode<Control>(EXTRA_INFO);
         VBoxContainer subButtonList = FindNode<VBoxContainer>(SUB_BUTTON_LIST);
+        NinePatchRect highlight = FindNode<NinePatchRect>(HIGHLIGHT_RECT);
 
         _nameLabel = new LabelElement(nameLabel);
         _itemCount = new LabelElement(itemCount);
@@ -63,7 +66,9 @@ public class InvItemDisplay : FormBase, IFocusable {
         _focusBtn = new ButtonElement(button);
         _extraInfoControl = new ControlElement(extraInfo);
         _subListVBox = new VBoxContainerElement(subButtonList);
-
+        _highlightRect = new NinePatchRectElement(highlight);
+        
+        _highlightRect.SetAlpha(0.0f);
         _bgColor.SetColor(DEFAULT_BG_COLOR);
 
         _focusBtn.AddAction(Control.SignalName.FocusEntered, _ => {
@@ -148,6 +153,11 @@ public class InvItemDisplay : FormBase, IFocusable {
     }
 
     public bool IsSelected() => _isSelected;
+
+    public void Highlight(bool highlight) {
+        GetBgColor().SetColor(DEFAULT_BG_COLOR);
+        _highlightRect.SetAlpha(highlight ? 0.5f : 0.0f);
+    }
 
     public void SetExpanded(bool expanded) {
         _isExpanded = expanded;

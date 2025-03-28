@@ -1,4 +1,6 @@
-[gd_scene load_steps=4 format=3 uid="uid://dvka8kvdljqew"]
+[gd_scene load_steps=5 format=3 uid="uid://dvka8kvdljqew"]
+
+[ext_resource type="PackedScene" uid="uid://badtsy0fmtmxl" path="res://3DModelsDownload/crowbar_v2/scene.gltf" id="1_qj2t5"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_f8i3f"]
 radius = 0.33
@@ -36,6 +38,14 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.7, 0)
 
 [node name="Camera" type="Camera3D" parent="HeadOrigin/CrouchControl"]
 current = true
+
+[node name="Hand Point" type="Node3D" parent="HeadOrigin/CrouchControl/Camera"]
+transform = Transform3D(1, 0, 0, 0, 0.998942, -0.0459907, 0, 0.0459907, 0.998942, 0.265694, -0.291393, -0.422314)
+
+[node name="ObjOrientation" type="Node3D" parent="HeadOrigin/CrouchControl/Camera/Hand Point"]
+transform = Transform3D(0.0952811, 0.144444, -0.636912, 0.392364, 0.501885, 0.172518, 0.522084, -0.403544, -0.0134159, 0, 0, 0.0472862)
+
+[node name="Sketchfab_Scene" parent="HeadOrigin/CrouchControl/Camera/Hand Point/ObjOrientation" instance=ExtResource("1_qj2t5")]
 
 [node name="StairsRaycasts" type="Node3D" parent="."]
 

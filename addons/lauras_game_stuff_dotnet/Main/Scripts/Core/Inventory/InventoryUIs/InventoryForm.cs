@@ -98,12 +98,15 @@ public abstract class InventoryForm : FormBase {
 
         if (side == InventorySide.PRIMARY) {
             SetPrimaryInventory(_primaryOwner);
-            _primaryList.GetNode().QueueRedraw();
         } else if (side == InventorySide.OTHER) {
             SetOtherInventory(_otherOwner);
-            _otherList.GetNode().QueueRedraw();
         }
 
+        HandleHighlights(InventorySide.PRIMARY);
+        if (GetMode() == Mode.DUAL) HandleHighlights(InventorySide.OTHER);
+        
+        _primaryList.GetNode().QueueRedraw();
+        if (GetMode() == Mode.DUAL) _otherList.GetNode().QueueRedraw();
         UpdateActionsList();
         _actionsList.GetNode().QueueRedraw();
     }
@@ -119,6 +122,7 @@ public abstract class InventoryForm : FormBase {
         SelectedInfo selectedInfo = GetSelectedItem(side);
         InvItemDisplay selected = selectedInfo.GetItem();
         InvItemSummary selectedSummary = selectedInfo.GetSummary();
+        bool isLastSelected = selectedInfo.IsLastSelected();
 
         ItemType selectedItemType = selected?.GetItemType();
         bool selectedIsExpanded = selected?.IsExpanded() ?? false;
@@ -152,20 +156,42 @@ public abstract class InventoryForm : FormBase {
 
         (side == InventorySide.PRIMARY ? _primaryHeader : _otherHeader).SetChildren(invHeaderInfo);
 
-        if (ArrayUtils.ExactMatch<InvItemDisplay>(oldBtns, newBtns))
+        if (ArrayUtils.ExactMatch<InvItemDisplay>(oldBtns, newBtns)) {
             newBtns.ForEach(btn => btn.Destroy());
-        else {
+        } else {
             list.GetDisplayList().SetChildren(newBtns);
             InvItemDisplay toSelect = newBtns.FirstOrDefault(btn => btn.GetItemType().Equals(selectedItemType));
             toSelect?.SetExpanded(selectedIsExpanded);
-            toSelect?.Select(true);
+            if (isLastSelected) toSelect?.Select(true);
             if (selectedSummary != null && toSelect != null) {
                 int index = selectedSummary.GetIndex();
                 foreach (InvItemSummary summary in toSelect.GetSummaries().Where(summary => summary.GetIndex() == index)) {
-                    summary.SetSelected(true);
+                    if (isLastSelected) summary.SetSelected(true);
                     break;
                 }
             }
+        }
+    }
+
+    private void HandleHighlights(InventorySide side) {
+        SelectedInfo selectedItem = GetSelectedItem(side);
+        ItemType itemType = selectedItem.GetItem()?.GetItemType();
+        int index = selectedItem.GetSummary() == null ? -1 : selectedItem.GetSummary().GetIndex();
+        bool isLastSelected = selectedItem.IsLastSelected();
+
+        List<InvItemDisplay> btns = GetInventory(side).GetDisplayObjects().Cast<InvItemDisplay>().ToList();
+        foreach (InvItemDisplay btn in btns) {
+            if (!btn.GetItemType().Equals(itemType)) continue;
+            if (!isLastSelected) {
+                btn.Highlight(true);
+                if (index == -1) continue;
+                foreach (InvItemSummary summary in btn.GetSummaries()) {
+                    if (summary.GetIndex() != index) continue;
+                    summary.Highlight(false);
+                    break;
+                }
+            }
+            else if (index != -1) btn.Highlight(true);
         }
     }
 

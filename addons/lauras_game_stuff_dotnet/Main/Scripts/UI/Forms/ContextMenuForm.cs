@@ -154,10 +154,14 @@ public class ContextMenuForm : FormBase {
         List<string> existingContexts = contextListContainer.GetDisplayObjects().Select(o => ((ContextInfoElement)o).GetContext()).ToList();
 
         if (!ArrayUtils.ExactMatch<string>(existingContexts, contexts)) {
-            List<ContextInfoElement> elements = contexts.Select(c => new ContextInfoElement(c, ACTION_SIZE_X)).ToList();
+            List<ContextInfoElement> elements = new();
+            foreach (string c in contexts) elements.Add(new ContextInfoElement(c));
+
             contextListContainer.SetChildren(elements);
 
-            float width = elements.Select(c => c.GetMinimumWidth()).Prepend(0).Max() + 20;
+            float max = 0;
+            foreach (ContextInfoElement c in elements) max = Math.Max(max, c.GetMinimumWidth());
+            float width = max + 20;
             Vector2 size = new(width, INFO_BOX_SIZE_Y * elements.Count);
             GetContextFrame().GetNode().SetCustomMinimumSize(size);
             contextListContainer.GetNode().SetCustomMinimumSize(size);

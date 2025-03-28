@@ -6,6 +6,7 @@ public class InvItemSummary : FormBase, IFocusable {
     private readonly LabelElement _numberLabel, _summaryLabel;
     private readonly ColorRectElement _bgColor;
     private readonly ButtonElement _focusBtn;
+    private readonly NinePatchRectElement _highlightRect;
 
     private readonly InvItemDisplay _owningBtn;
     
@@ -18,7 +19,8 @@ public class InvItemSummary : FormBase, IFocusable {
         NUMBER_LABEL = "Content/ObjNumber",
         SUMMARY_LABEL = "Content/ObjName",
         BG_COLOUR = "BGContainer/BGColour",
-        FOCUS_BUTTON = "Content/FocusButton";
+        FOCUS_BUTTON = "Content/FocusButton",
+        HIGHLIGHT_RECT = "BGContainer/Highlight";
 
     private static readonly Color
         DEFAULT_BG_COLOR = ColourHelper.GetFrom255(46,46,46,1.0f),
@@ -34,12 +36,15 @@ public class InvItemSummary : FormBase, IFocusable {
         Label summaryLabel = FindNode<Label>(SUMMARY_LABEL);
         ColorRect bgColor = FindNode<ColorRect>(BG_COLOUR);
         Button focusBtn = FindNode<Button>(FOCUS_BUTTON);
+        NinePatchRect highlight = FindNode<NinePatchRect>(HIGHLIGHT_RECT);
         
         _numberLabel = new LabelElement(numberLabel);
         _summaryLabel = new LabelElement(summaryLabel);
         _bgColor = new ColorRectElement(bgColor);
         _focusBtn = new ButtonElement(focusBtn);
+        _highlightRect = new NinePatchRectElement(highlight);
         
+        _highlightRect.SetAlpha(0.0f);
         _bgColor.SetColor(DEFAULT_BG_COLOR);
         
         _focusBtn.AddAction(Control.SignalName.FocusEntered, _ => {
@@ -91,6 +96,10 @@ public class InvItemSummary : FormBase, IFocusable {
         GetBgColor().SetColor(selected ? SELECTED_BG_COLOR : DEFAULT_BG_COLOR);
     }
     public bool IsSelected() => _isSelected;
+    public void Highlight(bool highlight) {
+        GetBgColor().SetColor(DEFAULT_BG_COLOR);
+        _highlightRect.SetAlpha(highlight ? 0.5f : 0.0f);
+    }
 
     public void GrabFocus() {
         if (!IsValid() || HasFocus()) return;
