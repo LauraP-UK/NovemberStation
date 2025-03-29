@@ -47,6 +47,11 @@ public abstract class ObjectBase<T> : IObjectBase where T : Node3D {
 
         return validActions;
     }
+    
+    public bool TestAction<TAction>(ActorBase actorBase, IEventBase ev) where TAction : IObjectAction {
+        (Func<ActorBase,IEventBase,bool> test, Action<ActorBase,IEventBase> run) pair = _actions.GetOrDefault(new ActionKey(typeof(TAction)), (null,null));
+        return pair.test != null && pair.test.Invoke(actorBase, ev);
+    }
 
     public Node3D GetBaseNode3D() => GetBaseNode();
     public string GetObjectTag() => _objectTag;

@@ -5,6 +5,7 @@ using Godot;
 public class ItemType {
     private readonly string _typeID, _itemName, _imagePath, _modelPath, _description;
     private readonly int _itemCost;
+    private readonly HeldDisplaySettings _displaySettings;
     private readonly Action<RigidBody3D> _onNodeSpawn;
     private readonly Action<IObjectBase> _onDataSpawn;
 
@@ -18,15 +19,27 @@ public class ItemType {
         _collisionLayers = new() {
             new KeyValuePair<int, bool>(3, true),
             new KeyValuePair<int, bool>(4, true)
+        },
+        _noCollisionMasks = new() {
+            new KeyValuePair<int, bool>(1, false),
+            new KeyValuePair<int, bool>(2, false),
+            new KeyValuePair<int, bool>(3, false),
+            new KeyValuePair<int, bool>(4, false)
+        },
+        _noCollisionLayers = new() {
+            new KeyValuePair<int, bool>(3, false),
+            new KeyValuePair<int, bool>(4, false)
         };
 
-    private ItemType(string typeID, string itemName, string imagePath, string modelPath, string description, int itemCost, Action<RigidBody3D> onNodeSpawn, Action<IObjectBase> onDataSpawn) {
+    private ItemType(string typeID, string itemName, string imagePath, string modelPath, string description, int itemCost, HeldDisplaySettings displaySettings,
+        Action<RigidBody3D> onNodeSpawn, Action<IObjectBase> onDataSpawn) {
         _typeID = typeID;
         _itemName = itemName;
         _imagePath = imagePath;
         _modelPath = modelPath;
         _description = description;
         _itemCost = itemCost;
+        _displaySettings = displaySettings ?? HeldDisplaySettings.Default();
         _onNodeSpawn = onNodeSpawn;
         _onDataSpawn = onDataSpawn;
     }
@@ -38,15 +51,20 @@ public class ItemType {
     public string GetDescription() => _description;
     public int GetItemCost() => _itemCost;
     public Texture2D GetImage() => ResourceLoader.Load<Texture2D>(GetImagePath());
-    
+
     public void TryOnDataSpawn(IObjectBase objBase) => _onDataSpawn?.Invoke(objBase);
+    public void ApplyHeldOrientation(Node3D node) => _displaySettings.ApplyTo(node);
 
     public RigidBody3D CreateInstance() {
         RigidBody3D rigidBody3D = Loader.SafeInstantiate<RigidBody3D>(GetModelPath());
-        _collisionLayers.ForEach(pair => rigidBody3D.SetCollisionLayerValue(pair.Key, pair.Value));
-        _collisionMasks.ForEach(pair => rigidBody3D.SetCollisionMaskValue(pair.Key, pair.Value));
+        SetCollision(true, rigidBody3D);
         _onNodeSpawn?.Invoke(rigidBody3D);
         return rigidBody3D;
+    }
+
+    public void SetCollision(bool collision, RigidBody3D node) {
+        (collision ? _collisionLayers : _noCollisionLayers).ForEach(pair => node.SetCollisionLayerValue(pair.Key, pair.Value));
+        (collision ? _collisionMasks : _noCollisionMasks).ForEach(pair => node.SetCollisionMaskValue(pair.Key, pair.Value));
     }
 
     public ShopItemDisplayButton CreateButton() {
@@ -62,7 +80,8 @@ public class ItemType {
         return item;
     }
 
-    public static ItemType Create(string typeID, string itemName, string imagePath, string modelPath, string description, int itemCost, Action<RigidBody3D> onNodeSpawn = null, Action<IObjectBase> onDataSpawn = null) {
-        return new ItemType(typeID, itemName, imagePath, modelPath, description, itemCost, onNodeSpawn, onDataSpawn);
+    public static ItemType Create(string typeID, string itemName, string imagePath, string modelPath, string description, int itemCost,
+        HeldDisplaySettings displaySettings = null, Action<RigidBody3D> onNodeSpawn = null, Action<IObjectBase> onDataSpawn = null) {
+        return new ItemType(typeID, itemName, imagePath, modelPath, description, itemCost, displaySettings, onNodeSpawn, onDataSpawn);
     }
 }

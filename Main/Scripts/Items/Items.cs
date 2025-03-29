@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Godot;
 
 public class Items {
     
@@ -9,7 +10,8 @@ public class Items {
         "res://Main/Textures/Items/GasCanImage.png",
         "res://Main/Prefabs/Sandbox/GasCanTest.tscn",
         "A can of gasoline.",
-        50);
+        50,
+        HeldDisplaySettings.Create(new Vector3(0.147f, -0.056f, -0.112f), new Vector3(6.0f, -146.0f, 5.8f), 0.5f));
     public static readonly ItemType WORK_DESK = ItemType.Create("work_desk",
         "Work Desk",
         "res://Main/Textures/Items/DeskImage.png",
@@ -22,25 +24,29 @@ public class Items {
         "res://Main/Prefabs/Sandbox/Geometry/PhysicsCube.tscn",
         "A wooden storage crate.",
         130,
+        HeldDisplaySettings.Default(),
         crate => crate.Mass = Math.Max(Randf.Random(0, 10) * 5, 1));
     public static readonly ItemType CROWBAR = ItemType.Create("crowbar",
         "Crowbar",
         "res://Main/Textures/Items/Crowbar.png",
         "res://Main/Prefabs/PhysicsObjects/Crowbar.tscn",
         "Gordon Freeman, for someone who proclaims to be a doctor, you should know that not every peepee time is a poopoo time. But every peepee-poo-pu- every... fuck.",
-        300);
+        300,
+        HeldDisplaySettings.Create(new Vector3(0.039f, -0.054f, 0.012f), new Vector3(68.9f, -42.6f, -4.1f), 0.66f));
     public static readonly ItemType FIRE_EXTINGUISHER = ItemType.Create("fire_extinguisher",
         "Fire Extinguisher",
         "res://Main/Textures/Items/FireExtinguisher.png",
         "res://Main/Prefabs/PhysicsObjects/FireExtinguisher.tscn",
         "Set things on unfire.",
-        150);
+        150,
+        HeldDisplaySettings.Create(new Vector3(0.039f, -0.054f, 0.012f), new Vector3(-10.2f, -79.4f, 22.8f), 0.66f));
     public static readonly ItemType FLOODLIGHT = ItemType.Create("floodlight",
         "Floodlight",
         "res://Main/Textures/Items/Floodlight.png",
         "res://Main/Prefabs/PhysicsObjects/Floodlight.tscn",
         "I love lamp.",
         300,
+        HeldDisplaySettings.Create(new Vector3(0.0f, 0.01f, 0.06f), new Vector3(-90.0f, 4.0f, 0.0f), 0.75f),
         null,
         data => {
             for (int i = 0; i < 4; i++) ((FloodlightObject)data).StoreItem(BATTERY);
@@ -56,13 +62,15 @@ public class Items {
         "res://Main/Textures/Items/ClockImage.png",
         "res://Main/Prefabs/PhysicsObjects/DigitalClock.tscn",
         "Letting the days go by. Let the water hold me down. Letting the days go by. Water flowing underground.",
-        250);
+        250,
+        HeldDisplaySettings.Create(new Vector3(0.109f, 0.04f, -0.14f), new Vector3(2.2f, -22.9f, 5.8f), 0.66f));
     public static readonly ItemType BATTERY = ItemType.Create("battery",
         "Battery",
         "res://Main/Textures/Items/BatteryImage.png",
         "res://Main/Prefabs/PhysicsObjects/Battery.tscn",
         "Do not eat.",
-        25);
+        25,
+        HeldDisplaySettings.Create(new Vector3(0.01f, 0.007f, -0.054f), new Vector3(0.2f, -25.0f, -4.9f), 0.75f));
     
     private static readonly ItemType[] ALL_ITEMS = {GAS_CAN, WORK_DESK, STORAGE_CRATE, CROWBAR, FIRE_EXTINGUISHER, FLOODLIGHT, BED, DIGITAL_CLOCK, BATTERY};
     public static List<ItemType> GetItems() => new(ALL_ITEMS);

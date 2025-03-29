@@ -53,7 +53,7 @@ public class FloodlightObject : ObjectBase<RigidBody3D>, IGrabbable, IUsable, IC
     public void Grab(ActorBase actorBase, IEventBase ev) => GrabActionDefault.Invoke(actorBase, GetBaseNode(), ev);
 
     public void Use(ActorBase actorBase, IEventBase ev) {
-        if (ev is not KeyPressEvent) return;
+        if (ev is not KeyPressEvent && ev is not MouseInputEvent) return;
 
         if (GetPowerRemaining() <= 0.0f) {
             Toast.Error((Player)actorBase, "Floodlight is out of power!");
@@ -101,7 +101,7 @@ public class FloodlightObject : ObjectBase<RigidBody3D>, IGrabbable, IUsable, IC
         GD.Print($"Serialised to {ProjectSettings.GlobalizePath(savePath)}");
     }
 
-    private void ToggleLight(bool isOn) {
+    public void ToggleLight(bool isOn) {
         _isOn = isOn;
         if (_light == null) return;
         _light.Visible = isOn;
@@ -156,7 +156,7 @@ public class FloodlightObject : ObjectBase<RigidBody3D>, IGrabbable, IUsable, IC
         if (GetPowerRemaining() <= 0.0f) ToggleLight(false);
     }
 
-    private float GetPowerRemaining() {
+    public float GetPowerRemaining() {
         float totalCount =
             GetInventory()
                 .GetContents()

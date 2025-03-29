@@ -5,7 +5,8 @@ public class PlayerController : ControllerBase {
     private const float HOLD_DISTANCE = 2.1f, HOLD_SMOOTHNESS = 15.0f, ROTATION_SMOOTHNESS = 10.0f;
     private const long JUMP_COOLDOWN_MILLIS = 250L;
 
-    private const uint PLAYER_LAYER = 1 << 0, // Layer 1
+    private const uint
+        PLAYER_LAYER = 1 << 0, // Layer 1
         STATIC_LAYER = 1 << 1, // Layer 2
         OBJECT_LAYER = 1 << 2; // Layer 3
 
@@ -41,7 +42,7 @@ public class PlayerController : ControllerBase {
         if (key != Key.F1) return;
         ShowUI(!_uiVisible);
     }
-    
+
     [EventListener]
     private void OnEscape(KeyPressEvent ev, Key key) {
         if (key != Key.Escape || !IsAsleep()) return;
@@ -55,7 +56,7 @@ public class PlayerController : ControllerBase {
         ev.Capture();
         new SingleInvDisplayMenu().Open();
     }
-    
+
     [EventListener]
     private void OnOpenShop(KeyPressEvent ev, Key key) {
         if (IsLocked()) return;
@@ -101,8 +102,10 @@ public class PlayerController : ControllerBase {
         if (!actor.Equals(GetActor())) return;
         if (_toggleCrouch) {
             if (!ev.IsStartCrouch()) return;
-            if (_crouching && !CanUncrouch()) _tryUncrouch = true;
-            else _crouching = !_crouching;
+            if (_crouching && !CanUncrouch())
+                _tryUncrouch = true;
+            else
+                _crouching = !_crouching;
             return;
         }
 
@@ -114,11 +117,12 @@ public class PlayerController : ControllerBase {
         if (IsLocked() || !ev.IsPressed()) return;
         MouseButton button = ev.GetMouseButton();
         if (button != MouseButton.WheelDown && button != MouseButton.WheelUp) return;
-        
+
         if (IsHoldingObject()) {
             _holdDistanceModifier = Mathf.Clamp(_holdDistanceModifier + (button == MouseButton.WheelDown ? -0.05f : 0.05f), 0.5f, 1.5f);
             return;
         }
+
         if (GetContextObject() != null) _actionIndex += button == MouseButton.WheelDown ? 1 : -1;
     }
 
@@ -126,20 +130,25 @@ public class PlayerController : ControllerBase {
     private void OnPickUpItem(ActorPickUpEvent ev, ActorBase actor) {
         if (!actor.Equals(GetActor())) return;
         RigidBody3D hitBody = ev.GetItem();
-
         if (hitBody == null || hitBody.Equals(_heldObject) || _heldObject != null) {
             ReleaseHeldObject(Vector3.Down * 0.2f); // Mini nudge down
             return;
         }
-
         PickupObject(hitBody);
     }
+    
+    
 
     [EventListener]
-    private void OnPlayerUseClick(PlayerUseClickEvent ev, ActorBase actor) {
-        if (!actor.Equals(GetActor()) || !ev.IsPressed() || _heldObject == null) return;
-        Vector3 tossDirection = -((Player)GetActor()).GetCamera().GlobalTransform.Basis.Z * 20.0f; // Big push in the direction
-        ReleaseHeldObject(tossDirection + Vector3.Down);
+    private void OnMouseClick(MouseInputEvent ev, Vector2 position) {
+        if (ev.GetMouseButton() != MouseButton.Left || !ev.IsPressed() || ev.IsCaptured()) return;
+        if (_heldObject == null) {
+            IObjectBase handItem = ((Player)GetActor()).GetHandItem();
+            switch (handItem) {
+                case IUsable usable when handItem.TestAction<IUsable>(GetActor(), ev): usable.Use(GetActor(), ev); break;
+                case IDrinkable drinkable when handItem.TestAction<IDrinkable>(GetActor(), ev): drinkable.Drink(GetActor(), ev); break;
+            }
+        }
     }
 
     [EventListener(PriorityLevels.TERMINUS)]
@@ -154,8 +163,7 @@ public class PlayerController : ControllerBase {
         Vector3 direction = ev.GetDirection();
         CharacterBody3D model = player.GetModel();
 
-        if (!direction.Equals(Vector3.Zero))
-            _intendedDirection = GetActor().GetModel().GlobalTransform.Basis * direction;
+        if (!direction.Equals(Vector3.Zero)) _intendedDirection = GetActor().GetModel().GlobalTransform.Basis * direction;
 
         Vector2 turnDelta = ev.GetTurnDelta();
         if (!turnDelta.Equals(Vector2.Zero)) {
@@ -181,7 +189,7 @@ public class PlayerController : ControllerBase {
     private static long GetCurrentTimeMillis() => DateTimeOffset.Now.ToUnixTimeMilliseconds();
     private long TimeSinceLastJump() => GetCurrentTimeMillis() - _lastJump;
     private bool IsHoldingObject() => _heldObject != null;
-    
+
     protected override void OnUpdate(float delta) => HandleContextMenu();
 
     protected override void OnPhysicsUpdate(float delta) {
@@ -208,6 +216,7 @@ public class PlayerController : ControllerBase {
         ActionDisplayButton btn = _contextMenu.GetForm().GetAction(_actionIndex);
         return btn?.GetAction();
     }
+
     public Node3D GetContextObject() => _heldObject ?? _contextObject;
     public bool IsAsleep() => _asleep;
 
@@ -284,8 +293,7 @@ public class PlayerController : ControllerBase {
             float targetPitch = playerYaw + pitchOffset;
 
             targetRotation = new Vector3(Mathf.DegToRad(90.0f), targetPitch, 0.0f);
-        }
-        else {
+        } else {
             float yawOffset = 0.0f;
             Vector3 offset = _heldObjectDirection.Offset;
             if (offset.Equals(Vector3.Forward))
@@ -294,8 +302,7 @@ public class PlayerController : ControllerBase {
                 yawOffset = Mathf.DegToRad(90.0f);
             else if (offset.Equals(Vector3.Back))
                 yawOffset = Mathf.DegToRad(180.0f);
-            else if (offset.Equals(Vector3.Left))
-                yawOffset = Mathf.DegToRad(-90.0f);
+            else if (offset.Equals(Vector3.Left)) yawOffset = Mathf.DegToRad(-90.0f);
 
             float targetYaw = playerYaw + yawOffset;
             targetRotation = new Vector3(0.0f, targetYaw, 0.0f);
@@ -309,7 +316,7 @@ public class PlayerController : ControllerBase {
         Basis smoothedBasis = new(smoothedRotation);
         obj.GlobalTransform = new Transform3D(smoothedBasis, obj.GlobalTransform.Origin);
     }
-    
+
     /* --- ---  UI  --- --- */
     private void HandleContextMenu() {
         Camera3D activeCamera = GameManager.I().GetActiveCamera();
@@ -329,6 +336,7 @@ public class PlayerController : ControllerBase {
             HideContextBox();
             return;
         }
+
         ulong instanceId = sceneRoot.GetInstanceId();
 
         CollisionShape3D shape = (CollisionShape3D)_contextObject.FindChild("BBox");
@@ -344,12 +352,12 @@ public class PlayerController : ControllerBase {
             _lastActionID = instanceId;
             if (_lastBehaviourType != objectData.GetObjectTag()) {
                 _actionIndex = 0;
-                _lastBehaviourType =  objectData.GetObjectTag();
+                _lastBehaviourType = objectData.GetObjectTag();
             }
         }
 
         BoundingBox bb = BoundingBox.FromCollisionMesh(shape);
-        
+
         Vector2[] inScreenSpace = bb.GetCornersInScreenSpace(activeCamera, shape.GlobalTransform);
         VectorUtils.ExtremesInfo2D vecExtremes = VectorUtils.GetExtremes(inScreenSpace);
 
@@ -359,11 +367,11 @@ public class PlayerController : ControllerBase {
         float distanceTo = !_uiVisible ? 10f : contextObjResult?.Distance ?? _contextObject.GlobalPosition.DistanceTo(activeCamera.GlobalPosition);
         float distRatio = Mathsf.InverseLerpClamped(2.9f, 0.9f, distanceTo);
         float titleRatio = Mathsf.InverseLerpClamped(2.9f, 2.5f, distanceTo);
-        
+
         ContextMenuForm form = _contextMenu.GetForm();
         form?.Draw(_actionIndex, minPos, maxPos, distRatio, titleRatio, _heldObject == null ? titleRatio : 0.0f, objectData);
     }
-    
+
     private void HideContextBox() {
         _lastActionID = 0;
         if (_contextMenu.GetForm() == null) return;
@@ -371,6 +379,7 @@ public class PlayerController : ControllerBase {
     }
 
     public ToastUI GetToastUI() => _toastUI;
+
     public void ShowUI(bool show) {
         _uiVisible = show;
         _contextMenu.GetForm().GetMenu().SetVisible(show);

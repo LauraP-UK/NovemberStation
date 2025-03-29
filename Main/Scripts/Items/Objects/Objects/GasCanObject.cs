@@ -19,7 +19,7 @@ public class GasCanObject : ObjectBase<RigidBody3D>, IGrabbable, IShovable, IDri
     public void Grab(ActorBase actorBase, IEventBase ev) => GrabActionDefault.Invoke(actorBase, GetBaseNode(), ev);
     public void Shove(ActorBase actorBase, IEventBase ev) => ShoveActionDefault.Invoke(actorBase, GetBaseNode(), ev);
     public void Drink(ActorBase actorBase, IEventBase ev) {
-        if (ev is not KeyPressEvent) return;
+        if (ev is not KeyPressEvent && ev is not MouseInputEvent) return;
         _fuelAmount -= 10;
     }
 

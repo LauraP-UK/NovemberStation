@@ -36,7 +36,7 @@ public class UseGameAction : GameActionBase {
         IObjectBase objectClass = GameManager.I().GetObjectClass(GameUtils.FindSceneRoot(obj).GetInstanceId());
         if (actionType == null || objectClass == null) return;
 
-        if (true) {
+        if (false) {
             objectClass.TryGetAction((ActionKey)actionType, out Func<ActorBase, IEventBase, bool> test, out Action<ActorBase, IEventBase> method);
             if (test.Invoke(player, ev)) method.Invoke(player, ev);
             _lastAction = actionType;

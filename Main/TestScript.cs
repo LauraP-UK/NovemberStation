@@ -31,6 +31,9 @@ public partial class TestScript : Node {
         player.SetPosition(spawnPoint, new Vector3(0.0f, -90.0f, 0.0f));
         gameManager.SetPlayer(player);
 
+        //FloodlightObject floodlightObject = (FloodlightObject) player.SetHeldItem(Items.FLOODLIGHT);
+        //floodlightObject.ToggleLight(true);
+
         Node3D sceneObjects = GetTree().Root.GetNode<Node3D>("Main/SceneObjects");
         foreach (Node child in sceneObjects.GetChildren()) {
             if (child is not Node3D obj) continue;
@@ -62,14 +65,19 @@ public partial class TestScript : Node {
         using FileAccess file = FileAccess.Open("user://SerialiseTest.json", FileAccess.ModeFlags.Read);
         string json = file.GetAsText();
 
+        FloodlightObject floodlightObject = (FloodlightObject)player.SetHeldItem(json);
+        //floodlightObject.ToggleLight(true);
+        
+        return;
+
         ObjectAtlas.CreatedObject createdObjectFromJson = ObjectAtlas.CreatedObjectFromJson(json);
 
         if (createdObjectFromJson.Success) {
-            foreach (IObjectBase objectBase in GetObjects().Values) {
+            /*foreach (IObjectBase objectBase in GetObjects().Values) {
                 if (objectBase is not StorageCrateObject storageCrate) continue;
                 storageCrate.StoreItem(createdObjectFromJson.Object, createdObjectFromJson.Node);
                 break;
-            }
+            }*/
         } else {
             GD.PrintErr($"Failed to create object from JSON.\nGot: {createdObjectFromJson}");
         }
