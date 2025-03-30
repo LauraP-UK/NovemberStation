@@ -62,6 +62,12 @@ public class Player : ActorBase, IViewable, IContainer {
     }
     public IObjectBase SetHeldItem(ItemType itemType) {
         _handItem?.GetBaseNode3D().QueueFree();
+
+        if (itemType == null) {
+            _handItem = null;
+            HeldDisplaySettings.Default().ApplyTo(GetHandOrientation());
+            return null;
+        }
         
         RigidBody3D item = itemType.CreateInstance();
         IObjectBase objClass = GameManager.I().RegisterObject(item);
@@ -78,6 +84,8 @@ public class Player : ActorBase, IViewable, IContainer {
         
         return objClass;
     }
+
+    public void ClearHeldItem() => SetHeldItem((ItemType)null);
 
     public RaycastResult GetLookingAt(float distance) => Raycast.Trace(this, distance);
     public ActorBase GetActor() => this;

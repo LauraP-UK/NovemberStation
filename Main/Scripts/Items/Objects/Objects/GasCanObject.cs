@@ -21,6 +21,7 @@ public class GasCanObject : ObjectBase<RigidBody3D>, IGrabbable, IShovable, IDri
     public void Drink(ActorBase actorBase, IEventBase ev) {
         if (ev is not KeyPressEvent && ev is not MouseInputEvent) return;
         _fuelAmount -= 10;
+        Toast.Info((Player)actorBase, $"Drinky poos! Fuel amount: {_fuelAmount}");
     }
 
     public override string GetDisplayName() => Items.GAS_CAN.GetItemName();

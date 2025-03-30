@@ -1,0 +1,271 @@
+[gd_scene load_steps=11 format=3 uid="uid://gcbrs4ih08h1"]
+
+[ext_resource type="Texture2D" uid="uid://cnafjpoh1lxps" path="res://Main/Textures/Sandbox/Checkerboard1.png" id="1_8t1lp"]
+
+[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_va7jy"]
+load_path = "res://.godot/imported/ContextNinePatch.png-1956a95d8fe2d1cd3bd043c483a8f7ae.ctex"
+
+[sub_resource type="LabelSettings" id="LabelSettings_28377"]
+font_size = 10
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_o3dh5"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_yei3m"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_61txq"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_8at3t"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_w6k6m"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_qlil4"]
+
+[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_sn8md"]
+load_path = "res://.godot/imported/ContextNinePatch.png-1956a95d8fe2d1cd3bd043c483a8f7ae.ctex"
+
+[node name="Control" type="Control"]
+custom_minimum_size = Vector2(200, 60)
+layout_mode = 3
+anchors_preset = 0
+
+[node name="HBoxContainer" type="HBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 0
+
+[node name="VBoxContainer" type="VBoxContainer" parent="HBoxContainer"]
+custom_minimum_size = Vector2(20, 40)
+layout_mode = 2
+theme_override_constants/separation = 0
+
+[node name="Up" type="Control" parent="HBoxContainer/VBoxContainer"]
+custom_minimum_size = Vector2(20, 30)
+layout_mode = 2
+
+[node name="UpBG" type="ColorRect" parent="HBoxContainer/VBoxContainer/Up"]
+z_index = -50
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0.216245, 0.202136, 0.194267, 1)
+
+[node name="NinePatchRect" type="NinePatchRect" parent="HBoxContainer/VBoxContainer/Up"]
+z_index = 20
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = SubResource("CompressedTexture2D_va7jy")
+patch_margin_left = 7
+patch_margin_top = 7
+patch_margin_right = 7
+patch_margin_bottom = 7
+
+[node name="Label" type="Label" parent="HBoxContainer/VBoxContainer/Up"]
+z_index = 10
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+rotation = 3.14159
+pivot_offset = Vector2(10, 15)
+text = "V"
+label_settings = SubResource("LabelSettings_28377")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="FocusBtn" type="Button" parent="HBoxContainer/VBoxContainer/Up"]
+z_index = 200
+z_as_relative = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/focus = SubResource("StyleBoxEmpty_o3dh5")
+theme_override_styles/disabled = SubResource("StyleBoxEmpty_yei3m")
+theme_override_styles/hover_pressed = SubResource("StyleBoxEmpty_61txq")
+theme_override_styles/hover = SubResource("StyleBoxEmpty_8at3t")
+theme_override_styles/pressed = SubResource("StyleBoxEmpty_w6k6m")
+theme_override_styles/normal = SubResource("StyleBoxEmpty_qlil4")
+shortcut_feedback = false
+shortcut_in_tooltip = false
+
+[node name="Down" type="Control" parent="HBoxContainer/VBoxContainer"]
+custom_minimum_size = Vector2(20, 30)
+layout_mode = 2
+
+[node name="DownBG" type="ColorRect" parent="HBoxContainer/VBoxContainer/Down"]
+z_index = -50
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0.215686, 0.203922, 0.196078, 1)
+
+[node name="NinePatchRect" type="NinePatchRect" parent="HBoxContainer/VBoxContainer/Down"]
+z_index = 20
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = SubResource("CompressedTexture2D_va7jy")
+patch_margin_left = 7
+patch_margin_top = 7
+patch_margin_right = 7
+patch_margin_bottom = 7
+
+[node name="Label" type="Label" parent="HBoxContainer/VBoxContainer/Down"]
+z_index = 10
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "V"
+label_settings = SubResource("LabelSettings_28377")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="FocusBtn" type="Button" parent="HBoxContainer/VBoxContainer/Down"]
+z_index = 200
+z_as_relative = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/focus = SubResource("StyleBoxEmpty_o3dh5")
+theme_override_styles/disabled = SubResource("StyleBoxEmpty_yei3m")
+theme_override_styles/hover_pressed = SubResource("StyleBoxEmpty_61txq")
+theme_override_styles/hover = SubResource("StyleBoxEmpty_8at3t")
+theme_override_styles/pressed = SubResource("StyleBoxEmpty_w6k6m")
+theme_override_styles/normal = SubResource("StyleBoxEmpty_qlil4")
+shortcut_feedback = false
+shortcut_in_tooltip = false
+
+[node name="Icon" type="Control" parent="HBoxContainer"]
+custom_minimum_size = Vector2(160, 0)
+layout_mode = 2
+
+[node name="MainBG" type="ColorRect" parent="HBoxContainer/Icon"]
+z_index = -50
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0.1482, 0.163527, 0.19, 1)
+
+[node name="ObjImg" type="TextureRect" parent="HBoxContainer/Icon"]
+z_index = 5
+z_as_relative = false
+custom_minimum_size = Vector2(60, 60)
+layout_mode = 1
+anchors_preset = 4
+anchor_top = 0.5
+anchor_bottom = 0.5
+offset_top = -30.0
+offset_right = 60.0
+offset_bottom = 30.0
+grow_vertical = 2
+mouse_filter = 2
+texture = ExtResource("1_8t1lp")
+expand_mode = 2
+stretch_mode = 5
+
+[node name="NinePatchRect" type="NinePatchRect" parent="HBoxContainer/Icon"]
+z_index = 20
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = SubResource("CompressedTexture2D_sn8md")
+patch_margin_left = 7
+patch_margin_top = 7
+patch_margin_right = 7
+patch_margin_bottom = 7
+
+[node name="XButtonContainer" type="Control" parent="HBoxContainer"]
+custom_minimum_size = Vector2(20, 0)
+layout_mode = 2
+
+[node name="XBG" type="ColorRect" parent="HBoxContainer/XButtonContainer"]
+z_index = -50
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0.215686, 0.203922, 0.196078, 1)
+
+[node name="Label" type="Label" parent="HBoxContainer/XButtonContainer"]
+z_index = 10
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "X"
+label_settings = SubResource("LabelSettings_28377")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="NinePatchRect" type="NinePatchRect" parent="HBoxContainer/XButtonContainer"]
+z_index = 20
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = SubResource("CompressedTexture2D_va7jy")
+patch_margin_left = 7
+patch_margin_top = 7
+patch_margin_right = 7
+patch_margin_bottom = 7
+
+[node name="FocusBtn" type="Button" parent="HBoxContainer/XButtonContainer"]
+z_index = 200
+z_as_relative = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/focus = SubResource("StyleBoxEmpty_o3dh5")
+theme_override_styles/disabled = SubResource("StyleBoxEmpty_yei3m")
+theme_override_styles/hover_pressed = SubResource("StyleBoxEmpty_61txq")
+theme_override_styles/hover = SubResource("StyleBoxEmpty_8at3t")
+theme_override_styles/pressed = SubResource("StyleBoxEmpty_w6k6m")
+theme_override_styles/normal = SubResource("StyleBoxEmpty_qlil4")
+shortcut_feedback = false
+shortcut_in_tooltip = false

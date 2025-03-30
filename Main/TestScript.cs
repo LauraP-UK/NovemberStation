@@ -1,4 +1,6 @@
+using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using Godot;
 
 public partial class TestScript : Node {
@@ -65,6 +67,8 @@ public partial class TestScript : Node {
         using FileAccess file = FileAccess.Open("user://SerialiseTest.json", FileAccess.ModeFlags.Read);
         string json = file.GetAsText();
 
+        //player.SetHeldItem(Items.DIGITAL_CLOCK);
+        
         FloodlightObject floodlightObject = (FloodlightObject)player.SetHeldItem(json);
         //floodlightObject.ToggleLight(true);
         

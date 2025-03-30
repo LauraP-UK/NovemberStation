@@ -142,13 +142,33 @@ public class PlayerController : ControllerBase {
     [EventListener]
     private void OnMouseClick(MouseInputEvent ev, Vector2 position) {
         if (ev.GetMouseButton() != MouseButton.Left || !ev.IsPressed() || ev.IsCaptured()) return;
-        if (_heldObject == null) {
-            IObjectBase handItem = ((Player)GetActor()).GetHandItem();
-            switch (handItem) {
-                case IUsable usable when handItem.TestAction<IUsable>(GetActor(), ev): usable.Use(GetActor(), ev); break;
-                case IDrinkable drinkable when handItem.TestAction<IDrinkable>(GetActor(), ev): drinkable.Drink(GetActor(), ev); break;
-            }
+        if (_heldObject != null) return;
+        IObjectBase handItem = GetActor<Player>().GetHandItem();
+        switch (handItem) {
+            case IUsable usable when handItem.TestAction<IUsable>(GetActor(), ev): usable.Use(GetActor(), ev); break;
+            case IDrinkable drinkable when handItem.TestAction<IDrinkable>(GetActor(), ev): drinkable.Drink(GetActor(), ev); break;
         }
+    }
+    
+    [EventListener]
+    private void OnMouseMiddleClick(MouseInputEvent ev, Vector2 position) {
+        if (ev.GetMouseButton() != MouseButton.Middle || !ev.IsPressed() || ev.IsCaptured()) return;
+        if (_heldObject != null) return;
+        Player owner = GetActor<Player>();
+        IObjectBase objectBase = owner.GetHandItem();
+        if (objectBase == null) return;
+
+        string toDropJson = objectBase.Serialise();
+        ObjectAtlas.CreatedObject obj = ObjectAtlas.CreatedObjectFromJson(toDropJson);
+        if (!obj.Success) return;
+
+        Vector3 spawn = owner.GetLookingAt(2).GetEnd();
+        Node3D objNode = (Node3D)obj.Node;
+        GameManager.I().GetSceneObjects().AddChild(obj.Node);
+        objNode.SetGlobalPosition(spawn);
+        GameManager.I().RegisterObject(objNode, obj.Object);
+        
+        owner.ClearHeldItem();
     }
 
     [EventListener(PriorityLevels.TERMINUS)]

@@ -9,6 +9,8 @@ public abstract class ButtonElementBase<T> : FormElement<T> where T : BaseButton
     public void OnButtonDown(Action<IFormObject> action) => AddAction(BaseButton.SignalName.ButtonDown, action);
     public void OnButtonUp(Action<IFormObject> action) => AddAction(BaseButton.SignalName.ButtonUp, action);
     public void OnToggled(Action<IFormObject, object[]> action) => AddAction(BaseButton.SignalName.Toggled, action);
+    public void OnMouseEntered(Action<IFormObject> action) => AddAction(Control.SignalName.MouseEntered, action);
+    public void OnMouseExited(Action<IFormObject> action) => AddAction(Control.SignalName.MouseExited, action);
     
     public void ForcePressed() => GetElement().EmitSignal(BaseButton.SignalName.Pressed);
     public void ForceButtonDown() => GetElement().EmitSignal(BaseButton.SignalName.ButtonDown);

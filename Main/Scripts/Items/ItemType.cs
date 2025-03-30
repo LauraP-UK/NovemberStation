@@ -54,6 +54,7 @@ public class ItemType {
 
     public void TryOnDataSpawn(IObjectBase objBase) => _onDataSpawn?.Invoke(objBase);
     public void ApplyHeldOrientation(Node3D node) => _displaySettings.ApplyTo(node);
+    public bool IsHoldable() => !_displaySettings.IsDefault();
 
     public RigidBody3D CreateInstance() {
         RigidBody3D rigidBody3D = Loader.SafeInstantiate<RigidBody3D>(GetModelPath());

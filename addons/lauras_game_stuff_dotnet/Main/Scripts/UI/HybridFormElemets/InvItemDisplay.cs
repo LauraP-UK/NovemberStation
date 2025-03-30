@@ -68,6 +68,7 @@ public class InvItemDisplay : FormBase, IFocusable {
         _subListVBox = new VBoxContainerElement(subButtonList);
         _highlightRect = new NinePatchRectElement(highlight);
         
+        _highlightRect.GetElement().SetModulate(SELECTED_BG_COLOR);
         _highlightRect.SetAlpha(0.0f);
         _bgColor.SetColor(DEFAULT_BG_COLOR);
 
