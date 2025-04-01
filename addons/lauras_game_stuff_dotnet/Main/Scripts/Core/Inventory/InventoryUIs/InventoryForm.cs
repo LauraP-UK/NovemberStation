@@ -195,8 +195,17 @@ public abstract class InventoryForm : FormBase {
         }
     }
 
-    public void SetPrimaryInventory(IContainer container) => SetInventory(container, InventorySide.PRIMARY);
-    public void SetOtherInventory(IContainer container) => SetInventory(container, InventorySide.OTHER);
+    public void SetPrimaryInventory(IContainer container) {
+        SetInventory(container, InventorySide.PRIMARY);
+        OnSetInventory(container, InventorySide.PRIMARY);
+    }
+
+    public void SetOtherInventory(IContainer container) {
+        SetInventory(container, InventorySide.OTHER);
+        OnSetInventory(container, InventorySide.OTHER);
+    }
+
+    protected virtual void OnSetInventory(IContainer container, InventorySide side) { }
 
     protected InvItemDisplay GetNewBtnOf(InvItemDisplay item, InventorySide side) => GetInventory(side)
         .GetDisplayObjects()

@@ -45,7 +45,14 @@ public static class ObjectAtlas {
     public static SmartDictionary<string, SmartSerialData> GetSerialiseData(Type clazz) => _serialiseDataCache.GetOrDefault(clazz, null);
 
     private static void RegisterSerialiseData(Type clazz, object dummyObj) {
-        FieldInfo[] fields = clazz.GetFields(BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Public);
+        List<FieldInfo> fields = new();
+        Type current = clazz;
+
+        while (current != null && current != typeof(object)) {
+            fields.AddRange(current.GetFields(BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Public | BindingFlags.DeclaredOnly));
+            current = current.BaseType;
+        }
+        
         SmartDictionary<string, SmartSerialData> serialiseData = new();
 
         foreach (FieldInfo field in fields) {

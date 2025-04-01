@@ -67,21 +67,25 @@ public partial class TestScript : Node {
         using FileAccess file = FileAccess.Open("user://SerialiseTest.json", FileAccess.ModeFlags.Read);
         string json = file.GetAsText();
 
-        //player.SetHeldItem(Items.DIGITAL_CLOCK);
+        //IObjectBase floodlight = player.SetHeldItem(Items.FLOODLIGHT);
+        //player.SetHotbarItem(0, floodlight.GetGUID());
+
+        RigidBody3D fireEx = Items.FIRE_EXTINGUISHER.CreateInstance();
+        IObjectBase fireExData = GameManager.I().RegisterObject(fireEx);
+        player.StoreItem(fireExData, fireEx);
+        player.GetHotbar().AddToHotbar(fireExData.GetGUID());
         
-        FloodlightObject floodlightObject = (FloodlightObject)player.SetHeldItem(json);
+        //FloodlightObject floodlightObject = (FloodlightObject)player.SetHeldItem(json);
         //floodlightObject.ToggleLight(true);
-        
-        return;
 
         ObjectAtlas.CreatedObject createdObjectFromJson = ObjectAtlas.CreatedObjectFromJson(json);
 
         if (createdObjectFromJson.Success) {
-            /*foreach (IObjectBase objectBase in GetObjects().Values) {
+            foreach (IObjectBase objectBase in GetObjects().Values) {
                 if (objectBase is not StorageCrateObject storageCrate) continue;
                 storageCrate.StoreItem(createdObjectFromJson.Object, createdObjectFromJson.Node);
                 break;
-            }*/
+            }
         } else {
             GD.PrintErr($"Failed to create object from JSON.\nGot: {createdObjectFromJson}");
         }

@@ -18,6 +18,7 @@ public class SingleInventoryForm : InventoryForm {
     public SingleInventoryForm(string formName, Action<Key, InventoryForm, bool> keyboardBehaviour) : base(formName, FORM_PATH, Mode.SINGLE) {
         _keyboardBehaviour = keyboardBehaviour;
         SetRegisterListenerOnReady(true);
+        RefreshHotbarIcons();
     }
 
     protected override List<IFormObject> GetAllElements() => new() { _primaryContainer, _actionsContainer, _hotbarContainer, _primaryHeader, _primaryList, _actionsList, _hotbarList };
@@ -45,12 +46,7 @@ public class SingleInventoryForm : InventoryForm {
 
         _actionsList.GetScrollContainer().SetVScrollMode(ScrollContainer.ScrollMode.Disabled);
 
-        List<ItemType> holdables = Items.GetItems().Where(i => i.IsHoldable()).ToList();
-        holdables.AddRange(holdables);
-        List<ItemType> shuffledItems = Randf.CopyAndShuffleList(holdables).GetRange(0, 9);
-        List<HotbarItem> toDisplay = shuffledItems.Select(holdable => new HotbarItem("", holdable)).ToList();
-
-        _hotbarList.GetDisplayList().SetChildren(toDisplay);
+        for (int i = 0; i < Hotbar.HOTBAR_SIZE; i++) _hotbarList.GetDisplayList().AddChild(new HotbarItem(i, this));
     }
 
     protected override List<InvActionButton> InitActionsList() {
@@ -114,14 +110,17 @@ public class SingleInventoryForm : InventoryForm {
 
                 if (selected == null) return;
                 selected = GetNewBtnOf(selected, InventorySide.PRIMARY);
+                string json = selected.GetJsonFromExpanded();
+
+                string guid = Serialiser.GetSpecificData<string>(IObjectBase.GUID_KEY, json);
+                GD.Print($"Adding {guid} to hotbar");
                 
-                GD.Print($"Adding {selected.GetItemType().GetItemName()} to hotbar!");
+                player.GetHotbar().AddToHotbar(Guid.Parse(guid));
+                RefreshHotbarIcons();
             }
         );
         _addToHotbarBtn.Disable();
         
-        
-
         return new List<InvActionButton> { _placeActionBtn, _dropActionBtn, _addToHotbarBtn, GetCloseButton() };
     }
 
@@ -136,5 +135,47 @@ public class SingleInventoryForm : InventoryForm {
             _dropActionBtn?.SetMisc("Drop");
             _addToHotbarBtn?.SetMisc("Add to Hotbar");
         }
+
+        if (_primaryOwner is Player player) {
+            if (player.GetHotbar().IsFull()) {
+                _addToHotbarBtn?.Disable("Hotbar is full");
+            }
+        }
+    }
+
+    public void RefreshHotbarIcons() {
+        if (_primaryOwner == null) return;
+        SmartDictionary<int,Guid> items = GameManager.I().GetPlayer().GetHotbar().GetHotbarItems();
+        List<HotbarItem> icons = _hotbarList.GetDisplayObjects().Cast<HotbarItem>().ToList();
+        
+        foreach (HotbarItem hotbarItem in icons) {
+            Guid guid = items.GetOrDefault(hotbarItem.GetIndex(), Guid.Empty);
+            if (guid == Guid.Empty) {
+                hotbarItem.SetFromItem("");
+                continue;
+            }
+            string json = _primaryOwner.GetInventory()
+                .GetContents()
+                .FirstOrDefault(c => Serialiser.GetSpecificData<string>(IObjectBase.GUID_KEY, c) == guid.ToString());
+            if (json == null) {
+                GD.PrintErr($"ERROR: SingleInventoryForm.RefreshHotbarIcons() : Hotbar item {guid} not found in inventory.");
+                hotbarItem.SetFromItem("");
+                continue;
+            }
+            hotbarItem.SetFromItem(json);
+        }
+        
+        /*foreach (KeyValuePair<int, Guid> entry in items) {
+            GD.Print($"Owner is null? {(_primaryOwner == null ? "YES" : "NO")}");
+            string json = _primaryOwner.GetInventory()
+                .GetContents()
+                .FirstOrDefault(c => Serialiser.GetSpecificData<string>(IObjectBase.GUID_KEY, c) == entry.Value.ToString());
+            icons[entry.Key].SetFromItem(json);
+        }*/
+    }
+
+    protected override void OnSetInventory(IContainer container, InventorySide side) {
+        foreach (HotbarItem hotbarItem in _hotbarList.GetDisplayObjects().Cast<HotbarItem>()) hotbarItem.SetOwner(container);
+        RefreshHotbarIcons();
     }
 }

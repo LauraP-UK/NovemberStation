@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Godot;
@@ -7,6 +8,7 @@ public class Player : ActorBase, IViewable, IContainer {
     private readonly Node3D _crouchNode, _handNode, _handOrientation;
     
     private IObjectBase _handItem;
+    private readonly Hotbar _hotbar;
 
     private readonly VolumetricInventory _inv;
 
@@ -29,12 +31,15 @@ public class Player : ActorBase, IViewable, IContainer {
 
         GetCamera().SetCullMaskValue(2, false);
         _inv = new VolumetricInventory(200, this);
+        
+        _hotbar = new Hotbar(this);
     }
 
     public IObjectBase GetHandItem() => _handItem;
     public Camera3D GetCamera() => _camera;
     public Node3D GetCrouchNode() => _crouchNode;
     public Node3D GetHandOrientation() => _handOrientation;
+    public Hotbar GetHotbar() => _hotbar;
 
     public IObjectBase SetHeldItem(string json) {
         ObjectAtlas.CreatedObject objInfo = ObjectAtlas.CreatedObjectFromJson(json);
@@ -86,7 +91,7 @@ public class Player : ActorBase, IViewable, IContainer {
     }
 
     public void ClearHeldItem() => SetHeldItem((ItemType)null);
-
+    
     public RaycastResult GetLookingAt(float distance) => Raycast.Trace(this, distance);
     public ActorBase GetActor() => this;
 

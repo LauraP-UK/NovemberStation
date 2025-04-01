@@ -9,11 +9,19 @@ public abstract class ObjectBase<T> : IObjectBase where T : Node3D {
     private readonly T _baseNode;
     private readonly SmartDictionary<ActionKey, (Func<ActorBase, IEventBase, bool> test, Action<ActorBase, IEventBase> run)> _actions = new();
     private readonly string _objectTag;
+    [SerialiseData(IObjectBase.GUID_KEY, nameof(SetIdFromString), nameof(SetNewId))]
+    private Guid _id;
     
     protected ObjectBase(T baseNode, string objectTag) {
         _baseNode = baseNode;
         _objectTag = objectTag;
+        SetNewId();
     }
+    
+    protected void SetId(Guid id) => _id = id;
+    protected void SetIdFromString(string id) => _id = Guid.Parse(id);
+    protected void SetNewId() => _id = Guid.NewGuid();
+    public Guid GetGUID() => _id;
 
     protected TType FindNode<TType>(string nodePath) where TType : Node => _baseNode.GetNode<TType>(nodePath);
     public T GetBaseNode() => _baseNode;

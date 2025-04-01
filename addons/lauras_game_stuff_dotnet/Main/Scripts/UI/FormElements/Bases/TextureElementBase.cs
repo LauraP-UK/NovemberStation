@@ -24,6 +24,11 @@ public abstract class TextureElementBase<T> : FormElement<T> where T : Control {
         Texture2D texture2D = ResourceLoader.Load<Texture2D>(path);
         SetTexture(texture2D);
     }
+
+    public void ClearTexture() {
+        Texture2D texture2D = ResourceLoader.Load<Texture2D>("res://Main/Textures/Sandbox/Checkerboard1.png");
+        SetTexture(texture2D);
+    }
     
     public void SetAlpha(float alpha) {
         T element = GetElement();
