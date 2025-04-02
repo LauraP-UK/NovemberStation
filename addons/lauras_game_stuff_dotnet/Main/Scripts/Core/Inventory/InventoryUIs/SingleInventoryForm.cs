@@ -73,6 +73,10 @@ public class SingleInventoryForm : InventoryForm, IProcess {
 
                 InvItemDisplay refreshSelected = selected.GetCount() > 0 ? selected : null;
                 UpdateSelectedItem(InventorySide.PRIMARY, refreshSelected, null);
+
+                string guid = Serialiser.GetSpecificData<string>(IObjectBase.GUID_KEY, itemJson);
+                player.GetHotbar().RemoveFromHotbar(Guid.Parse(guid));
+                RefreshHotbarIcons();
             }
         );
         _placeActionBtn.Disable();
@@ -97,6 +101,10 @@ public class SingleInventoryForm : InventoryForm, IProcess {
 
                 InvItemDisplay refreshSelected = selected.GetCount() > 0 ? selected : null;
                 UpdateSelectedItem(InventorySide.PRIMARY, refreshSelected, null);
+
+                string guid = Serialiser.GetSpecificData<string>(IObjectBase.GUID_KEY, itemJson);
+                player.GetHotbar().RemoveFromHotbar(Guid.Parse(guid));
+                RefreshHotbarIcons();
             }
         );
         _dropActionBtn.Disable();
@@ -113,7 +121,6 @@ public class SingleInventoryForm : InventoryForm, IProcess {
                 string json = selected.GetJsonFromExpanded();
 
                 string guid = Serialiser.GetSpecificData<string>(IObjectBase.GUID_KEY, json);
-                GD.Print($"Adding {guid} to hotbar");
                 
                 player.GetHotbar().AddToHotbar(Guid.Parse(guid));
                 RefreshHotbarIcons();
@@ -144,8 +151,8 @@ public class SingleInventoryForm : InventoryForm, IProcess {
     }
 
     public void RefreshHotbarIcons() {
-        if (_primaryOwner == null) return;
-        SmartDictionary<int,Guid> items = GameManager.I().GetPlayer().GetHotbar().GetHotbarItems();
+        if (_primaryOwner is not IHotbarActor owner) return;
+        SmartDictionary<int,Guid> items = owner.GetHotbar().GetHotbarItems();
         List<HotbarItem> icons = _hotbarList.GetDisplayObjects().Cast<HotbarItem>().ToList();
         
         foreach (HotbarItem hotbarItem in icons) {
@@ -155,13 +162,15 @@ public class SingleInventoryForm : InventoryForm, IProcess {
                 continue;
             }
             string json = _primaryOwner.GetInventory().GetViaGUID(guid);
-            if (json == null) {
+            if (string.IsNullOrEmpty(json)) {
                 GD.PrintErr($"ERROR: SingleInventoryForm.RefreshHotbarIcons() : Hotbar item {guid} not found in inventory.");
                 hotbarItem.SetFromItem("");
                 continue;
             }
             hotbarItem.SetFromItem(json);
         }
+        
+        owner.GetHotbar().UpdateOwnerHeldItem();
     }
 
     protected override void OnSetInventory(IContainer container, InventorySide side) {
@@ -174,20 +183,21 @@ public class SingleInventoryForm : InventoryForm, IProcess {
         IObjectBase handItem = owner.GetHandItem();
         if (handItem == null) return;
         string heldJson = owner.GetInventory().GetViaGUID(handItem.GetGUID());
+
+        if (string.IsNullOrEmpty(heldJson)) return;
+        
         string itemTypeTag = Serialiser.GetSpecificTag<string>(Serialiser.ObjectSaveData.TYPE_ID, heldJson);
         ItemType itemType = Items.GetViaID(itemTypeTag);
 
         List<InvItemDisplay> displayButtons = _primaryList.GetDisplayObjects().Cast<InvItemDisplay>().ToList();
         foreach (InvItemDisplay btn in displayButtons) {
             if (!btn.GetItemType().Equals(itemType)) continue;
-            
             List<InvItemSummary> summaries = btn.GetSummaries();
             foreach (InvItemSummary summary in summaries) {
                 string summaryGuid = Serialiser.GetSpecificData<string>(IObjectBase.GUID_KEY, summary.GetJson());
-                if (summaryGuid == handItem.GetGUID().ToString()) {
-                    summary.RefreshSummaryText(heldJson);
-                    return;
-                }
+                if (summaryGuid != handItem.GetGUID().ToString()) continue;
+                summary.RefreshSummaryText(heldJson);
+                return;
             }
         }
     }

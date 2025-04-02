@@ -14,7 +14,7 @@ public class PlayerController : ControllerBase {
     private float _holdDistanceModifier = 1.0f;
     private Vector2 _rotationOffset = Vector2.Zero;
     private long _lastJump;
-    private int _actionIndex, _hotbarIndex;
+    private int _actionIndex;
     private ulong _lastActionID;
     private string _lastBehaviourType = "";
     private Node3D _contextObject;
@@ -116,30 +116,25 @@ public class PlayerController : ControllerBase {
     private void OnMouseScroll(MouseInputEvent ev, Vector2 position) {
         if (IsLocked() || !ev.IsPressed()) return;
         MouseButton button = ev.GetMouseButton();
+        
         if (button != MouseButton.WheelDown && button != MouseButton.WheelUp) return;
+        bool isDown = button == MouseButton.WheelDown;
 
         if (!IsHoldingObject() && GetContextObject() == null) {
             Player player = GetActor<Player>();
             Hotbar hotbar = player.GetHotbar();
 
-            _hotbarIndex += button == MouseButton.WheelDown ? 1 : -1;
-            _hotbarIndex = Mathf.Wrap(_hotbarIndex, 0, hotbar.GetHotbarSize());
-            
+            hotbar.ChangeIndex(isDown ? 1 : -1);
             player.GetHotbar().ResyncInventory();
-            
-            Guid hotbarItem = hotbar.GetHotbarItem(_hotbarIndex);
-            if (hotbarItem != Guid.Empty) {
-                string hotbarJson = player.GetInventory().GetViaGUID(hotbarItem);
-                player.SetHeldItem(hotbarJson);
-            }
+            player.GetHotbar().UpdateOwnerHeldItem();
         }
-        
+
         if (IsHoldingObject()) {
-            _holdDistanceModifier = Mathf.Clamp(_holdDistanceModifier + (button == MouseButton.WheelDown ? -0.05f : 0.05f), 0.5f, 1.5f);
+            _holdDistanceModifier = Mathf.Clamp(_holdDistanceModifier + (isDown ? -0.05f : 0.05f), 0.5f, 1.5f);
             return;
         }
 
-        if (GetContextObject() != null) _actionIndex += button == MouseButton.WheelDown ? 1 : -1;
+        if (GetContextObject() != null) _actionIndex += isDown ? 1 : -1;
     }
 
     [EventListener]
@@ -150,6 +145,7 @@ public class PlayerController : ControllerBase {
             ReleaseHeldObject(Vector3.Down * 0.2f); // Mini nudge down
             return;
         }
+
         PickupObject(hitBody);
     }
 
@@ -162,9 +158,10 @@ public class PlayerController : ControllerBase {
             case IUsable usable when handItem.TestAction<IUsable>(GetActor(), ev): usable.Use(GetActor(), ev); break;
             case IDrinkable drinkable when handItem.TestAction<IDrinkable>(GetActor(), ev): drinkable.Drink(GetActor(), ev); break;
         }
+
         GetActor<Player>().GetHotbar().ResyncInventory();
     }
-    
+
     [EventListener]
     private void OnMouseMiddleClick(MouseInputEvent ev, Vector2 position) {
         if (ev.GetMouseButton() != MouseButton.Middle || !ev.IsPressed() || ev.IsCaptured()) return;
@@ -177,13 +174,18 @@ public class PlayerController : ControllerBase {
         ObjectAtlas.CreatedObject obj = ObjectAtlas.CreatedObjectFromJson(toDropJson);
         if (!obj.Success) return;
 
-        Vector3 spawn = owner.GetLookingAt(2).GetEnd();
+        RaycastResult result = owner.GetLookingAt(2);
+
+        Vector3 spawn =
+            result.HasHit() ?
+            result.GetClosestHit().HitAtPosition + result.GetClosestHit().HitNormal * 0.2f :
+            result.GetEnd();
+        
         Node3D objNode = (Node3D)obj.Node;
         GameManager.I().GetSceneObjects().AddChild(obj.Node);
         objNode.SetGlobalPosition(spawn);
         objNode.SetGlobalRotation(new Vector3(0, owner.GetCamera().GlobalRotation.Y, 0));
         GameManager.I().RegisterObject(objNode, obj.Object);
-        
         
         owner.GetHotbar().ResyncInventory();
 

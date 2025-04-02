@@ -7,7 +7,25 @@ public class Hotbar {
     
     private readonly SmartDictionary<int, Guid> _hotbarGuids = new();
     private readonly IHotbarActor _owner;
+    private int _hotbarIndex;
+    
     public Hotbar(IHotbarActor owner) => _owner = owner;
+    
+    public void ChangeIndex(int change) {
+        _hotbarIndex += change;
+        _hotbarIndex = Mathf.Wrap(_hotbarIndex, 0, GetHotbarSize());
+    }
+
+    public void UpdateOwnerHeldItem() {
+        Guid hotbarItem = GetHotbarItem();
+        if (hotbarItem == Guid.Empty) {
+            _owner.ClearHeldItem();
+            return;
+        }
+        
+        string hotbarJson = _owner.GetInventory().GetViaGUID(hotbarItem);
+        _owner.SetHeldItem(hotbarJson);
+    }
 
     public bool AddToHotbar(Guid guid) {
         if (_hotbarGuids.Values.Contains(guid)) {
@@ -30,10 +48,8 @@ public class Hotbar {
         if (index < 0 || index >= HOTBAR_SIZE)
             throw new IndexOutOfRangeException($"Hotbar index out of range. Got: {index}, Expected: 0-{HOTBAR_SIZE - 1}");
         
-        if (!_hotbarGuids.TryGetValue(index, out Guid guid)) {
-            GD.PrintErr($"WARN: Hotbar.RemoveFromHotbar() : No item at index {index}. Cannot remove.");
+        if (!_hotbarGuids.TryGetValue(index, out Guid guid))
             return Guid.Empty;
-        }
 
         bool remove = _hotbarGuids.Remove(index);
         if (!remove) {
@@ -57,15 +73,17 @@ public class Hotbar {
             RemoveFromHotbar(entry.Key);
             return entry.Key;
         }
-        GD.PrintErr($"WARN: Hotbar.RemoveFromHotbar() : No item found with GUID {guid}. Cannot remove.");
         return -1;
     }
     
-    public Guid GetHotbarItem(int index) {
+    public Guid GetHotbarItem(int index = -1) {
+        if (index == -1) index = _hotbarIndex;
+        
         if (index < 0 || index >= HOTBAR_SIZE) {
             GD.PrintErr($"WARN: Player.GetHotbarItem(): Index out of range. Clamping to 0-{HOTBAR_SIZE - 1}");
             index = Mathsf.Clamp(index, 0, HOTBAR_SIZE - 1);
         }
+        
         return _hotbarGuids.GetOrDefault(index, Guid.Empty);
     }
 

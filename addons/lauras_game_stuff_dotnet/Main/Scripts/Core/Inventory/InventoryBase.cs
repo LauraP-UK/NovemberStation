@@ -71,8 +71,6 @@ public abstract class InventoryBase : IInventory {
             contents[i] = updatedJson;
             return true;
         }
-
-        GD.PrintErr($"WARN: InventoryBase.UpdateItem() : No item with GUID '{updatedGuid}' found in inventory.");
         return false;
     }
 
@@ -91,7 +89,6 @@ public abstract class InventoryBase : IInventory {
             string guidString = Serialiser.GetSpecificData<string>(IObjectBase.GUID_KEY, content);
             if (guidString == id.ToString()) return content;
         }
-        GD.PrintErr($"ERROR: InventoryBase.GetViaGUID() : No item found with GUID '{id}'!");
         return null;
     }
 
