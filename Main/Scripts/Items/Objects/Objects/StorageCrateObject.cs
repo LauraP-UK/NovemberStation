@@ -1,7 +1,7 @@
 ﻿using Godot;
 
 public class StorageCrateObject : ObjectBase<RigidBody3D>, IGrabbable, IShovable, IContainer {
-    [InventoryDataSerialise]
+    [InventorySerialiseData]
     private readonly VolumetricInventory _inventory;
 
     public StorageCrateObject(RigidBody3D baseNode, bool dataOnly = false) : base(baseNode, "cube_obj") {

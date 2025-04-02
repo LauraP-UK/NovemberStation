@@ -14,7 +14,7 @@ public class PlayerController : ControllerBase {
     private float _holdDistanceModifier = 1.0f;
     private Vector2 _rotationOffset = Vector2.Zero;
     private long _lastJump;
-    private int _actionIndex;
+    private int _actionIndex, _hotbarIndex;
     private ulong _lastActionID;
     private string _lastBehaviourType = "";
     private Node3D _contextObject;
@@ -118,6 +118,22 @@ public class PlayerController : ControllerBase {
         MouseButton button = ev.GetMouseButton();
         if (button != MouseButton.WheelDown && button != MouseButton.WheelUp) return;
 
+        if (!IsHoldingObject() && GetContextObject() == null) {
+            Player player = GetActor<Player>();
+            Hotbar hotbar = player.GetHotbar();
+
+            _hotbarIndex += button == MouseButton.WheelDown ? 1 : -1;
+            _hotbarIndex = Mathf.Wrap(_hotbarIndex, 0, hotbar.GetHotbarSize());
+            
+            player.GetHotbar().ResyncInventory();
+            
+            Guid hotbarItem = hotbar.GetHotbarItem(_hotbarIndex);
+            if (hotbarItem != Guid.Empty) {
+                string hotbarJson = player.GetInventory().GetViaGUID(hotbarItem);
+                player.SetHeldItem(hotbarJson);
+            }
+        }
+        
         if (IsHoldingObject()) {
             _holdDistanceModifier = Mathf.Clamp(_holdDistanceModifier + (button == MouseButton.WheelDown ? -0.05f : 0.05f), 0.5f, 1.5f);
             return;
@@ -136,8 +152,6 @@ public class PlayerController : ControllerBase {
         }
         PickupObject(hitBody);
     }
-    
-    
 
     [EventListener]
     private void OnMouseClick(MouseInputEvent ev, Vector2 position) {
@@ -148,6 +162,7 @@ public class PlayerController : ControllerBase {
             case IUsable usable when handItem.TestAction<IUsable>(GetActor(), ev): usable.Use(GetActor(), ev); break;
             case IDrinkable drinkable when handItem.TestAction<IDrinkable>(GetActor(), ev): drinkable.Drink(GetActor(), ev); break;
         }
+        GetActor<Player>().GetHotbar().ResyncInventory();
     }
     
     [EventListener]
@@ -166,9 +181,14 @@ public class PlayerController : ControllerBase {
         Node3D objNode = (Node3D)obj.Node;
         GameManager.I().GetSceneObjects().AddChild(obj.Node);
         objNode.SetGlobalPosition(spawn);
+        objNode.SetGlobalRotation(new Vector3(0, owner.GetCamera().GlobalRotation.Y, 0));
         GameManager.I().RegisterObject(objNode, obj.Object);
         
+        
+        owner.GetHotbar().ResyncInventory();
+
         owner.ClearHeldItem();
+        owner.RemoveItem(toDropJson);
     }
 
     [EventListener(PriorityLevels.TERMINUS)]
@@ -210,7 +230,10 @@ public class PlayerController : ControllerBase {
     private long TimeSinceLastJump() => GetCurrentTimeMillis() - _lastJump;
     private bool IsHoldingObject() => _heldObject != null;
 
-    protected override void OnUpdate(float delta) => HandleContextMenu();
+    protected override void OnUpdate(float delta) {
+        HandleContextMenu();
+        GetActor<Player>().GetHotbar().ResyncInventory();
+    }
 
     protected override void OnPhysicsUpdate(float delta) {
         if (_heldObject != null) UpdateHeldObjectPosition(delta);

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Godot;
 
-public class Player : ActorBase, IViewable, IContainer {
+public class Player : ActorBase, IViewable, IHotbarActor {
     private readonly Camera3D _camera;
     private readonly Node3D _crouchNode, _handNode, _handOrientation;
     
@@ -42,6 +42,7 @@ public class Player : ActorBase, IViewable, IContainer {
     public Hotbar GetHotbar() => _hotbar;
 
     public IObjectBase SetHeldItem(string json) {
+        ClearHeldItem();
         ObjectAtlas.CreatedObject objInfo = ObjectAtlas.CreatedObjectFromJson(json);
         if (!objInfo.Success) {
             objInfo.Node?.QueueFree();
@@ -130,6 +131,8 @@ public class Player : ActorBase, IViewable, IContainer {
         VolumetricInventory inv = GetInventory().GetAs<VolumetricInventory>();
         string tag = Serialiser.GetSpecificTag<string>(Serialiser.ObjectSaveData.META_TAG, objectJson);
         inv.RemoveItem(tag, objectJson);
+        string guidString = Serialiser.GetSpecificData<string>(IObjectBase.GUID_KEY, objectJson);
+        GetHotbar().RemoveFromHotbar(Guid.Parse(guidString));
         return true;
     }
 }

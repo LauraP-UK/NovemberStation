@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Godot;
 
-public class SingleInventoryForm : InventoryForm {
+public class SingleInventoryForm : InventoryForm, IProcess {
     private InvActionButton _placeActionBtn, _dropActionBtn, _addToHotbarBtn;
     private ScrollDisplayList _hotbarList;
     private ControlElement _hotbarContainer;
@@ -154,9 +154,7 @@ public class SingleInventoryForm : InventoryForm {
                 hotbarItem.SetFromItem("");
                 continue;
             }
-            string json = _primaryOwner.GetInventory()
-                .GetContents()
-                .FirstOrDefault(c => Serialiser.GetSpecificData<string>(IObjectBase.GUID_KEY, c) == guid.ToString());
+            string json = _primaryOwner.GetInventory().GetViaGUID(guid);
             if (json == null) {
                 GD.PrintErr($"ERROR: SingleInventoryForm.RefreshHotbarIcons() : Hotbar item {guid} not found in inventory.");
                 hotbarItem.SetFromItem("");
@@ -164,18 +162,33 @@ public class SingleInventoryForm : InventoryForm {
             }
             hotbarItem.SetFromItem(json);
         }
-        
-        /*foreach (KeyValuePair<int, Guid> entry in items) {
-            GD.Print($"Owner is null? {(_primaryOwner == null ? "YES" : "NO")}");
-            string json = _primaryOwner.GetInventory()
-                .GetContents()
-                .FirstOrDefault(c => Serialiser.GetSpecificData<string>(IObjectBase.GUID_KEY, c) == entry.Value.ToString());
-            icons[entry.Key].SetFromItem(json);
-        }*/
     }
 
     protected override void OnSetInventory(IContainer container, InventorySide side) {
         foreach (HotbarItem hotbarItem in _hotbarList.GetDisplayObjects().Cast<HotbarItem>()) hotbarItem.SetOwner(container);
         RefreshHotbarIcons();
+    }
+
+    public void Process(float delta) {
+        if (_primaryOwner is not IHotbarActor owner) return;
+        IObjectBase handItem = owner.GetHandItem();
+        if (handItem == null) return;
+        string heldJson = owner.GetInventory().GetViaGUID(handItem.GetGUID());
+        string itemTypeTag = Serialiser.GetSpecificTag<string>(Serialiser.ObjectSaveData.TYPE_ID, heldJson);
+        ItemType itemType = Items.GetViaID(itemTypeTag);
+
+        List<InvItemDisplay> displayButtons = _primaryList.GetDisplayObjects().Cast<InvItemDisplay>().ToList();
+        foreach (InvItemDisplay btn in displayButtons) {
+            if (!btn.GetItemType().Equals(itemType)) continue;
+            
+            List<InvItemSummary> summaries = btn.GetSummaries();
+            foreach (InvItemSummary summary in summaries) {
+                string summaryGuid = Serialiser.GetSpecificData<string>(IObjectBase.GUID_KEY, summary.GetJson());
+                if (summaryGuid == handItem.GetGUID().ToString()) {
+                    summary.RefreshSummaryText(heldJson);
+                    return;
+                }
+            }
+        }
     }
 }

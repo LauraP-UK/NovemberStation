@@ -10,7 +10,7 @@ public class InvItemSummary : FormBase, IFocusable {
 
     private readonly InvItemDisplay _owningBtn;
     
-    private readonly string _json;
+    private string _json;
     private bool _isSelected;
     private int _index;
 
@@ -87,6 +87,15 @@ public class InvItemSummary : FormBase, IFocusable {
     public ColorRectElement GetBgColor() => _bgColor;
     public string GetJson() => _json;
     public int GetIndex() => _index;
+    
+    public void RefreshSummaryText(string newJson) {
+        _json = newJson;
+        IObjectBase obj = ObjectAtlas.DeserialiseDataWithoutNode(_json);
+        Serialiser.ObjectSaveData data = ObjectAtlas.DeserialiseObject(_json);
+        obj.BuildFromData(data.Data);
+        string summary = obj.GetSummary();
+        _summaryLabel.SetText(string.IsNullOrEmpty(summary) ? obj.GetDisplayName() : summary);
+    }
 
     public void SelectAndAlert(bool selected) {
         SetSelected(selected);

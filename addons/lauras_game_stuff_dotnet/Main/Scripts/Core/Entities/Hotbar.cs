@@ -3,15 +3,11 @@ using System.Collections.Generic;
 using Godot;
 
 public class Hotbar {
-    
-    private readonly SmartDictionary<int, Guid> _hotbarGuids = new();
     public const int HOTBAR_SIZE = 9;
     
-    private readonly IContainer _owner;
-
-    public Hotbar(IContainer owner) => _owner = owner;
-
-
+    private readonly SmartDictionary<int, Guid> _hotbarGuids = new();
+    private readonly IHotbarActor _owner;
+    public Hotbar(IHotbarActor owner) => _owner = owner;
 
     public bool AddToHotbar(Guid guid) {
         if (_hotbarGuids.Values.Contains(guid)) {
@@ -26,6 +22,7 @@ public class Hotbar {
         }
         
         _hotbarGuids.Add(index, guid);
+        ResyncInventory();
         return true;
     }
     
@@ -50,7 +47,18 @@ public class Hotbar {
             _hotbarGuids.Remove(i);
         }
         
+        ResyncInventory();
         return guid;
+    }
+    
+    public int RemoveFromHotbar(Guid guid) {
+        foreach (KeyValuePair<int,Guid> entry in _hotbarGuids) {
+            if (!entry.Value.Equals(guid)) continue;
+            RemoveFromHotbar(entry.Key);
+            return entry.Key;
+        }
+        GD.PrintErr($"WARN: Hotbar.RemoveFromHotbar() : No item found with GUID {guid}. Cannot remove.");
+        return -1;
     }
     
     public Guid GetHotbarItem(int index) {
@@ -59,14 +67,6 @@ public class Hotbar {
             index = Mathsf.Clamp(index, 0, HOTBAR_SIZE - 1);
         }
         return _hotbarGuids.GetOrDefault(index, Guid.Empty);
-    }
-
-    private void SetHotbarItem(int index, Guid guid) {
-        if (index < 0 || index >= HOTBAR_SIZE)
-            throw new IndexOutOfRangeException($"Hotbar index out of range. Got: {index}, Expected: 0-{HOTBAR_SIZE - 1}\nItem was: {guid}");
-        if (_hotbarGuids.Values.Contains(guid))
-            throw new ArgumentException($"Hotbar item already exists. Got: {guid}");
-        _hotbarGuids.Add(index, guid);
     }
 
     public void MoveHotbarItem(int index, bool up) {
@@ -94,6 +94,12 @@ public class Hotbar {
         if (index == 0) return (false, true);
         if (index == GetHotbarSize() - 1) return (true, false);
         return (true, true);
+    }
+
+    public void ResyncInventory() {
+        IObjectBase handItem = _owner.GetHandItem();
+        if (handItem == null) return;
+        _owner.GetInventory().UpdateItem(handItem.Serialise());
     }
 
     public SmartDictionary<int, Guid> GetHotbarItems() => _hotbarGuids.Clone();

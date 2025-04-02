@@ -52,6 +52,29 @@ public abstract class InventoryBase : IInventory {
         group.Remove(jsonData);
         _onRemove.ForEach(a => a.Invoke());
     }
+    
+    public bool UpdateItem(string updatedJson) {
+        string updatedGuid = Serialiser.GetSpecificData<string>(IObjectBase.GUID_KEY, updatedJson);
+        if (string.IsNullOrEmpty(updatedGuid)) {
+            GD.PrintErr("WARN: InventoryBase.UpdateItem() : Invalid or missing GUID in updatedJson.");
+            return false;
+        }
+        
+        string tag = Serialiser.GetSpecificTag<string>(Serialiser.ObjectSaveData.META_TAG, updatedJson);
+        
+        List<string> contents = GetGroup(tag);
+        for (int i = 0; i < contents.Count; i++) {
+            string existingJson = contents[i];
+            string existingGuid = Serialiser.GetSpecificData<string>(IObjectBase.GUID_KEY, existingJson);
+
+            if (existingGuid != updatedGuid) continue;
+            contents[i] = updatedJson;
+            return true;
+        }
+
+        GD.PrintErr($"WARN: InventoryBase.UpdateItem() : No item with GUID '{updatedGuid}' found in inventory.");
+        return false;
+    }
 
     public bool HasItem(string objectMetaTag) => CountItemType(objectMetaTag) > 0;
 
@@ -62,6 +85,15 @@ public abstract class InventoryBase : IInventory {
     public List<string> GetContentsOfType(ItemType itemType) => GetContents()
         .Where(json => itemType.GetTypeID() == Serialiser.GetSpecificTag<string>(Serialiser.ObjectSaveData.TYPE_ID, json))
         .ToList();
+
+    public string GetViaGUID(Guid id) {
+        foreach (string content in GetContents()) {
+            string guidString = Serialiser.GetSpecificData<string>(IObjectBase.GUID_KEY, content);
+            if (guidString == id.ToString()) return content;
+        }
+        GD.PrintErr($"ERROR: InventoryBase.GetViaGUID() : No item found with GUID '{id}'!");
+        return null;
+    }
 
     public List<string> GetContents() {
         return _inventory

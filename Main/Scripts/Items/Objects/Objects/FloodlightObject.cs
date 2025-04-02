@@ -8,7 +8,7 @@ public class FloodlightObject : ObjectBase<RigidBody3D>, IGrabbable, IUsable, IC
     private readonly MeshInstance3D _lightTip;
     private readonly float _initialRange, _initialAngle, _initialEnergy;
 
-    [InventoryDataSerialise] private readonly QuantitativeInventory _inventory;
+    [InventorySerialiseData] private readonly QuantitativeInventory _inventory;
 
     public const string IS_ON_KEY = "isOn";
     [SerialiseData(IS_ON_KEY, nameof(ToggleLight), nameof(TurnOff))]

@@ -1,4 +1,5 @@
 ﻿
+using System;
 using System.Collections.Generic;
 using Godot;
 
@@ -10,6 +11,7 @@ public interface IInventory {
     public AddItemFailCause CanAddItem(IObjectBase item);
     public AddItemFailCause CanAddItem(string jsonData);
     public void RemoveItem(string objectMetaTag, string jsonData);
+    public bool UpdateItem(string updatedJson);
     public int CountItemType(string objectMetaTag);
     public bool HasItem(string objectMetaTag);
     public bool HasItem(ItemType itemType);
@@ -17,6 +19,7 @@ public interface IInventory {
     public List<string> GetContents();
     public List<string> GetContentsOfType(string type);
     public List<string> GetContentsOfType(ItemType type);
+    public string GetViaGUID(Guid id);
     public void ClearContents();
     public T GetAs<T>() where T : IInventory;
     public string Serialise();
