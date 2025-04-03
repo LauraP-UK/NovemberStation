@@ -15,6 +15,8 @@ public class Hotbar {
         _hotbarIndex += change;
         _hotbarIndex = Mathf.Wrap(_hotbarIndex, 0, GetHotbarSize());
     }
+    
+    public int GetIndex() => _hotbarIndex;
 
     public void UpdateOwnerHeldItem() {
         Guid hotbarItem = GetHotbarItem();

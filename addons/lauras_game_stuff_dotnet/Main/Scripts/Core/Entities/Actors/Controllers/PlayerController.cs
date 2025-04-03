@@ -26,12 +26,15 @@ public class PlayerController : ControllerBase {
     private readonly CrosshairOverlay _crosshair = new();
     private readonly ShopMenu _shopMenu = new();
     private readonly ToastUI _toastUI = new();
+    private readonly HotbarMenu _hotbarMenu = new();
 
     public PlayerController(Player player) : base(player) {
         GetActor().GetModel().CollisionLayer = PLAYER_LAYER;
         _contextMenu.Open();
         _crosshair.Open();
         _toastUI.Open();
+        _hotbarMenu.Open();
+        Scheduler.ScheduleOnce(50L, _ => _hotbarMenu.GetForm().SetOwner(GetActor<Player>()));
     }
 
 
@@ -429,5 +432,6 @@ public class PlayerController : ControllerBase {
         _uiVisible = show;
         _contextMenu.GetForm().GetMenu().SetVisible(show);
         _crosshair.GetForm().GetMenu().SetVisible(show);
+        _hotbarMenu.GetForm().GetMenu().SetVisible(show);
     }
 }

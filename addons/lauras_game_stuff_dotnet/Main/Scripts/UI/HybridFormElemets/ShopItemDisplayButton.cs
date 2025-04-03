@@ -14,7 +14,7 @@ public class ShopItemDisplayButton : FormBase, IFocusable {
     private static readonly Color
         DEFAULT_BG_COLOR = new(0.1f,0.1f,0.1f),
         FOCUS_BG_COLOR = Colors.DimGray,
-        SELECTED_BG_COLOR = Colors.Gold;
+        SELECTED_BG_COLOR = Colors.DarkGoldenrod;
     
     private Action<Key, ShopItemDisplayButton> _keyboardBehaviour;
 
