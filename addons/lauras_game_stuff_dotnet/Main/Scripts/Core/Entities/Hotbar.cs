@@ -1,28 +1,26 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using Godot;
 
 public class Hotbar {
     public const int HOTBAR_SIZE = 9;
     public const ulong DISPLAY_TIME = 2500, FADE_TIME = 500;
-    
-    private readonly SmartDictionary<int, Guid> _hotbarGuids = new();
-    private readonly SmartDictionary<int, string> _priorStates = new();
+
+    private readonly SmartDictionary<int, Guid> _hotbarGuids = new(), _priorGUIDs = new();
     private readonly IHotbarActor _owner;
     private int _hotbarIndex;
     private bool _changed;
     private ulong _lastPoppedTime;
-    
+
     public Hotbar(IHotbarActor owner) => _owner = owner;
-    
+
     public void ChangeIndex(int change) {
         int oldIndex = _hotbarIndex;
         _hotbarIndex += change;
         _hotbarIndex = Mathf.Wrap(_hotbarIndex, 0, HOTBAR_SIZE);
         _changed = oldIndex != _hotbarIndex;
     }
-    
+
     public int GetIndex() => _hotbarIndex;
 
     public void UpdateOwnerHeldItem() {
@@ -31,7 +29,7 @@ public class Hotbar {
             _owner.ClearHeldItem();
             return;
         }
-        
+
         string hotbarJson = _owner.GetInventory().GetViaGUID(hotbarItem);
         _owner.SetHeldItem(hotbarJson);
     }
@@ -41,24 +39,22 @@ public class Hotbar {
             GD.PrintErr($"WARN: Hotbar.AddToHotbar() : Item already exists in hotbar. Cannot add: {guid}");
             return false;
         }
-        
+
         int index = GetNextFreeIndex();
         if (index == -1) {
             GD.PrintErr($"WARN: Hotbar.AddToHotbar() : Hotbar is full. Cannot add: {guid}");
             return false;
         }
-        
+
         _hotbarGuids.Add(index, guid);
         ResyncInventory();
         return true;
     }
-    
+
     public Guid RemoveFromHotbar(int index) {
-        if (index < 0 || index >= HOTBAR_SIZE)
-            throw new IndexOutOfRangeException($"Hotbar index out of range. Got: {index}, Expected: 0-{HOTBAR_SIZE - 1}");
-        
-        if (!_hotbarGuids.TryGetValue(index, out Guid guid))
-            return Guid.Empty;
+        if (index < 0 || index >= HOTBAR_SIZE) throw new IndexOutOfRangeException($"Hotbar index out of range. Got: {index}, Expected: 0-{HOTBAR_SIZE - 1}");
+
+        if (!_hotbarGuids.TryGetValue(index, out Guid guid)) return Guid.Empty;
 
         bool remove = _hotbarGuids.Remove(index);
         if (!remove) {
@@ -71,86 +67,86 @@ public class Hotbar {
             _hotbarGuids[i - 1] = _hotbarGuids[i];
             _hotbarGuids.Remove(i);
         }
-        
+
         ResyncInventory();
         return guid;
     }
-    
+
     public int RemoveFromHotbar(Guid guid) {
-        foreach (KeyValuePair<int,Guid> entry in _hotbarGuids) {
+        foreach (KeyValuePair<int, Guid> entry in _hotbarGuids) {
             if (!entry.Value.Equals(guid)) continue;
             RemoveFromHotbar(entry.Key);
             return entry.Key;
         }
+
         return -1;
     }
-    
+
     public Guid GetHotbarItem(int index = -1) {
         if (index == -1) index = _hotbarIndex;
-        
+
         if (index < 0 || index >= HOTBAR_SIZE) {
             GD.PrintErr($"WARN: Player.GetHotbarItem(): Index out of range. Clamping to 0-{HOTBAR_SIZE - 1}");
             index = Mathsf.Clamp(index, 0, HOTBAR_SIZE - 1);
         }
-        
+
         return _hotbarGuids.GetOrDefault(index, Guid.Empty);
     }
 
     public void MoveHotbarItem(int index, bool up) {
-        if (index < 0 || index >= HOTBAR_SIZE)
-            throw new IndexOutOfRangeException($"Hotbar index out of range. Got: {index}, Expected: 0-{HOTBAR_SIZE - 1}");
-        
+        if (index < 0 || index >= HOTBAR_SIZE) throw new IndexOutOfRangeException($"Hotbar index out of range. Got: {index}, Expected: 0-{HOTBAR_SIZE - 1}");
+
         int target = index + (up ? -1 : 1);
         if (target < 0 || target >= HOTBAR_SIZE || !_hotbarGuids.ContainsKey(target)) return;
-        
+
         Guid first = GetHotbarItem(index);
         Guid second = GetHotbarItem(target);
-        
+
         _hotbarGuids[index] = second;
         _hotbarGuids[target] = first;
     }
-    
+
     private int GetNextFreeIndex() {
         for (int i = 0; i < HOTBAR_SIZE; i++)
-            if (!_hotbarGuids.ContainsKey(i)) return i;
+            if (!_hotbarGuids.ContainsKey(i))
+                return i;
         return -1;
     }
 
     public (bool up, bool down) GetHotbarItemMovement(int index) {
-        if (GetHotbarSize() <= 1) return (false, false);
+        int count = _hotbarGuids.Count;
+        if (count <= 1) return (false, false);
         if (index == 0) return (false, true);
-        if (index == GetHotbarSize() - 1) return (true, false);
+        if (index == count - 1) return (true, false);
         return (true, true);
     }
 
     public void ResyncInventory() {
-        SmartDictionary<int,Guid> guids = GetHotbarItems();
+        SmartDictionary<int, Guid> guids = GetHotbarItems();
         IInventory inventory = _owner.GetInventory();
 
         if (_owner is Player player) {
-            if (guids.Count != _priorStates.Count) _changed = true;
-            else {
-                List<string> currentStates = guids.Select(entry => inventory.GetViaGUID(entry.Value)).ToList();
-                if (!ArrayUtils.ExactMatch<string>(_priorStates.Values, currentStates)) _changed = true;
-            }
+            if (!_changed && !ArrayUtils.ExactMatchSorted(
+                    (a, b) => a.Key.CompareTo(b.Key),
+                    _priorGUIDs,
+                    guids
+                ))
+                _changed = true;
 
             ulong currentTime = Time.GetTicksMsec();
 
             if (_changed) {
-                GD.Print($"INFO: Hotbar.ResyncInventory() : Hotbar changed. Updating inventory.");
-                _priorStates.ClearAndReturn();
-                foreach (KeyValuePair<int,Guid> entry in guids)
-                    _priorStates.Add(entry.Key, inventory.GetViaGUID(entry.Value));
+                _priorGUIDs.ClearAndReturn();
+                foreach (KeyValuePair<int, Guid> entry in guids) _priorGUIDs.Add(entry.Key, entry.Value);
                 _changed = false;
-            
                 _lastPoppedTime = currentTime;
             }
 
             float alpha =
-                currentTime - _lastPoppedTime < DISPLAY_TIME ?
-                1.0f :
-                Math.Clamp(Mathsf.Remap(_lastPoppedTime + DISPLAY_TIME, _lastPoppedTime + DISPLAY_TIME + FADE_TIME, currentTime, 1.0f, 0.0f), 0.0f, 1.0f);
-            
+                currentTime - _lastPoppedTime < DISPLAY_TIME
+                    ? 1.0f
+                    : Math.Clamp(Mathsf.Remap(_lastPoppedTime + DISPLAY_TIME, _lastPoppedTime + DISPLAY_TIME + FADE_TIME, currentTime, 1.0f, 0.0f), 0.0f, 1.0f);
+
             HotbarMenu hotbarMenu = player.GetController<PlayerController>().GetHotbarMenu();
             Control menuNode = hotbarMenu.GetForm().GetMenu();
             Color modulate = menuNode.GetModulate();

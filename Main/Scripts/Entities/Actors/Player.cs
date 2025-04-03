@@ -108,11 +108,24 @@ public class Player : ActorBase, IViewable, IHotbarActor {
 
     public AddItemFailCause StoreItem(IObjectBase objectBase, Node node) {
         AddItemFailCause result = GetInventory().AddItem(objectBase);
-        if (result == AddItemFailCause.SUCCESS) node.QueueFree();
+        if (result != AddItemFailCause.SUCCESS) return result;
+        if (!GetHotbar().IsFull()) {
+            GetHotbar().AddToHotbar(objectBase.GetGUID());
+            GetHotbar().UpdateOwnerHeldItem();
+        }
+        node.QueueFree();
         return result;
     }
 
-    public AddItemFailCause StoreItem(string objectMetaTag, string objectJson) => GetInventory().AddItem(objectMetaTag, objectJson);
+    public AddItemFailCause StoreItem(string objectMetaTag, string objectJson) {
+        AddItemFailCause result = GetInventory().AddItem(objectMetaTag, objectJson);
+        if (result != AddItemFailCause.SUCCESS || GetHotbar().IsFull()) return result;
+        string guidString = Serialiser.GetSpecificData<string>(IObjectBase.GUID_KEY, objectJson);
+        Guid guid = Guid.Parse(guidString);
+        GetHotbar().AddToHotbar(guid);
+        GetHotbar().UpdateOwnerHeldItem();
+        return result;
+    }
 
     public bool DropItem(string objectJson) {
         ObjectAtlas.CreatedObject obj = ObjectAtlas.CreatedObjectFromJson(objectJson);
