@@ -104,7 +104,7 @@ public abstract class InventoryForm : FormBase {
 
         HandleHighlights(InventorySide.PRIMARY);
         if (GetMode() == Mode.DUAL) HandleHighlights(InventorySide.OTHER);
-        
+
         _primaryList.GetNode().QueueRedraw();
         if (GetMode() == Mode.DUAL) _otherList.GetNode().QueueRedraw();
         UpdateActionsList();
@@ -128,16 +128,10 @@ public abstract class InventoryForm : FormBase {
         bool selectedIsExpanded = selected?.IsExpanded() ?? false;
 
         switch (side) {
-            case InventorySide.PRIMARY:
-                _primaryOwner = container;
-                break;
-            case InventorySide.OTHER:
-                _otherOwner = container;
-                break;
-            case InventorySide.NONE:
-                return;
-            default:
-                throw new ArgumentOutOfRangeException(nameof(side), side, null);
+            case InventorySide.PRIMARY: _primaryOwner = container; break;
+            case InventorySide.OTHER: _otherOwner = container; break;
+            case InventorySide.NONE: return;
+            default: throw new ArgumentOutOfRangeException(nameof(side), side, null);
         }
 
         IInventory inventory = container.GetInventory();
@@ -178,6 +172,8 @@ public abstract class InventoryForm : FormBase {
         ItemType itemType = selectedItem.GetItem()?.GetItemType();
         int index = selectedItem.GetSummary() == null ? -1 : selectedItem.GetSummary().GetIndex();
         bool isLastSelected = selectedItem.IsLastSelected();
+        
+        ShowHotbarStars();
 
         List<InvItemDisplay> btns = GetInventory(side).GetDisplayObjects().Cast<InvItemDisplay>().ToList();
         foreach (InvItemDisplay btn in btns) {
@@ -190,8 +186,20 @@ public abstract class InventoryForm : FormBase {
                     summary.Highlight(false);
                     break;
                 }
+            } else if (index != -1) btn.Highlight(true);
+        }
+    }
+
+    public void ShowHotbarStars() {
+        List<string> horbarGuids = new();
+        if (_primaryOwner is IHotbarActor hbActor) horbarGuids = hbActor.GetHotbar().GetHotbarItems().Select(kv => kv.Value.ToString()).ToList();
+
+        List<InvItemDisplay> btns = GetInventory(InventorySide.PRIMARY).GetDisplayObjects().Cast<InvItemDisplay>().ToList();
+        foreach (InvItemDisplay btn in btns) {
+            foreach (InvItemSummary summary in btn.GetSummaries()) {
+                string thisGuid = Serialiser.GetSpecificData<string>(IObjectBase.GUID_KEY, summary.GetJson());
+                summary.ShowHotbarIcon(horbarGuids.Contains(thisGuid));
             }
-            else if (index != -1) btn.Highlight(true);
         }
     }
 

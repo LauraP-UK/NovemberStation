@@ -179,7 +179,10 @@ public class FloodlightObject : ObjectBase<RigidBody3D>, IGrabbable, IUsable, IC
         return $"Status: {(_isOn ? "ON" : "OFF")}\n{secondLine}";
     }
 
-    public override string GetSummary() => GetContext().Replace("\n", " | ");
+    public override string GetSummary() {
+        float power = GetPowerRemaining();
+        return power <= 0.0f ? "NO POWER" : $"{(_isOn ? "ON" : "OFF")} | Power: {power:00.00}%";
+    }
 
     public float GetSize() => 90.0f;
     public void Collect(ActorBase actorBase, IEventBase ev) => CollectActionDefault.Invoke(actorBase, this, ev);

@@ -1,6 +1,7 @@
-[gd_scene load_steps=11 format=3 uid="uid://gcbrs4ih08h1"]
+[gd_scene load_steps=12 format=3 uid="uid://gcbrs4ih08h1"]
 
 [ext_resource type="Texture2D" uid="uid://cnafjpoh1lxps" path="res://Main/Textures/Sandbox/Checkerboard1.png" id="1_8t1lp"]
+[ext_resource type="Texture2D" uid="uid://bnbxqu3kkmc2y" path="res://Main/Textures/UI/HighlightNinePatch.png" id="2_8tc5b"]
 
 [sub_resource type="CompressedTexture2D" id="CompressedTexture2D_va7jy"]
 load_path = "res://.godot/imported/ContextNinePatch.png-1956a95d8fe2d1cd3bd043c483a8f7ae.ctex"
@@ -180,7 +181,6 @@ mouse_filter = 2
 color = Color(0.1482, 0.163527, 0.19, 1)
 
 [node name="ObjImg" type="TextureRect" parent="HBoxContainer/Icon"]
-z_index = 5
 z_as_relative = false
 custom_minimum_size = Vector2(60, 60)
 layout_mode = 1
@@ -209,6 +209,19 @@ patch_margin_left = 7
 patch_margin_top = 7
 patch_margin_right = 7
 patch_margin_bottom = 7
+
+[node name="Highlight" type="NinePatchRect" parent="HBoxContainer/Icon"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("2_8tc5b")
+patch_margin_left = 10
+patch_margin_top = 10
+patch_margin_right = 10
+patch_margin_bottom = 10
 
 [node name="XButtonContainer" type="Control" parent="HBoxContainer"]
 custom_minimum_size = Vector2(20, 0)

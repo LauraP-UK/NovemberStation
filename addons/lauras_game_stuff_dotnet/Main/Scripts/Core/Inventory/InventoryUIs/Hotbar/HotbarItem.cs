@@ -8,11 +8,12 @@ public class HotbarItem : FormBase {
     private readonly TextureRectElement _itemIcon;
     private readonly ControlElement _removeContainer, _upContainer, _downContainer;
     private readonly VBoxContainerElement _arrowsContainer;
+    private readonly NinePatchRectElement _highlightNinepatch;
 
     private readonly SingleInventoryForm _form;
     private readonly int _index;
 
-    private string _json;
+    private Guid _guid;
     private IContainer _owner;
 
     private const string
@@ -27,6 +28,7 @@ public class HotbarItem : FormBase {
         REMOVE_CONTAINER = "HBoxContainer/XButtonContainer",
         UP_CONTAINER = "HBoxContainer/VBoxContainer/Up",
         DOWN_CONTAINER = "HBoxContainer/VBoxContainer/Down",
+        HIGHLIGHT_NINEPATCH = "HBoxContainer/Icon/Highlight",
         ARROWS_CONTAINER = "HBoxContainer/VBoxContainer";
 
     private readonly Color
@@ -48,6 +50,7 @@ public class HotbarItem : FormBase {
         Control removeContainer = FindNode<Control>(REMOVE_CONTAINER);
         Control upContainer = FindNode<Control>(UP_CONTAINER);
         Control downContainer = FindNode<Control>(DOWN_CONTAINER);
+        NinePatchRect highlight = FindNode<NinePatchRect>(HIGHLIGHT_NINEPATCH);
         VBoxContainer arrowsContainer = FindNode<VBoxContainer>(ARROWS_CONTAINER);
 
         _removeButton = new ButtonElement(removeBtn);
@@ -60,6 +63,7 @@ public class HotbarItem : FormBase {
         _removeContainer = new ControlElement(removeContainer);
         _upContainer = new ControlElement(upContainer);
         _downContainer = new ControlElement(downContainer);
+        _highlightNinepatch = new NinePatchRectElement(highlight);
         _arrowsContainer = new VBoxContainerElement(arrowsContainer);
 
         _menuElement = new ControlElement(_menu);
@@ -72,7 +76,7 @@ public class HotbarItem : FormBase {
             _ => {
                 if (GetOwner() is not Player player) return;
                 player.GetHotbar().RemoveFromHotbar(_index);
-                form.RefreshHotbarIcons();
+                _form.RefreshHotbarIcons();
             }
         );
 
@@ -84,7 +88,7 @@ public class HotbarItem : FormBase {
             _ => {
                 if (GetOwner() is not Player player) return;
                 player.GetHotbar().MoveHotbarItem(_index, true);
-                form.RefreshHotbarIcons();
+                _form.RefreshHotbarIcons();
             }
         );
 
@@ -96,11 +100,13 @@ public class HotbarItem : FormBase {
             _ => {
                 if (GetOwner() is not Player player) return;
                 player.GetHotbar().MoveHotbarItem(_index, false);
-                form.RefreshHotbarIcons();
+                _form.RefreshHotbarIcons();
             }
         );
 
         _arrowsContainer.SetAlignment(BoxContainer.AlignmentMode.Center);
+        _highlightNinepatch.GetElement().SetModulate(Colors.DarkGoldenrod);
+        _highlightNinepatch.SetAlpha(0.0f);
 
         SetFromItem("");
     }
@@ -117,6 +123,7 @@ public class HotbarItem : FormBase {
 
     protected override void OnDestroy() { }
     public int GetIndex() => _index;
+    public Guid GetItemGUID() => _guid;
     public void SetOwner(IContainer owner) => _owner = owner;
 
     private IContainer GetOwner() {
@@ -125,16 +132,18 @@ public class HotbarItem : FormBase {
     }
 
     public void SetFromItem(string json) {
-        _json = json;
-
         if (json == "") {
+            _guid = Guid.Empty;
             _itemIcon.ClearTexture();
             _itemIcon.GetElement().SetVisible(false);
             _removeContainer.GetElement().SetVisible(false);
             _upContainer.GetElement().SetVisible(false);
             _downContainer.GetElement().SetVisible(false);
+            Highlight(false);
             return;
         }
+        
+        _guid = Guid.Parse(Serialiser.GetSpecificData<string>(IObjectBase.GUID_KEY, json));
 
         string itemTag = Serialiser.GetSpecificTag<string>(Serialiser.ObjectSaveData.TYPE_ID, json);
         ItemType itemType = Items.GetViaID(itemTag);
@@ -146,5 +155,9 @@ public class HotbarItem : FormBase {
 
         _upContainer.GetElement().SetVisible(up);
         _downContainer.GetElement().SetVisible(down);
+    }
+
+    public void Highlight(bool highlight) {
+        _highlightNinepatch.SetAlpha(highlight ? 0.75f : 0.0f);
     }
 }

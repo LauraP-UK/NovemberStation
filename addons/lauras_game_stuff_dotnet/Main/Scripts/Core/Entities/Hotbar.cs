@@ -164,4 +164,5 @@ public class Hotbar {
     public int GetHotbarSize() => _hotbarGuids.Count;
     public bool IsFull() => GetHotbarSize() >= HOTBAR_SIZE;
     public IDictionary<int, Guid> ClearHotbar() => _hotbarGuids.ClearAndReturn();
+    public bool Contains(Guid guid) => _hotbarGuids.Values.Contains(guid);
 }

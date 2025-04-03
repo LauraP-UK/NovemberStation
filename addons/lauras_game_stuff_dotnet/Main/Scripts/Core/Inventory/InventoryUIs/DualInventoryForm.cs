@@ -88,6 +88,7 @@ public class DualInventoryForm : InventoryForm {
 
                 UpdateSelectedItem(otherSide, otherSideItem.GetItem(), otherSideItem.GetSummary());
                 UpdateSelectedItem(side, refreshSelected, null);
+                ShowHotbarStars();
             }
         );
 

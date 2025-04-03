@@ -155,6 +155,14 @@ public class SingleInventoryForm : InventoryForm, IProcess {
         SmartDictionary<int,Guid> items = owner.GetHotbar().GetHotbarItems();
         List<HotbarItem> icons = _hotbarList.GetDisplayObjects().Cast<HotbarItem>().ToList();
         
+
+        SelectedInfo selectedItem = GetSelectedItem(InventorySide.PRIMARY);
+        Guid toHighlight = Guid.Empty;
+        if (selectedItem?.GetSummary() != null) {
+            InvItemSummary summary = selectedItem.GetSummary();
+            toHighlight = Guid.Parse(Serialiser.GetSpecificData<string>(IObjectBase.GUID_KEY, summary.GetJson()));
+        }
+
         foreach (HotbarItem hotbarItem in icons) {
             Guid guid = items.GetOrDefault(hotbarItem.GetIndex(), Guid.Empty);
             if (guid == Guid.Empty) {
@@ -168,9 +176,11 @@ public class SingleInventoryForm : InventoryForm, IProcess {
                 continue;
             }
             hotbarItem.SetFromItem(json);
+            hotbarItem.Highlight(hotbarItem.GetItemGUID().Equals(toHighlight));
         }
         
         owner.GetHotbar().UpdateOwnerHeldItem();
+        ShowHotbarStars();
     }
 
     protected override void OnSetInventory(IContainer container, InventorySide side) {

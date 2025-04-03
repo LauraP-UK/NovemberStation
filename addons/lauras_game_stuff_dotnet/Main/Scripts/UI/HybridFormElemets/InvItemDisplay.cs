@@ -157,7 +157,7 @@ public class InvItemDisplay : FormBase, IFocusable {
 
     public void Highlight(bool highlight) {
         GetBgColor().SetColor(DEFAULT_BG_COLOR);
-        _highlightRect.SetAlpha(highlight ? 0.5f : 0.0f);
+        _highlightRect.SetAlpha(highlight ? 0.75f : 0.0f);
     }
 
     public void SetExpanded(bool expanded) {

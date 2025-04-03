@@ -7,6 +7,7 @@ public class InvItemSummary : FormBase, IFocusable {
     private readonly ColorRectElement _bgColor;
     private readonly ButtonElement _focusBtn;
     private readonly NinePatchRectElement _highlightRect;
+    private readonly TextureRectElement _isHotbarIcon;
 
     private readonly InvItemDisplay _owningBtn;
     
@@ -20,7 +21,8 @@ public class InvItemSummary : FormBase, IFocusable {
         SUMMARY_LABEL = "Content/ObjName",
         BG_COLOUR = "BGContainer/BGColour",
         FOCUS_BUTTON = "Content/FocusButton",
-        HIGHLIGHT_RECT = "BGContainer/Highlight";
+        HIGHLIGHT_RECT = "BGContainer/Highlight",
+        IS_HOTBAR_ICON = "Content/HotbarIcon";
 
     private static readonly Color
         DEFAULT_BG_COLOR = ColourHelper.GetFrom255(46,46,46,1.0f),
@@ -37,16 +39,20 @@ public class InvItemSummary : FormBase, IFocusable {
         ColorRect bgColor = FindNode<ColorRect>(BG_COLOUR);
         Button focusBtn = FindNode<Button>(FOCUS_BUTTON);
         NinePatchRect highlight = FindNode<NinePatchRect>(HIGHLIGHT_RECT);
+        TextureRect isHotbarIcon = FindNode<TextureRect>(IS_HOTBAR_ICON);
         
         _numberLabel = new LabelElement(numberLabel);
         _summaryLabel = new LabelElement(summaryLabel);
         _bgColor = new ColorRectElement(bgColor);
         _focusBtn = new ButtonElement(focusBtn);
         _highlightRect = new NinePatchRectElement(highlight);
+        _isHotbarIcon = new TextureRectElement(isHotbarIcon);
         
         _highlightRect.GetElement().SetModulate(SELECTED_BG_COLOR);
         _highlightRect.SetAlpha(0.0f);
         _bgColor.SetColor(DEFAULT_BG_COLOR);
+        
+        _isHotbarIcon.SetAlpha(0.0f);
         
         _focusBtn.AddAction(Control.SignalName.FocusEntered, _ => {
             if (_isSelected) return;
@@ -108,8 +114,9 @@ public class InvItemSummary : FormBase, IFocusable {
     public bool IsSelected() => _isSelected;
     public void Highlight(bool highlight) {
         GetBgColor().SetColor(DEFAULT_BG_COLOR);
-        _highlightRect.SetAlpha(highlight ? 0.5f : 0.0f);
+        _highlightRect.SetAlpha(highlight ? 0.75f : 0.0f);
     }
+    public void ShowHotbarIcon(bool show) => _isHotbarIcon.SetAlpha(show ? 1.0f : 0.0f);
 
     public void GrabFocus() {
         if (!IsValid() || HasFocus()) return;
