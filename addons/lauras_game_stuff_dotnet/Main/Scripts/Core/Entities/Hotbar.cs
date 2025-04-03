@@ -1,19 +1,26 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Godot;
 
 public class Hotbar {
     public const int HOTBAR_SIZE = 9;
+    public const ulong DISPLAY_TIME = 2500, FADE_TIME = 500;
     
     private readonly SmartDictionary<int, Guid> _hotbarGuids = new();
+    private readonly SmartDictionary<int, string> _priorStates = new();
     private readonly IHotbarActor _owner;
     private int _hotbarIndex;
+    private bool _changed;
+    private ulong _lastPoppedTime;
     
     public Hotbar(IHotbarActor owner) => _owner = owner;
     
     public void ChangeIndex(int change) {
+        int oldIndex = _hotbarIndex;
         _hotbarIndex += change;
-        _hotbarIndex = Mathf.Wrap(_hotbarIndex, 0, GetHotbarSize());
+        _hotbarIndex = Mathf.Wrap(_hotbarIndex, 0, HOTBAR_SIZE);
+        _changed = oldIndex != _hotbarIndex;
     }
     
     public int GetIndex() => _hotbarIndex;
@@ -108,7 +115,7 @@ public class Hotbar {
             if (!_hotbarGuids.ContainsKey(i)) return i;
         return -1;
     }
-    
+
     public (bool up, bool down) GetHotbarItemMovement(int index) {
         if (GetHotbarSize() <= 1) return (false, false);
         if (index == 0) return (false, true);
@@ -117,9 +124,43 @@ public class Hotbar {
     }
 
     public void ResyncInventory() {
+        SmartDictionary<int,Guid> guids = GetHotbarItems();
+        IInventory inventory = _owner.GetInventory();
+
+        if (_owner is Player player) {
+            if (guids.Count != _priorStates.Count) _changed = true;
+            else {
+                List<string> currentStates = guids.Select(entry => inventory.GetViaGUID(entry.Value)).ToList();
+                if (!ArrayUtils.ExactMatch<string>(_priorStates.Values, currentStates)) _changed = true;
+            }
+
+            ulong currentTime = Time.GetTicksMsec();
+
+            if (_changed) {
+                GD.Print($"INFO: Hotbar.ResyncInventory() : Hotbar changed. Updating inventory.");
+                _priorStates.ClearAndReturn();
+                foreach (KeyValuePair<int,Guid> entry in guids)
+                    _priorStates.Add(entry.Key, inventory.GetViaGUID(entry.Value));
+                _changed = false;
+            
+                _lastPoppedTime = currentTime;
+            }
+
+            float alpha =
+                currentTime - _lastPoppedTime < DISPLAY_TIME ?
+                1.0f :
+                Math.Clamp(Mathsf.Remap(_lastPoppedTime + DISPLAY_TIME, _lastPoppedTime + DISPLAY_TIME + FADE_TIME, currentTime, 1.0f, 0.0f), 0.0f, 1.0f);
+            
+            HotbarMenu hotbarMenu = player.GetController<PlayerController>().GetHotbarMenu();
+            Control menuNode = hotbarMenu.GetForm().GetMenu();
+            Color modulate = menuNode.GetModulate();
+            modulate.A = alpha;
+            menuNode.SetModulate(modulate);
+        }
+
         IObjectBase handItem = _owner.GetHandItem();
         if (handItem == null) return;
-        _owner.GetInventory().UpdateItem(handItem.Serialise());
+        inventory.UpdateItem(handItem.Serialise());
     }
 
     public SmartDictionary<int, Guid> GetHotbarItems() => _hotbarGuids.Clone();

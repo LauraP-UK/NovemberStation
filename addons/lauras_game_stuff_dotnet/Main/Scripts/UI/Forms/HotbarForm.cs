@@ -34,9 +34,8 @@ public class HotbarForm : FormBase, IProcess {
         _bgColour.SetAlpha(0.5f);
     }
 
-    protected override List<IFormObject> GetAllElements() => new() { _hbContainer };
+    protected override List<IFormObject> GetAllElements() => new() { _hbContainer, _bgColour };
     protected override void OnDestroy() { }
-
     public void SetOwner(IHotbarActor owner) => _owner = owner;
 
     public void Process(float delta) {
@@ -48,15 +47,15 @@ public class HotbarForm : FormBase, IProcess {
         SmartDictionary<int,Guid> items = _owner.GetHotbar().GetHotbarItems();
         foreach (KeyValuePair<int,HotbarIcon> icon in _hotbarIcons) {
             Guid guid = items.GetOrDefault(icon.Key, Guid.Empty);
+            icon.Value.Highlight(icon.Key == selectedIndex);
+            
             if (Guid.Empty.Equals(guid)) {
                 icon.Value.SetIcon(null);
-                icon.Value.Highlight(false);
                 continue;
             }
             string itemJson = inventory.GetViaGUID(guid);
             string itemTag = Serialiser.GetSpecificTag<string>(Serialiser.ObjectSaveData.TYPE_ID, itemJson);
             icon.Value.SetIcon(Items.GetViaID(itemTag));
-            icon.Value.Highlight(icon.Key == selectedIndex);
         }
     }
     public override bool LockMovement() => false;

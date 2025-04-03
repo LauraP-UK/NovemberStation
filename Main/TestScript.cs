@@ -67,16 +67,11 @@ public partial class TestScript : Node {
         using FileAccess file = FileAccess.Open("user://SerialiseTest.json", FileAccess.ModeFlags.Read);
         string json = file.GetAsText();
 
-        //IObjectBase floodlight = player.SetHeldItem(Items.FLOODLIGHT);
-        //player.SetHotbarItem(0, floodlight.GetGUID());
-
-        RigidBody3D fireEx = Items.FIRE_EXTINGUISHER.CreateInstance();
-        IObjectBase fireExData = GameManager.I().RegisterObject(fireEx);
-        player.StoreItem(fireExData, fireEx);
-        player.GetHotbar().AddToHotbar(fireExData.GetGUID());
-        
-        //FloodlightObject floodlightObject = (FloodlightObject)player.SetHeldItem(json);
-        //floodlightObject.ToggleLight(true);
+        //RigidBody3D fireEx = Items.FIRE_EXTINGUISHER.CreateInstance();
+        //IObjectBase fireExData = GameManager.I().RegisterObject(fireEx);
+        //player.StoreItem(fireExData, fireEx);
+        //player.GetHotbar().AddToHotbar(fireExData.GetGUID());
+        //player.GetHotbar().UpdateOwnerHeldItem();
 
         ObjectAtlas.CreatedObject createdObjectFromJson = ObjectAtlas.CreatedObjectFromJson(json);
 

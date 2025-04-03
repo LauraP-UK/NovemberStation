@@ -427,6 +427,7 @@ public class PlayerController : ControllerBase {
     }
 
     public ToastUI GetToastUI() => _toastUI;
+    public HotbarMenu GetHotbarMenu() => _hotbarMenu;
 
     public void ShowUI(bool show) {
         _uiVisible = show;
