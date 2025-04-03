@@ -142,7 +142,7 @@ public partial class DrawDemo : Node3D
 		
 			float[] motionResult = GetWorld3D().DirectSpaceState.CastMotion(_shapeQueryMotion);
 			DebugDraw.ShapeMotion(_shapeQueryMotion, motionResult, 0.0f, null, null, 1 << 4);
-		
+
 			GC.Array<Vector3> hits = GetWorld3D().DirectSpaceState.CollideShape(_shapeQueryCollision, 
 				32);
 			DebugDraw.ShapeCollision(_shapeQueryCollision, hits, 0.0f, null, null, 1 << 4);

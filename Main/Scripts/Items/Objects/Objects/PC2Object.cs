@@ -1,5 +1,4 @@
-﻿
-using System;
+﻿using System;
 using Godot;
 
 public class PC2Object : ObjectBase<Node3D>, IUsable {

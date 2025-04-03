@@ -1,5 +1,7 @@
 using System.Linq;
-using Godot; // Assuming Godot's Vector2 is available
+using Godot;
+
+// Assuming Godot's Vector2 is available
 
 /// <summary>
 /// Represents a Direction with various properties and methods.
