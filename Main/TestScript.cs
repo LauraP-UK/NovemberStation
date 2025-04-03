@@ -1,6 +1,4 @@
-using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using Godot;
 
 public partial class TestScript : Node {
@@ -33,9 +31,6 @@ public partial class TestScript : Node {
         player.SetPosition(spawnPoint, new Vector3(0.0f, -90.0f, 0.0f));
         gameManager.SetPlayer(player);
 
-        //FloodlightObject floodlightObject = (FloodlightObject) player.SetHeldItem(Items.FLOODLIGHT);
-        //floodlightObject.ToggleLight(true);
-
         Node3D sceneObjects = GetTree().Root.GetNode<Node3D>("Main/SceneObjects");
         foreach (Node child in sceneObjects.GetChildren()) {
             if (child is not Node3D obj) continue;
@@ -66,12 +61,6 @@ public partial class TestScript : Node {
 
         using FileAccess file = FileAccess.Open("user://SerialiseTest.json", FileAccess.ModeFlags.Read);
         string json = file.GetAsText();
-
-        //RigidBody3D fireEx = Items.FIRE_EXTINGUISHER.CreateInstance();
-        //IObjectBase fireExData = GameManager.I().RegisterObject(fireEx);
-        //player.StoreItem(fireExData, fireEx);
-        //player.GetHotbar().AddToHotbar(fireExData.GetGUID());
-        //player.GetHotbar().UpdateOwnerHeldItem();
 
         ObjectAtlas.CreatedObject createdObjectFromJson = ObjectAtlas.CreatedObjectFromJson(json);
 

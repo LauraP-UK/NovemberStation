@@ -54,6 +54,7 @@ public class FloodlightObject : ObjectBase<RigidBody3D>, IGrabbable, IUsable, IC
 
     public void Use(ActorBase actorBase, IEventBase ev) {
         if (ev is not KeyPressEvent && ev is not MouseInputEvent) return;
+        if (actorBase is not IHotbarActor hbActor || ev is MouseInputEvent && !IsHeldItem(hbActor)) return;
 
         if (GetPowerRemaining() <= 0.0f) {
             Toast.Error((Player)actorBase, "Floodlight is out of power!");

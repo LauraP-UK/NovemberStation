@@ -76,6 +76,7 @@ public class Hotbar {
         foreach (KeyValuePair<int, Guid> entry in _hotbarGuids) {
             if (!entry.Value.Equals(guid)) continue;
             RemoveFromHotbar(entry.Key);
+            UpdateOwnerHeldItem();
             return entry.Key;
         }
 

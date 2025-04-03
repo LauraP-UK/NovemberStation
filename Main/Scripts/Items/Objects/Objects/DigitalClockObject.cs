@@ -11,7 +11,6 @@ public class DigitalClockObject : ObjectBase<RigidBody3D>, IGrabbable, IProcess,
     private readonly TimeDisplayMenu _timeMenu;
     
     private int _lastMinute = -1;
-    private bool _showDivider = false;
 
     public DigitalClockObject(RigidBody3D baseNode, bool dataOnly = false) : base(baseNode, "digitalclock_obj") {
         if (dataOnly) return;
@@ -49,9 +48,7 @@ public class DigitalClockObject : ObjectBase<RigidBody3D>, IGrabbable, IProcess,
         
         if (minutes == _lastMinute) return;
         _lastMinute = minutes;
-        
-        _timeMenu.GetForm().ShowDivider(_showDivider);
-        _showDivider = !_showDivider;
+        _timeMenu.GetForm().ShowDivider(minutes % 2 == 0);
     }
 
     public float GetSize() => 2.0f;

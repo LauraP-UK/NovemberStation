@@ -20,6 +20,7 @@ public class GasCanObject : ObjectBase<RigidBody3D>, IGrabbable, IShovable, IDri
     public void Shove(ActorBase actorBase, IEventBase ev) => ShoveActionDefault.Invoke(actorBase, GetBaseNode(), ev);
     public void Drink(ActorBase actorBase, IEventBase ev) {
         if (ev is not KeyPressEvent && ev is not MouseInputEvent) return;
+        if (actorBase is not IHotbarActor hbActor || ev is MouseInputEvent && !IsHeldItem(hbActor)) return;
         _fuelAmount -= 10;
         Toast.Info((Player)actorBase, $"Drinky-poos! Fuel amount: {_fuelAmount}");
     }

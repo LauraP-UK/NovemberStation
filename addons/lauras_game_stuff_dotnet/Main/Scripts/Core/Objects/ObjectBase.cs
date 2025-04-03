@@ -25,6 +25,9 @@ public abstract class ObjectBase<T> : IObjectBase where T : Node3D {
 
     protected TType FindNode<TType>(string nodePath) where TType : Node => _baseNode.GetNode<TType>(nodePath);
     public T GetBaseNode() => _baseNode;
+
+    public bool IsHeldItem(IHotbarActor actor) => GetGUID().Equals(actor.GetHandItem()?.GetGUID());
+
     protected void RegisterAction<TAction>(Func<ActorBase, IEventBase, bool> test, Action<ActorBase, IEventBase> action) where TAction : IObjectAction =>
         _actions[new ActionKey(typeof(TAction))] = (test, action);
     
