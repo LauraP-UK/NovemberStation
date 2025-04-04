@@ -85,9 +85,10 @@ public abstract class InventoryBase : IInventory {
         .ToList();
 
     public string GetViaGUID(Guid id) {
+        string guidStr = id.ToString();
         foreach (string content in GetContents()) {
             string guidString = Serialiser.GetSpecificData<string>(IObjectBase.GUID_KEY, content);
-            if (guidString == id.ToString()) return content;
+            if (guidString == guidStr) return content;
         }
         return null;
     }

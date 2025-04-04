@@ -49,7 +49,7 @@ radial_segments = 8
 rings = 0
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_cpo0e"]
-size = Vector3(0.05, 0.13, 0.05)
+size = Vector3(0.075, 0.15, 0.075)
 
 [node name="Battery" type="RigidBody3D"]
 collision_layer = 4

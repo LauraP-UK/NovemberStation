@@ -4,6 +4,7 @@ using System.Text.Json;
 using Godot;
 
 public static class Serialiser {
+    
     public static string Serialise<T>(T obj) {
         return JsonSerializer.Serialize(obj, new JsonSerializerOptions {
             WriteIndented = true,
@@ -31,6 +32,17 @@ public static class Serialiser {
     }
     
     public static T GetSpecificData<T>(string key, string json) {
+        object result = ObjectSerialiserCache.GetFromCache(json, key);
+        if (result != null) {
+            if (result is T converted) return converted;
+            try {
+                return (T)Convert.ChangeType(result, typeof(T));
+            } catch {
+                GD.PrintErr($"WARN: Serialiser.GetSpecificData() : Failed to convert {result} to {typeof(T)}");
+                return default;
+            }
+        }
+
         using JsonDocument doc = JsonDocument.Parse(json);
         JsonElement root = doc.RootElement;
 
@@ -38,6 +50,7 @@ public static class Serialiser {
         if (!dataElement.TryGetProperty(key, out JsonElement target)) return default;
 
         object raw = ExtractData(target);
+        ObjectSerialiserCache.AddToCache(json, key, raw);
         if (raw is T tVal) return tVal;
 
         try {
