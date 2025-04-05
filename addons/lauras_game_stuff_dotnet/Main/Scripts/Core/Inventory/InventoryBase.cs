@@ -7,7 +7,7 @@ using Godot;
 public abstract class InventoryBase : IInventory {
     public const string INVENTORY_TAG = "inventory_data_tag";
     
-    private readonly SmartDictionary<string, List<string>> _inventory = new(); // ObjectMetaTag Type, List of Object Json
+    private readonly SmartDictionary<string, List<(string json, Guid guid)>> _inventory = new(); // ObjectMetaTag Type, List of Object Json
     private readonly SmartSet<Action> _onAdd = new(), _onRemove = new();
 
     public AddItemFailCause AddItem(Node3D node) => AddItem(GameManager.I().GetObjectClass(node.GetInstanceId()));
@@ -25,7 +25,8 @@ public abstract class InventoryBase : IInventory {
     }
     
     protected AddItemFailCause AddItemUnchecked(string objectMetaTag, string jsonData) {
-        GetGroup(objectMetaTag).Add(jsonData);
+        string guidString = Serialiser.GetSpecificData<string>(IObjectBase.GUID_KEY, jsonData);
+        GetGroup(objectMetaTag).Add((jsonData, Guid.Parse(guidString)));
         _onAdd.ForEach(a => a.Invoke());
         return AddItemFailCause.SUCCESS;
     }
@@ -43,13 +44,13 @@ public abstract class InventoryBase : IInventory {
     protected abstract AddItemFailCause CanAddInternal(string jsonData);
 
     public void RemoveItem(string objectMetaTag, string jsonData) {
-        List<string> group = GetGroup(objectMetaTag);
+        List<(string,Guid)> group = GetGroup(objectMetaTag);
         if (group.Count == 0) {
             GD.PrintErr($"WARN: InventoryBase.RemoveItem() : No items found with objectMetaTag '{objectMetaTag}'.");
             return;
         }
-
-        group.Remove(jsonData);
+        string guidString = Serialiser.GetSpecificData<string>(IObjectBase.GUID_KEY, jsonData);
+        group.Remove((jsonData, Guid.Parse(guidString)));
         _onRemove.ForEach(a => a.Invoke());
     }
     
@@ -62,13 +63,11 @@ public abstract class InventoryBase : IInventory {
         
         string tag = Serialiser.GetSpecificTag<string>(Serialiser.ObjectSaveData.META_TAG, updatedJson);
         
-        List<string> contents = GetGroup(tag);
+        List<(string,Guid)> contents = GetGroup(tag);
         for (int i = 0; i < contents.Count; i++) {
-            string existingJson = contents[i];
-            string existingGuid = Serialiser.GetSpecificData<string>(IObjectBase.GUID_KEY, existingJson);
-
-            if (existingGuid != updatedGuid) continue;
-            contents[i] = updatedJson;
+            Guid existingGuid = contents[i].Item2;
+            if (existingGuid.ToString() != updatedGuid) continue;
+            contents[i] = (updatedJson,existingGuid);
             return true;
         }
         return false;
@@ -77,30 +76,27 @@ public abstract class InventoryBase : IInventory {
     public bool HasItem(string objectMetaTag) => CountItemType(objectMetaTag) > 0;
 
     public bool HasItem(ItemType itemType) => GetContents()
-        .Select(json => Serialiser.GetSpecificTag<string>(Serialiser.ObjectSaveData.TYPE_ID, json))
+        .Select(json => Serialiser.GetSpecificTag<string>(Serialiser.ObjectSaveData.TYPE_ID, json.Item1))
         .Any(typeID => typeID == itemType.GetTypeID());
 
-    public List<string> GetContentsOfType(ItemType itemType) => GetContents()
-        .Where(json => itemType.GetTypeID() == Serialiser.GetSpecificTag<string>(Serialiser.ObjectSaveData.TYPE_ID, json))
+    public List<(string,Guid)> GetContentsOfType(ItemType itemType) => GetContents()
+        .Where(item => itemType.GetTypeID() == Serialiser.GetSpecificTag<string>(Serialiser.ObjectSaveData.TYPE_ID, item.Item1))
         .ToList();
 
     public string GetViaGUID(Guid id) {
-        string guidStr = id.ToString();
-        foreach (string content in GetContents()) {
-            string guidString = Serialiser.GetSpecificData<string>(IObjectBase.GUID_KEY, content);
-            if (guidString == guidStr) return content;
-        }
+        foreach ((string json, Guid guid) in GetContents())
+            if (id.Equals(guid)) return json;
         return null;
     }
 
-    public List<string> GetContents() {
+    public List<(string,Guid)> GetContents() {
         return _inventory
             .OrderBy(pair => pair.Key)
             .SelectMany(pair => pair.Value)
             .ToList();
     }
 
-    public List<string> GetContentsOfType(string type) => GetGroup(type);
+    public List<(string,Guid)> GetContentsOfType(string type) => GetGroup(type);
 
     public T GetAs<T>() where T : IInventory {
         if (this is T t) return t;
@@ -110,9 +106,9 @@ public abstract class InventoryBase : IInventory {
 
     public string Serialise() {
         Dictionary<string, string> inventoryContents = new();
-        List<string> items = GetContents();
+        List<(string,Guid)> items = GetContents();
 
-        for (int i = 0; i < items.Count; i++) inventoryContents[i.ToString()] = items[i];
+        for (int i = 0; i < items.Count; i++) inventoryContents[i.ToString()] = items[i].Item1;
 
         Dictionary<string, object> wrapper = new() {
             { INVENTORY_TAG, inventoryContents }
@@ -139,9 +135,9 @@ public abstract class InventoryBase : IInventory {
 
     public Dictionary<string, string> SerialiseToDict() {
         Dictionary<string, string> inventoryContents = new();
-        List<string> items = GetContents();
+        List<(string,Guid)> items = GetContents();
 
-        for (int i = 0; i < items.Count; i++) inventoryContents[i.ToString()] = items[i];
+        for (int i = 0; i < items.Count; i++) inventoryContents[i.ToString()] = items[i].Item1;
 
         return inventoryContents;
     }
@@ -161,7 +157,7 @@ public abstract class InventoryBase : IInventory {
         _inventory.Clear();
     }
 
-    private List<string> GetGroup(string key) => _inventory.GetOrCompute(key, () => new List<string>());
+    private List<(string,Guid)> GetGroup(string key) => _inventory.GetOrCompute(key, () => new List<(string,Guid)>());
     public abstract string GetName();
     protected void OnAdd(Action onAdd) => _onAdd.Add(onAdd);
     protected void OnRemove(Action onRemove) => _onRemove.Add(onRemove);

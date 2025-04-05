@@ -10,7 +10,7 @@ public class PlayerController : ControllerBase {
         STATIC_LAYER = 1 << 1, // Layer 2
         OBJECT_LAYER = 1 << 2; // Layer 3
 
-    private bool _asleep, _altAction, _toggleCrouch, _uiVisible = true;
+    private bool _asleep, _altAction, _toggleCrouch, _uiVisible = true, _debugObjects = false;
     private float _holdDistanceModifier = 1.0f;
     private Vector2 _rotationOffset = Vector2.Zero;
     private long _lastJump;
@@ -44,6 +44,14 @@ public class PlayerController : ControllerBase {
         if (IsLocked()) return;
         if (key != Key.F1) return;
         ShowUI(!_uiVisible);
+    }
+    
+    [EventListener]
+    private void ToggleDebugObjects(KeyPressEvent ev, Key key) {
+        if (IsLocked()) return;
+        if (key != Key.F2 || !GameManager.IsDebugMode()) return;
+        _debugObjects = !_debugObjects;
+        GameManager.I().DebugObjects(_debugObjects);
     }
 
     [EventListener]

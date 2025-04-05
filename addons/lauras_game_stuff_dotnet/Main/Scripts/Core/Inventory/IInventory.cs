@@ -15,9 +15,9 @@ public interface IInventory {
     public bool HasItem(string objectMetaTag);
     public bool HasItem(ItemType itemType);
     public bool IsEmpty();
-    public List<string> GetContents();
-    public List<string> GetContentsOfType(string type);
-    public List<string> GetContentsOfType(ItemType type);
+    public List<(string,Guid)> GetContents();
+    public List<(string,Guid)> GetContentsOfType(string type);
+    public List<(string,Guid)> GetContentsOfType(ItemType type);
     public string GetViaGUID(Guid id);
     public void ClearContents();
     public T GetAs<T>() where T : IInventory;

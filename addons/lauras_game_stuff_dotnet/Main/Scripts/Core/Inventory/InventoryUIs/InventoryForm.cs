@@ -222,10 +222,10 @@ public abstract class InventoryForm : FormBase {
 
 
     private List<InvItemDisplay> GetButtons(IInventory inv) {
-        List<string> contents = inv.GetContents();
+        List<(string,Guid)> contents = inv.GetContents();
         List<InvItemDisplay> displayButtons = new();
 
-        foreach (string itemJson in contents) {
+        foreach ((string itemJson, Guid _) in contents) {
             string itemID = Serialiser.GetSpecificTag<string>(Serialiser.ObjectSaveData.TYPE_ID, itemJson);
             IObjectBase objData = ObjectAtlas.DeserialiseDataWithoutNode(itemJson);
             ItemType itemType = Items.GetViaID(itemID);

@@ -129,10 +129,6 @@ public class BoundingBox {
         List<KeyValuePair<Vector3, Vector3>> edges = GetEdgesInWorldSpace(transform3D);
         foreach (KeyValuePair<Vector3, Vector3> edge in edges) DebugDraw.Line(edge.Key, edge.Value, color);
     }
-    
-    public void DrawDebugLines(Transform3D transform3D) {
-        
-    }
 
     public static BoundingBox FromCollisionMesh(CollisionShape3D shape) {
         switch (shape.Shape) {

@@ -21,7 +21,7 @@ public class VolumetricInventory : InventoryBase, IVolumetricInventory, IOwnable
     public float GetUsedSize() {
         if (!_changedSinceLastCheck) return _lastSize;
         float usedSize = 0;
-        foreach (IObjectBase objectData in GetContents().Select(ObjectAtlas.DeserialiseDataWithoutNode)) {
+        foreach (IObjectBase objectData in GetContents().Select(c => ObjectAtlas.DeserialiseDataWithoutNode(c.Item1))) {
             if (objectData is IVolumetricObject volumetricObject) usedSize += volumetricObject.GetSize();
         }
         _lastSize = usedSize;
@@ -44,16 +44,6 @@ public class VolumetricInventory : InventoryBase, IVolumetricInventory, IOwnable
     }
     
     public float GetFilledPercentage() => Mathsf.Remap(0.0f, GetMaxSize(), GetUsedSize(), 0.0f, 100.0f);
-
-    public void PrintContents() {
-        GD.Print($"Total size: {GetMaxSize()}  |  Used size: {GetUsedSize()}  |  Remaining size: {GetRemainingSize()}  |  Filled percentage: {GetFilledPercentage()}%");
-        List<string> contents = GetContents();
-        int counter = 0;
-        contents.ForEach(o => {
-            GD.Print($"Slot {counter}: {o}");
-            counter++;
-        });
-    }
 
     public IContainer GetOwner() => _owner;
     public void SetOwner(IContainer owner) => _owner = owner;

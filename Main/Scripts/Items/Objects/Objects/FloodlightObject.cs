@@ -91,7 +91,7 @@ public class FloodlightObject : ObjectBase<RigidBody3D>, IGrabbable, IUsable, IC
         if (ev is not KeyPressEvent) return;
         string savePath = "user://SerialiseTest.json";
 
-        List<string> contents = _inventory.GetContents();
+        List<string> contents = _inventory.GetContents().Select(i => i.Item1).ToList();
         GD.Print($"Serialising these contents: {string.Join(", ", contents)}");
 
         string jsonData = Serialise();
@@ -134,7 +134,7 @@ public class FloodlightObject : ObjectBase<RigidBody3D>, IGrabbable, IUsable, IC
     public void Process(float delta) {
         if (!_isOn || GameUtils.IsNodeInvalid(_lightTip) || GetPowerRemaining() <= 0.0f) return;
         
-        List<string> oldJsons = _inventory.GetContents();
+        List<string> oldJsons = _inventory.GetContents().Select(i => i.Item1).ToList();
         int activeBatteries = oldJsons.Count(json => Serialiser.GetSpecificData<float>(BatteryObject.POWER_KEY, json) > 0.0f);
 
         if (activeBatteries == 0) {
@@ -161,7 +161,7 @@ public class FloodlightObject : ObjectBase<RigidBody3D>, IGrabbable, IUsable, IC
         float totalCount =
             GetInventory()
                 .GetContents()
-                .Select(json => Serialiser.GetSpecificData<float>(BatteryObject.POWER_KEY, json))
+                .Select(json => Serialiser.GetSpecificData<float>(BatteryObject.POWER_KEY, json.Item1))
                 .Sum();
 
         float maxPower =

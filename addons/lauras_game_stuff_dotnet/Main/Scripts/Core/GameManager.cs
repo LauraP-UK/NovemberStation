@@ -11,6 +11,8 @@ public class GameManager {
     private Node _activeScene, _sceneObjects;
     private Player _player;
     
+    private bool _debugObjects;
+    
     private GameManager() => instance = this;
 
     public static GameManager I() {
@@ -58,6 +60,15 @@ public class GameManager {
             if (_player != null) GetPlayer().GetController().Update((float)delta);
             foreach ((ulong _, IObjectBase obj) in ((TestScript)GetActiveScene()).GetObjects())
                 if (obj is IProcess processObj) processObj.Process((float)delta);
+        }
+
+        if (_debugObjects) {
+            foreach (IObjectBase obj in ((TestScript)GetActiveScene()).GetObjects().Values) {
+                CollisionShape3D shape = (CollisionShape3D)obj.GetBaseNode3D().FindChild("BBox");
+                if (shape == null) continue;
+                BoundingBox bb = BoundingBox.FromCollisionMesh(shape);
+                bb.DrawDebugLines(shape.GlobalTransform, Colors.Yellow);
+            }
         }
     }
     
@@ -114,4 +125,6 @@ public class GameManager {
     public void SetMouseVisible(bool visible) => Input.MouseMode = visible ? Input.MouseModeEnum.Visible : Input.MouseModeEnum.Hidden;
     
     public static bool IsDebugMode() => DEBUG_MODE;
+
+    public void DebugObjects(bool debug) => _debugObjects = debug;
 }
