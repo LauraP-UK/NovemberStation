@@ -48,8 +48,9 @@ height = 0.01
 radial_segments = 8
 rings = 0
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_cpo0e"]
-size = Vector3(0.075, 0.15, 0.075)
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_avjx7"]
+height = 0.13
+radius = 0.025
 
 [node name="Battery" type="RigidBody3D"]
 collision_layer = 4
@@ -91,4 +92,4 @@ collision_layer = 128
 collision_mask = 128
 
 [node name="BBox" type="CollisionShape3D" parent="Area3D"]
-shape = SubResource("BoxShape3D_cpo0e")
+shape = SubResource("CylinderShape3D_avjx7")

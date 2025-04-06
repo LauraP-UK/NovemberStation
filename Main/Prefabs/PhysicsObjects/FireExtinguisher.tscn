@@ -211,8 +211,9 @@ radius = 0.0298512
 height = 0.285634
 radius = 0.0298512
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_qfxrk"]
-size = Vector3(0.449463, 1.25751, 0.378799)
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_p2h14"]
+height = 1.34133
+radius = 0.221
 
 [node name="RigidBody3D" type="RigidBody3D"]
 collision_layer = 4
@@ -306,5 +307,5 @@ collision_layer = 128
 collision_mask = 128
 
 [node name="BBox" type="CollisionShape3D" parent="Area3D"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.00158691, -0.0635804, -0.00232697)
-shape = SubResource("BoxShape3D_qfxrk")
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.00158691, -0.00280792, -0.00232697)
+shape = SubResource("CylinderShape3D_p2h14")

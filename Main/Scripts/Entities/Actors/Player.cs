@@ -127,19 +127,6 @@ public class Player : ActorBase, IViewable, IHotbarActor {
         return result;
     }
 
-    public bool DropItem(string objectJson) {
-        ObjectAtlas.CreatedObject obj = ObjectAtlas.CreatedObjectFromJson(objectJson);
-        if (!obj.Success) return false;
-
-        Vector3 spawn = GetLookingAt(2).GetEnd();
-        Node3D objNode = (Node3D)obj.Node;
-        GameManager.I().GetSceneObjects().AddChild(obj.Node);
-        objNode.SetGlobalPosition(spawn);
-        GameManager.I().RegisterObject(objNode, obj.Object);
-        
-        return RemoveItem(objectJson);
-    }
-
     public bool RemoveItem(string objectJson) {
         VolumetricInventory inv = GetInventory().GetAs<VolumetricInventory>();
         string tag = Serialiser.GetSpecificTag<string>(Serialiser.ObjectSaveData.META_TAG, objectJson);

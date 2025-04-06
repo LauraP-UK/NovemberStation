@@ -141,6 +141,11 @@ public class BoundingBox {
                 float height = capsuleShape.Height / 2;
                 return new BoundingBox(new Vector3(radius, height + radius, radius));
             }
+            case CylinderShape3D cylinderShape: {
+                float radius = cylinderShape.Radius;
+                float height = cylinderShape.Height / 2;
+                return new BoundingBox(new Vector3(radius, height, radius));
+            }
             default:
                 throw new NotSupportedException($"ERROR: BoundingBox.FromCollisionMesh() : Collision shape type not supported: {shape.Shape.GetType()}");
         }

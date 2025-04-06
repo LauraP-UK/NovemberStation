@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using Godot;
 
 public class Items {
@@ -72,7 +73,17 @@ public class Items {
         25,
         HeldDisplaySettings.Create(new Vector3(0.01f, 0.007f, -0.054f), new Vector3(0.2f, -25.0f, -4.9f), 0.75f));
     
-    private static readonly ItemType[] ALL_ITEMS = {GAS_CAN, WORK_DESK, STORAGE_CRATE, CROWBAR, FIRE_EXTINGUISHER, FLOODLIGHT, BED, DIGITAL_CLOCK, BATTERY};
+    private static readonly ItemType[] ALL_ITEMS;
+
+    static Items() {
+        ALL_ITEMS = typeof(Items)
+            .GetFields(BindingFlags.Public | BindingFlags.Static)
+            .Where(field => typeof(ItemType).IsAssignableFrom(field.FieldType))
+            .Select(field => field.GetValue(null) as ItemType)
+            .Where(p => p != null)
+            .ToArray();
+        GD.Print("[Items] INFO: Registered all items.");
+    }
     public static List<ItemType> GetItems() => new(ALL_ITEMS);
     public static List<ShopItemDisplayButton> GetItemButtons() => GetItems().Select(item => item.CreateButton()).ToList();
     public static ItemType GetViaID(string id) => GetItems().FirstOrDefault(itemType => itemType.GetTypeID() == id);

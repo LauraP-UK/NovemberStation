@@ -1,4 +1,6 @@
 using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
 using Godot;
 
 public static class GameAction {
@@ -26,17 +28,16 @@ public static class GameAction {
     public static readonly GameActionBase QUIT = new QuitGameAction(Action.QUIT);
     public static readonly GameActionBase NONE =new NoOpGameAction(Action.NONE);
 
-    private static readonly List<GameActionBase> _all = new() {
-        MOVE_FORWARD,
-        MOVE_BACKWARD,
-        MOVE_LEFT,
-        MOVE_RIGHT,
-        JUMP,
-        CROUCH,
-        TURN_CAMERA,
-        USE,
-        QUIT
-    };
+    private static readonly GameActionBase[] _all;
+    static GameAction() {
+        _all = typeof(GameAction)
+            .GetFields(BindingFlags.Public | BindingFlags.Static)
+            .Where(field => typeof(GameActionBase).IsAssignableFrom(field.FieldType))
+            .Select(field => field.GetValue(null) as GameActionBase)
+            .Where(p => p != null)
+            .ToArray();
+        GD.Print("[GameAction] INFO: Registered all game actions.");
+    }
     
     public static void Init() => GetAll(); // Dummy method to ensure static constructor is called
 

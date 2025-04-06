@@ -2,7 +2,7 @@ using System;
 using Godot;
 
 public class PlayerController : ControllerBase {
-    private const float HOLD_DISTANCE = 2.1f, HOLD_SMOOTHNESS = 15.0f, ROTATION_SMOOTHNESS = 10.0f;
+    private const float HOLD_DISTANCE = 2.1f, HOLD_DISTANCE_MIN = 0.5f, HOLD_DISTANCE_MAX = 1.5f, HOLD_SMOOTHNESS = 15.0f, ROTATION_SMOOTHNESS = 10.0f;
     private const long JUMP_COOLDOWN_MILLIS = 250L;
 
     private const uint
@@ -45,7 +45,7 @@ public class PlayerController : ControllerBase {
         if (key != Key.F1) return;
         ShowUI(!_uiVisible);
     }
-    
+
     [EventListener]
     private void ToggleDebugObjects(KeyPressEvent ev, Key key) {
         if (IsLocked()) return;
@@ -127,7 +127,7 @@ public class PlayerController : ControllerBase {
     private void OnMouseScroll(MouseInputEvent ev, Vector2 position) {
         if (IsLocked() || !ev.IsPressed()) return;
         MouseButton button = ev.GetMouseButton();
-        
+
         if (button != MouseButton.WheelDown && button != MouseButton.WheelUp) return;
         bool isDown = button == MouseButton.WheelDown;
 
@@ -141,7 +141,7 @@ public class PlayerController : ControllerBase {
         }
 
         if (IsHoldingObject()) {
-            _holdDistanceModifier = Mathf.Clamp(_holdDistanceModifier + (isDown ? -0.05f : 0.05f), 0.5f, 1.5f);
+            _holdDistanceModifier = Mathf.Clamp(_holdDistanceModifier + (isDown ? -0.05f : 0.05f), HOLD_DISTANCE_MIN, HOLD_DISTANCE_MAX);
             return;
         }
 
@@ -188,16 +188,14 @@ public class PlayerController : ControllerBase {
         RaycastResult result = owner.GetLookingAt(2);
 
         Vector3 spawn =
-            result.HasHit() ?
-            result.GetClosestHit().HitAtPosition + result.GetClosestHit().HitNormal * 0.2f :
-            result.GetEnd();
-        
+            result.HasHit() ? result.GetClosestHit().HitAtPosition + result.GetClosestHit().HitNormal * 0.2f : result.GetEnd();
+
         Node3D objNode = (Node3D)obj.Node;
         GameManager.I().GetSceneObjects().AddChild(obj.Node);
         objNode.SetGlobalPosition(spawn);
         objNode.SetGlobalRotation(new Vector3(0, owner.GetCamera().GlobalRotation.Y, 0));
         GameManager.I().RegisterObject(objNode, obj.Object);
-        
+
         owner.GetHotbar().ResyncInventory();
 
         owner.ClearHeldItem();
@@ -281,8 +279,6 @@ public class PlayerController : ControllerBase {
 
         _heldObject.CollisionMask |= PLAYER_LAYER;
         _heldObject.CollisionLayer |= OBJECT_LAYER;
-        _heldObject.FreezeMode = RigidBody3D.FreezeModeEnum.Static;
-        _heldObject.Freeze = false;
 
         _heldObject.LinearVelocity += releaseVelocity ?? Vector3.Down;
 
@@ -293,6 +289,16 @@ public class PlayerController : ControllerBase {
     private void PickupObject(RigidBody3D obj) {
         _holdDistanceModifier = 1.0f;
         _rotationOffset = Vector2.Zero;
+
+        RaycastResult raycast = Raycast.Trace(GetActor<Player>(), obj.GlobalPosition);
+        if (raycast.HasHit())
+            _holdDistanceModifier = Mathsf.Remap(
+                HOLD_DISTANCE * HOLD_DISTANCE_MIN,
+                HOLD_DISTANCE * HOLD_DISTANCE_MAX,
+                obj.GlobalPosition.DistanceTo(raycast.GetStart()),
+                HOLD_DISTANCE_MIN,
+                HOLD_DISTANCE_MAX
+            );
 
         _heldObject = obj;
         _heldObject.CollisionMask &= ~PLAYER_LAYER;
@@ -412,13 +418,7 @@ public class PlayerController : ControllerBase {
             }
         }
 
-        BoundingBox bb = BoundingBox.FromCollisionMesh(shape);
-
-        Vector2[] inScreenSpace = bb.GetCornersInScreenSpace(activeCamera, shape.GlobalTransform);
-        VectorUtils.ExtremesInfo2D vecExtremes = VectorUtils.GetExtremes(inScreenSpace);
-
-        Vector2 minPos = vecExtremes.min;
-        Vector2 maxPos = vecExtremes.max - minPos;
+        (Vector2 minPos, Vector2 maxPos) = Projections.Project(shape, activeCamera, shape.GlobalTransform);
 
         float distanceTo = !_uiVisible ? 10f : contextObjResult?.Distance ?? _contextObject.GlobalPosition.DistanceTo(activeCamera.GlobalPosition);
         float distRatio = Mathsf.InverseLerpClamped(2.9f, 0.9f, distanceTo);
