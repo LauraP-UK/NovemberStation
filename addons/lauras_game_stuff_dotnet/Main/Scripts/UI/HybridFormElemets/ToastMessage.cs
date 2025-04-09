@@ -79,9 +79,8 @@ public class ToastMessage : FormBase {
     public void SetBGColour(Color colour) => _background.SetColor(colour);
 
     public void SetAlpha(float alpha) {
-        _icon.SetAlpha(alpha);
-        _text.SetAlpha(alpha);
-        _background.SetAlpha(alpha);
-        _border.SetAlpha(alpha);
+        Color modulate = _menu.GetModulate();
+        modulate.A = alpha;
+        _menu.SetModulate(modulate);
     }
 }

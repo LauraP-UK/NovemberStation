@@ -114,7 +114,7 @@ public static class Projections {
         foreach (IObjectProjection projection in _all)
             if (projection.GetShapeType() == matchType)
                 return projection.GetScreenCorners(shape, camera, transform);
-        GD.PrintErr($"No projection found for shape type: {matchType}");
+        GD.PrintErr($"ERROR: Projections.Project() : No projection found for shape type: {matchType.Name}");
         return (default, default);
     }
 }

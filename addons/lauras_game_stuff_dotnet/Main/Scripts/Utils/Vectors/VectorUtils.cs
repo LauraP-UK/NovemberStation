@@ -11,6 +11,14 @@ public static class VectorUtils {
             );
     }
 
+    public static Vector3 Remap(Vector3 fromMin, Vector3 fromMax, float ratio, Vector3 toMin, Vector3 toMax) {
+        return new Vector3(
+            fromMin.X == fromMax.X ? 0.0f : Mathsf.Remap(fromMin.X, fromMax.X, ratio, toMin.X, toMax.X),
+            fromMin.Y == fromMax.Y ? 0.0f : Mathsf.Remap(fromMin.Y, fromMax.Y, ratio, toMin.Y, toMax.Y),
+            fromMin.Z == fromMax.Z ? 0.0f : Mathsf.Remap(fromMin.Z, fromMax.Z, ratio, toMin.Z, toMax.Z)
+            );
+    }
+
     public static ExtremesInfo2D GetExtremes(params Vector2[] vectors) {
         if (vectors.Length == 0) return ExtremesInfo2D.Empty();
 

@@ -10,6 +10,7 @@ radius = 0.33
 size = Vector3(0.2, 0.2, 0.2)
 
 [node name="PlayerRoot" type="CharacterBody3D"]
+transform = Transform3D(-4.37114e-08, 0, -1, 0, 1, 0, 1, 0, -4.37114e-08, 0, 0, 0)
 collision_mask = 6
 platform_on_leave = 2
 
@@ -32,15 +33,21 @@ skeleton = NodePath("")
 [node name="HeadOrigin" type="Node3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.7, 0)
 
-[node name="CrouchControl" type="Node3D" parent="HeadOrigin"]
+[node name="LeanControl" type="Node3D" parent="HeadOrigin"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1, 0)
 
-[node name="Camera" type="Camera3D" parent="HeadOrigin/CrouchControl"]
+[node name="CamContainer" type="Node3D" parent="HeadOrigin/LeanControl"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+
+[node name="CrouchControl" type="Node3D" parent="HeadOrigin/LeanControl/CamContainer"]
+
+[node name="Camera" type="Camera3D" parent="HeadOrigin/LeanControl/CamContainer/CrouchControl"]
 current = true
 
-[node name="HandPoint" type="Node3D" parent="HeadOrigin/CrouchControl/Camera"]
+[node name="HandPoint" type="Node3D" parent="HeadOrigin/LeanControl/CamContainer/CrouchControl/Camera"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.319661, -0.331089, -0.422314)
 
-[node name="ObjOrientation" type="Node3D" parent="HeadOrigin/CrouchControl/Camera/HandPoint"]
+[node name="ObjOrientation" type="Node3D" parent="HeadOrigin/LeanControl/CamContainer/CrouchControl/Camera/HandPoint"]
 transform = Transform3D(0.748173, -0.0523174, -2.28686e-09, 0, -3.27835e-08, 0.75, -0.0523174, -0.748173, -3.27037e-08, 0, 0.00999999, 0.0603524)
 
 [node name="StairsRaycasts" type="Node3D" parent="."]

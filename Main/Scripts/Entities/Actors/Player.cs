@@ -5,7 +5,7 @@ using Godot;
 
 public class Player : ActorBase, IViewable, IHotbarActor {
     private readonly Camera3D _camera;
-    private readonly Node3D _crouchNode, _handNode, _handOrientation;
+    private readonly Node3D _crouchNode, _handNode, _handOrientation, _leanNode;
     
     private IObjectBase _handItem;
     private readonly Hotbar _hotbar;
@@ -13,11 +13,11 @@ public class Player : ActorBase, IViewable, IHotbarActor {
     private readonly VolumetricInventory _inv;
 
     public Player(CharacterBody3D body) : base(body) {
-        new PlayerController(this);
-        _crouchNode = GetModel().GetNode<Node3D>("HeadOrigin/CrouchControl");
-        _handNode = GetModel().GetNode<Node3D>("HeadOrigin/CrouchControl/Camera/HandPoint");
-        _handOrientation = GetModel().GetNode<Node3D>("HeadOrigin/CrouchControl/Camera/HandPoint/ObjOrientation");
-        _camera = _crouchNode.GetNode<Camera3D>("Camera");
+        _leanNode = GetModel().GetNode<Node3D>("HeadOrigin/LeanControl");
+        _crouchNode = GetModel().GetNode<Node3D>("HeadOrigin/LeanControl/CamContainer/CrouchControl");
+        _camera = GetModel().GetNode<Camera3D>("HeadOrigin/LeanControl/CamContainer/CrouchControl/Camera");
+        _handNode = GetModel().GetNode<Node3D>("HeadOrigin/LeanControl/CamContainer/CrouchControl/Camera/HandPoint");
+        _handOrientation = GetModel().GetNode<Node3D>("HeadOrigin/LeanControl/CamContainer/CrouchControl/Camera/HandPoint/ObjOrientation");
 
         List<VisualInstance3D> children = GetVisualModel()
             .GetChildren()
@@ -33,11 +33,13 @@ public class Player : ActorBase, IViewable, IHotbarActor {
         _inv = new VolumetricInventory(200, this);
         
         _hotbar = new Hotbar(this);
+        new PlayerController(this);
     }
 
     public IObjectBase GetHandItem() => _handItem;
     public Camera3D GetCamera() => _camera;
     public Node3D GetCrouchNode() => _crouchNode;
+    public Node3D GetLeanNode() => _leanNode;
     public Node3D GetHandOrientation() => _handOrientation;
     public Hotbar GetHotbar() => _hotbar;
 
@@ -95,6 +97,7 @@ public class Player : ActorBase, IViewable, IHotbarActor {
     
     public RaycastResult GetLookingAt(float distance) => Raycast.Trace(this, distance);
     public ActorBase GetActor() => this;
+    public float GetLookSmoothness() => 150.0f;
 
     public IInventory GetInventory() => _inv;
 

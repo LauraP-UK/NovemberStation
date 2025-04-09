@@ -2,17 +2,28 @@ using System;
 using Godot;
 
 public class PlayerController : ControllerBase {
-    private const float HOLD_DISTANCE = 2.1f, HOLD_DISTANCE_MIN = 0.5f, HOLD_DISTANCE_MAX = 1.5f, HOLD_SMOOTHNESS = 15.0f, ROTATION_SMOOTHNESS = 10.0f;
-    private const long JUMP_COOLDOWN_MILLIS = 250L;
-
+    private const float
+        HOLD_DISTANCE = 2.1f,
+        HOLD_DISTANCE_MIN = 0.5f,
+        HOLD_DISTANCE_MAX = 1.5f,
+        HOLD_SMOOTHNESS = 15.0f,
+        ROTATION_SMOOTHNESS = 10.0f;
+    private const long
+        JUMP_COOLDOWN_MILLIS = 250L;
     private const uint
         PLAYER_LAYER = 1 << 0, // Layer 1
         STATIC_LAYER = 1 << 1, // Layer 2
         OBJECT_LAYER = 1 << 2; // Layer 3
+    
+    private static readonly Vector3
+        FORWARD_LEAN_ROTATION = new(-7.5f, 0.0f, 0.0f),
+        BACKWARD_LEAN_ROTATION = new(2.0f, 0.0f, 0.0f),
+        LEFT_LEAN_ROTATION = new(0.0f, 0.0f, 4.5f),
+        RIGHT_LEAN_ROTATION = new(0.0f, 0.0f, -4.5f);
 
     private bool _asleep, _altAction, _toggleCrouch, _uiVisible = true, _debugObjects = false;
     private float _holdDistanceModifier = 1.0f;
-    private Vector2 _rotationOffset = Vector2.Zero;
+    private Vector2 _rotationOffset = Vector2.Zero, _targetLook, _currentLook;
     private long _lastJump;
     private int _actionIndex;
     private ulong _lastActionID;
@@ -29,12 +40,12 @@ public class PlayerController : ControllerBase {
     private readonly HotbarMenu _hotbarMenu = new();
 
     public PlayerController(Player player) : base(player) {
-        GetActor().GetModel().CollisionLayer = PLAYER_LAYER;
+        player.GetModel().CollisionLayer = PLAYER_LAYER;
         _contextMenu.Open();
         _crosshair.Open();
         _toastUI.Open();
         _hotbarMenu.Open();
-        Scheduler.ScheduleOnce(50L, _ => _hotbarMenu.GetForm().SetOwner(GetActor<Player>()));
+        _hotbarMenu.GetForm().SetOwner(player);
     }
 
 
@@ -113,10 +124,8 @@ public class PlayerController : ControllerBase {
         if (!actor.Equals(GetActor())) return;
         if (_toggleCrouch) {
             if (!ev.IsStartCrouch()) return;
-            if (_crouching && !CanUncrouch())
-                _tryUncrouch = true;
-            else
-                _crouching = !_crouching;
+            if (_crouching && !CanUncrouch()) _tryUncrouch = true;
+            else _crouching = !_crouching;
             return;
         }
 
@@ -212,27 +221,16 @@ public class PlayerController : ControllerBase {
     [EventListener(PriorityLevels.TERMINUS)]
     private void OnPlayerMove(PlayerMoveEvent ev, Player player) {
         Vector3 direction = ev.GetDirection();
-        CharacterBody3D model = player.GetModel();
-
-        if (!direction.Equals(Vector3.Zero)) _intendedDirection = GetActor().GetModel().GlobalTransform.Basis * direction;
+        if (!direction.Equals(Vector3.Zero)) {
+            _intendedDirection = GetActor().GetModel().GlobalTransform.Basis * direction;
+            _lastDirection = direction;
+            _inputThisFrame = true;
+        }
 
         Vector2 turnDelta = ev.GetTurnDelta();
-        if (!turnDelta.Equals(Vector2.Zero)) {
-            if (_altAction && _heldObject != null) {
-                _rotationOffset += turnDelta * 0.02f;
-                return;
-            }
-
-            Camera3D camera3D = player.GetCamera();
-
-            Vector3 modelRotation = model.Rotation;
-            Vector3 cameraRotation = camera3D.RotationDegrees;
-
-            float newPitch = Mathf.Clamp(cameraRotation.X - turnDelta.Y * 0.5f, -90.0f, 90.0f);
-
-            model.Rotation = new Vector3(modelRotation.X, modelRotation.Y - turnDelta.X * 0.01f, modelRotation.Z);
-            camera3D.RotationDegrees = new Vector3(newPitch, cameraRotation.Y, cameraRotation.Z);
-        }
+        if (turnDelta.Equals(Vector2.Zero)) return;
+        if (_altAction && _heldObject != null) _rotationOffset += turnDelta * 0.02f;
+        else _targetLook += turnDelta * 0.5f;
     }
 
     /* --- ---  METHODS  --- --- */
@@ -242,8 +240,17 @@ public class PlayerController : ControllerBase {
     private bool IsHoldingObject() => _heldObject != null;
 
     protected override void OnUpdate(float delta) {
+        Player player = GetActor<Player>();
+
+        Vector3 targetLean = GetAmalgamatedLean(_lastDirection) * _leanInertia;
+        _leanTarget = _leanTarget.Lerp(targetLean, 10.0f * delta);
+        
+        player.GetLeanNode().RotationDegrees = _leanTarget;
+
+        HandleLookRot(delta);
         HandleContextMenu();
-        GetActor<Player>().GetHotbar().ResyncInventory();
+        
+        player.GetHotbar().ResyncInventory();
     }
 
     protected override void OnPhysicsUpdate(float delta) {
@@ -274,6 +281,24 @@ public class PlayerController : ControllerBase {
     public Node3D GetContextObject() => _heldObject ?? _contextObject;
     public bool IsAsleep() => _asleep;
 
+    private Vector3 GetAmalgamatedLean(Vector3 dir) {
+        Vector3 toReturn = Vector3.Zero;
+        float leanFactor = _sprinting ? 1.0f : 0.25f;
+        toReturn.Z = dir.X switch {
+            > 0.0f => Mathf.Lerp(0, RIGHT_LEAN_ROTATION.Z * leanFactor, dir.X),
+            < 0.0f => Mathf.Lerp(0, LEFT_LEAN_ROTATION.Z * leanFactor, -dir.X),
+            _ => toReturn.Z
+        };
+        
+        toReturn.X = dir.Z switch {
+            > 0.0f => Mathf.Lerp(0, BACKWARD_LEAN_ROTATION.X * leanFactor, dir.Z),
+            < 0.0f => Mathf.Lerp(0, FORWARD_LEAN_ROTATION.X * leanFactor, -dir.Z),
+            _ => toReturn.X
+        };
+
+        return toReturn;
+    }
+
     private void ReleaseHeldObject(Vector3? releaseVelocity = null) {
         if (_heldObject == null) return;
 
@@ -291,7 +316,7 @@ public class PlayerController : ControllerBase {
         _rotationOffset = Vector2.Zero;
 
         RaycastResult raycast = Raycast.Trace(GetActor<Player>(), obj.GlobalPosition);
-        if (raycast.HasHit())
+        if (raycast.HasHit()) {
             _holdDistanceModifier = Mathsf.Remap(
                 HOLD_DISTANCE * HOLD_DISTANCE_MIN,
                 HOLD_DISTANCE * HOLD_DISTANCE_MAX,
@@ -299,6 +324,8 @@ public class PlayerController : ControllerBase {
                 HOLD_DISTANCE_MIN,
                 HOLD_DISTANCE_MAX
             );
+            _holdDistanceModifier = Mathsf.RoundTo(_holdDistanceModifier, 0.05f);
+        }
 
         _heldObject = obj;
         _heldObject.CollisionMask &= ~PLAYER_LAYER;
@@ -377,6 +404,27 @@ public class PlayerController : ControllerBase {
 
         Basis smoothedBasis = new(smoothedRotation);
         obj.GlobalTransform = new Transform3D(smoothedBasis, obj.GlobalTransform.Origin);
+    }
+
+    private void HandleLookRot(float delta) {
+        Player player = GetActor<Player>();
+        float smoothness = player.GetLookSmoothness();
+        _currentLook = _currentLook.MoveToward(_targetLook, smoothness * delta);
+        
+        float yawDelta = _currentLook.X;
+        float pitchDelta = _currentLook.Y;
+        
+        Camera3D camera3D = player.GetCamera();
+        CharacterBody3D model = player.GetModel();
+        
+        Vector3 modelRotation = model.Rotation;
+        Vector3 cameraRotation = camera3D.RotationDegrees;
+        
+        float newPitch = Mathf.Clamp(cameraRotation.X - pitchDelta * 0.5f, -90.0f, 90.0f);
+        model.Rotation = new Vector3(modelRotation.X, modelRotation.Y - yawDelta * 0.015f, modelRotation.Z);
+        camera3D.RotationDegrees = new Vector3(newPitch, cameraRotation.Y, cameraRotation.Z);
+
+        _targetLook = Vector2.Zero;
     }
 
     /* --- ---  UI  --- --- */

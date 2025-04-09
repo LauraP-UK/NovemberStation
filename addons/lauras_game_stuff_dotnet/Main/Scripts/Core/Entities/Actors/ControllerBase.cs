@@ -7,6 +7,8 @@ public abstract class ControllerBase : Listener {
         WALK_SPEED = 4.5f,
         SPRINT_SPEED = 7.0f,
         CROUCH_SPEED = WALK_SPEED * 0.5f,
+        INERTIA_GAIN = 0.15f,
+        INERTIA_LOSS = 0.075f,
         AIR_CAP = 0.85f,
         AIR_ACCELERATION = 800.0f,
         AIR_MOVE_SPEED = 500.0f,
@@ -23,12 +25,12 @@ public abstract class ControllerBase : Listener {
 
     private ActorBase _actor { get; }
     private ulong _lastFrameOnFloor = ulong.MinValue;
-    private bool _snappedToStairs, _lockedMode = false;
+    private bool _snappedToStairs, _lockedMode, _crouchingLastFrame;
     private Vector3? _savedCamGlobalPosition;
 
-    protected Vector3 _intendedDirection = Vector3.Zero;
-    protected bool _sprinting = false, _jumping, _crouching, _tryUncrouch;
-    private bool _crouchingLastFrame;
+    protected float _inertia, _leanInertia;
+    protected Vector3 _intendedDirection = Vector3.Zero, _lastDirection = Vector3.Zero, _leanTarget = Vector3.Zero;
+    protected bool _sprinting = false, _jumping, _crouching, _tryUncrouch, _inputThisFrame;
     protected readonly float _actorHeight = -1.0f;
 
     protected ControllerBase(ActorBase actor) {
@@ -56,6 +58,8 @@ public abstract class ControllerBase : Listener {
 
         HandleCrouch(delta);
         
+        _leanInertia = Math.Clamp(_leanInertia + (_inputThisFrame ? INERTIA_GAIN : -INERTIA_LOSS), 0.0f, 1.0f);
+        
         if (model.IsOnFloor()) {
             _lastFrameOnFloor = Engine.GetPhysicsFrames();
             Vector3 velocity = model.GetVelocity();
@@ -70,10 +74,13 @@ public abstract class ControllerBase : Listener {
             model.MoveAndSlide();
             SnapToStairsCheck();
         }
+        
+        _inputThisFrame = false;
 
         SlideCamToOrigin(delta);
-        
-        _intendedDirection = Vector3.Zero;
+
+        _intendedDirection = _inertia <= 0.0f ? Vector3.Zero : _intendedDirection;
+        _lastDirection = _leanInertia <= 0.0f ? Vector3.Zero : _lastDirection;
         _jumping = false;
     }
     
@@ -150,7 +157,10 @@ public abstract class ControllerBase : Listener {
     
     protected void HandleGroundPhysics(float delta) {
         CharacterBody3D model = GetActor().GetModel();
-        float speed = GetSpeed();
+
+        _inertia = Math.Clamp(_inertia + (_inputThisFrame ? INERTIA_GAIN : -INERTIA_LOSS), 0.0f, 1.0f);
+        
+        float speed = GetSpeed() * _inertia;
         Vector3 velocity = model.GetVelocity();
 
         float curSpeedInDirection = velocity.Dot(_intendedDirection);
@@ -270,7 +280,6 @@ public abstract class ControllerBase : Listener {
                 float massRatio = Math.Min(1.0f, APPROX_ACTOR_MASS / rigidBody.Mass);
 
                 Vector3 pushDirection = -collision.GetNormal();
-                //pushDirection = pushDirection.Normalized();
 
                 float velocityDiff = model.GetVelocity().Dot(pushDirection) - rigidBody.LinearVelocity.Dot(pushDirection);
                 velocityDiff = Math.Max(0.0f, velocityDiff);
@@ -283,7 +292,6 @@ public abstract class ControllerBase : Listener {
 
                 Vector3 impulse = VectorUtils.RoundTo(pushDirection * velocityDiff * pushForce, 4);
                 Vector3 position = collision.GetPosition() - rigidBody.GetGlobalPosition();
-                //position.Y = 0.0f;
 
                 rigidBody.ApplyImpulse(impulse, position);
             }
