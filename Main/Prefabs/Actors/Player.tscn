@@ -10,7 +10,6 @@ radius = 0.33
 size = Vector3(0.2, 0.2, 0.2)
 
 [node name="PlayerRoot" type="CharacterBody3D"]
-transform = Transform3D(-4.37114e-08, 0, -1, 0, 1, 0, 1, 0, -4.37114e-08, 0, 0, 0)
 collision_mask = 6
 platform_on_leave = 2
 

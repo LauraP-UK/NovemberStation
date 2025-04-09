@@ -242,14 +242,13 @@ public class PlayerController : ControllerBase {
     protected override void OnUpdate(float delta) {
         Player player = GetActor<Player>();
 
-        Vector3 targetLean = GetAmalgamatedLean(_lastDirection) * _leanInertia;
-        _leanTarget = _leanTarget.Lerp(targetLean, 10.0f * delta);
-        
-        player.GetLeanNode().RotationDegrees = _leanTarget;
-
-        HandleLookRot(delta);
+        if (!IsAsleep()) {
+            Vector3 targetLean = GetAmalgamatedLean(_lastDirection) * _leanInertia;
+            _leanTarget = _leanTarget.Lerp(targetLean, 10.0f * delta);
+            player.GetLeanNode().RotationDegrees = _leanTarget;
+            HandleLookRot(delta);
+        }
         HandleContextMenu();
-        
         player.GetHotbar().ResyncInventory();
     }
 

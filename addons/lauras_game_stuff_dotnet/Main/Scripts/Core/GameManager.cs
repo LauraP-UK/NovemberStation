@@ -4,7 +4,6 @@ using Godot;
 public class GameManager {
     
     private const bool DEBUG_MODE = true;
-    public const float SLEEP_SPEED = 20.0f;
     
     private static GameManager instance;
 
