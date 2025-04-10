@@ -72,6 +72,13 @@ public class Items {
         "Do not eat.",
         25,
         HeldDisplaySettings.Create(new Vector3(0.01f, 0.007f, -0.054f), new Vector3(0.2f, -25.0f, -4.9f), 0.75f));
+    public static readonly ItemType PAPER_SHEET = ItemType.Create("paper_sheet",
+        "Paper Sheet",
+        "res://Main/Textures/Items/BatteryImage.png",
+        "res://Main/Prefabs/PhysicsObjects/PaperSheet.tscn",
+        "A sheet of paper.",
+        2,
+        HeldDisplaySettings.Create(new Vector3(0.0f, 0.06f, 0.0f), new Vector3(90.0f, 33.0f, 77.4f), 0.75f));
     
     private static readonly ItemType[] ALL_ITEMS;
 

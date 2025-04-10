@@ -55,6 +55,7 @@ radius = 0.025
 [node name="Battery" type="RigidBody3D"]
 collision_layer = 4
 collision_mask = 7
+continuous_cd = true
 metadata/object_tag = "battery_obj"
 
 [node name="CollisionMesh" type="CollisionShape3D" parent="."]

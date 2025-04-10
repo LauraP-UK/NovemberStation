@@ -60,3 +60,5 @@ ui_focus_prev={
 
 3d/physics_engine="JoltPhysics3D"
 3d/default_gravity=13.0
+3d/solver/solver_iterations=32
+3d/solver/contact_max_allowed_penetration=0.001

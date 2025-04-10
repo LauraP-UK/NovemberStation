@@ -47,7 +47,7 @@ current = true
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.319661, -0.331089, -0.422314)
 
 [node name="ObjOrientation" type="Node3D" parent="HeadOrigin/LeanControl/CamContainer/CrouchControl/Camera/HandPoint"]
-transform = Transform3D(0.748173, -0.0523174, -2.28686e-09, 0, -3.27835e-08, 0.75, -0.0523174, -0.748173, -3.27037e-08, 0, 0.00999999, 0.0603524)
+transform = Transform3D(0.535855, -0.524747, -1.78552e-08, -3.1994e-08, -7.15151e-09, -0.75, 0.524747, 0.535855, -2.74946e-08, 0, 0.06, 0)
 
 [node name="StairsRaycasts" type="Node3D" parent="."]
 

@@ -177,6 +177,7 @@ public class PlayerController : ControllerBase<Player> {
         switch (handItem) {
             case IUsable usable when handItem.TestAction<IUsable>(GetActor(), ev): usable.Use(GetActor(), ev); break;
             case IDrinkable drinkable when handItem.TestAction<IDrinkable>(GetActor(), ev): drinkable.Drink(GetActor(), ev); break;
+            case IWritable writable when handItem.TestAction<IWritable>(GetActor(), ev): writable.OpenWritingUI(GetActor(), ev); break;
         }
 
         GetActor().GetHotbar().ResyncInventory();

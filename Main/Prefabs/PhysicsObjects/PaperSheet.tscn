@@ -1,0 +1,37 @@
+[gd_scene load_steps=5 format=3 uid="uid://bis7ttpok81r1"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_yc35k"]
+metallic_specular = 0.0
+
+[sub_resource type="BoxMesh" id="BoxMesh_ygxgi"]
+material = SubResource("StandardMaterial3D_yc35k")
+size = Vector3(0.45, 0.001, 0.3)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_3g6pe"]
+margin = 0.3
+size = Vector3(0.45, 0.025, 0.3)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_ilswi"]
+size = Vector3(0.45, 0.001, 0.3)
+
+[node name="RigidBody3D" type="RigidBody3D"]
+collision_layer = 4
+collision_mask = 7
+continuous_cd = true
+metadata/object_tag = "papersheet_obj"
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+transform = Transform3D(-4.37114e-08, 0, 1, 0, 1, 0, -1, 0, -4.37114e-08, 0, 0, 0)
+mesh = SubResource("BoxMesh_ygxgi")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(-4.37114e-08, 0, 1, 0, 1, 0, -1, 0, -4.37114e-08, 0, 0, 0)
+shape = SubResource("BoxShape3D_3g6pe")
+
+[node name="Area3D" type="Area3D" parent="."]
+transform = Transform3D(-4.37114e-08, 0, 1, 0, 1, 0, -1, 0, -4.37114e-08, 0, 0, 0)
+collision_layer = 128
+collision_mask = 128
+
+[node name="BBox" type="CollisionShape3D" parent="Area3D"]
+shape = SubResource("BoxShape3D_ilswi")
