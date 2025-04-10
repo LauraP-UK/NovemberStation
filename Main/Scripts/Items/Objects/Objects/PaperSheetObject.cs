@@ -14,11 +14,11 @@ public class PaperSheetObject : ObjectBase<RigidBody3D>, IGrabbable, ICollectabl
         RegisterAction<IGrabbable>((_, _) => true, Grab);
         RegisterAction<ICollectable>((_, _) => true, (actor, ev) => CollectActionDefault.Invoke(actor, this, ev));
         RegisterAction<IWritable>((_, _) => true, OpenWritingUI);
-        RegisterArbitraryAction("To JSON", 10, (_, _) => GameManager.IsDebugMode(), (_, ev)  => {
+        /*RegisterArbitraryAction("To JSON", 10, (_, _) => GameManager.IsDebugMode(), (_, ev)  => {
             if (ev is not KeyPressEvent) return;
             GD.Print("----- JSON -----");
             GD.Print(Serialise());
-        });
+        });*/
     }
 
     public override string GetDisplayName() => Items.PAPER_SHEET.GetItemName();

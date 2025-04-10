@@ -160,7 +160,7 @@ public class Hotbar {
         inventory.UpdateItem(handItem.Serialise());
     }
 
-    public SmartDictionary<int, Guid> GetHotbarItems() => _hotbarGuids.Clone();
+    public SmartDictionary<int, Guid> GetHotbarItems() => _hotbarGuids;
     public int GetHotbarSize() => _hotbarGuids.Count;
     public bool IsFull() => GetHotbarSize() >= HOTBAR_SIZE;
     public IDictionary<int, Guid> ClearHotbar() => _hotbarGuids.ClearAndReturn();

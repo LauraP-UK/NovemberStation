@@ -178,17 +178,20 @@ transform = Transform3D(0.687582, 0, 0.726107, 0, 1, 0, -0.726107, 0, 0.687582, 
 collision_layer = 12
 collision_mask = 15
 mass = 20.0
+metadata/init_state = "{  \"MetaTag\": \"cube_obj\",  \"TypeID\": \"storage_crate\",  \"Data\": {    \"guid\": \"2a8c070a-2e1e-406c-8979-724ee5ff0350\",    \"inventory_data_tag\": {      \"0\": \"{\\r\\n  \\u0022MetaTag\\u0022: \\u0022floodlight_obj\\u0022,\\r\\n  \\u0022TypeID\\u0022: \\u0022floodlight\\u0022,\\r\\n  \\u0022Data\\u0022: {\\r\\n    \\u0022guid\\u0022: \\u00222d30b5d3-1aa9-4922-8432-55095529d536\\u0022,\\r\\n    \\u0022isOn\\u0022: false,\\r\\n    \\u0022inventory_data_tag\\u0022: {}\\r\\n  }\\r\\n}\",      \"1\": \"{\\r\\n  \\u0022MetaTag\\u0022: \\u0022floodlight_obj\\u0022,\\r\\n  \\u0022TypeID\\u0022: \\u0022floodlight\\u0022,\\r\\n  \\u0022Data\\u0022: {\\r\\n    \\u0022guid\\u0022: \\u0022b6404fdf-6ed0-43a7-afc1-3a36e78b66b8\\u0022,\\r\\n    \\u0022isOn\\u0022: false,\\r\\n    \\u0022inventory_data_tag\\u0022: {\\r\\n      \\u00220\\u0022: \\u0022{\\\\r\\\\n  \\\\u0022MetaTag\\\\u0022: \\\\u0022battery_obj\\\\u0022,\\\\r\\\\n  \\\\u0022TypeID\\\\u0022: \\\\u0022battery\\\\u0022,\\\\r\\\\n  \\\\u0022Data\\\\u0022: {\\\\r\\\\n    \\\\u0022guid\\\\u0022: \\\\u0022c503116a-ce03-49ce-ba5b-aa19aff567e6\\\\u0022,\\\\r\\\\n    \\\\u0022power\\\\u0022: 100\\\\r\\\\n  }\\\\r\\\\n}\\u0022,\\r\\n      \\u00221\\u0022: \\u0022{\\\\r\\\\n  \\\\u0022MetaTag\\\\u0022: \\\\u0022battery_obj\\\\u0022,\\\\r\\\\n  \\\\u0022TypeID\\\\u0022: \\\\u0022battery\\\\u0022,\\\\r\\\\n  \\\\u0022Data\\\\u0022: {\\\\r\\\\n    \\\\u0022guid\\\\u0022: \\\\u002270d54e2e-f8b7-41a0-b883-dba9cb5bd8d1\\\\u0022,\\\\r\\\\n    \\\\u0022power\\\\u0022: 100\\\\r\\\\n  }\\\\r\\\\n}\\u0022,\\r\\n      \\u00222\\u0022: \\u0022{\\\\r\\\\n  \\\\u0022MetaTag\\\\u0022: \\\\u0022battery_obj\\\\u0022,\\\\r\\\\n  \\\\u0022TypeID\\\\u0022: \\\\u0022battery\\\\u0022,\\\\r\\\\n  \\\\u0022Data\\\\u0022: {\\\\r\\\\n    \\\\u0022guid\\\\u0022: \\\\u00227321cd75-0bba-405f-9f2e-17ecde77040a\\\\u0022,\\\\r\\\\n    \\\\u0022power\\\\u0022: 100\\\\r\\\\n  }\\\\r\\\\n}\\u0022,\\r\\n      \\u00223\\u0022: \\u0022{\\\\r\\\\n  \\\\u0022MetaTag\\\\u0022: \\\\u0022battery_obj\\\\u0022,\\\\r\\\\n  \\\\u0022TypeID\\\\u0022: \\\\u0022battery\\\\u0022,\\\\r\\\\n  \\\\u0022Data\\\\u0022: {\\\\r\\\\n    \\\\u0022guid\\\\u0022: \\\\u0022fc54e00e-8eb6-49fd-880d-15ec766990d8\\\\u0022,\\\\r\\\\n    \\\\u0022power\\\\u0022: 100\\\\r\\\\n  }\\\\r\\\\n}\\u0022\\r\\n    }\\r\\n  }\\r\\n}\"    }  }}"
 
 [node name="Cube 2" parent="SceneObjects" instance=ExtResource("2_y3p7f")]
 transform = Transform3D(0.894279, 0, -0.447509, 0, 1, 0, 0.447509, 0, 0.894279, -10.7457, 1.70844, 2.38692)
 collision_layer = 12
 collision_mask = 15
+metadata/init_state = "{  \"MetaTag\": \"cube_obj\",  \"TypeID\": \"storage_crate\",  \"Data\": {    \"guid\": \"9e891a87-8eb6-4e5d-bfd6-540ff8d14b81\",    \"inventory_data_tag\": {      \"0\": \"{\\r\\n  \\u0022MetaTag\\u0022: \\u0022crowbar_obj\\u0022,\\r\\n  \\u0022TypeID\\u0022: \\u0022crowbar\\u0022,\\r\\n  \\u0022Data\\u0022: {\\r\\n    \\u0022guid\\u0022: \\u00226e2fd251-455d-4897-b729-f1869e89967b\\u0022\\r\\n  }\\r\\n}\"    }  }}"
 
 [node name="Cube 3" parent="SceneObjects" instance=ExtResource("2_y3p7f")]
 transform = Transform3D(0.963574, 0, -0.26744, 0, 1, 0, 0.26744, 0, 0.963574, -10.9413, 0.550935, 3.01853)
 collision_layer = 12
 collision_mask = 15
 mass = 10.0
+metadata/init_state = "{  \"MetaTag\": \"cube_obj\",  \"TypeID\": \"storage_crate\",  \"Data\": {    \"guid\": \"1a9834e0-ca7d-4b6f-bb92-27c00170be59\",    \"inventory_data_tag\": {      \"0\": \"{\\r\\n  \\u0022MetaTag\\u0022: \\u0022battery_obj\\u0022,\\r\\n  \\u0022TypeID\\u0022: \\u0022battery\\u0022,\\r\\n  \\u0022Data\\u0022: {\\r\\n    \\u0022guid\\u0022: \\u00228428fb77-3740-4ff9-9848-ab9bf7cf385c\\u0022,\\r\\n    \\u0022power\\u0022: 100\\r\\n  }\\r\\n}\"    }  }}"
 
 [node name="Floor2" type="StaticBody3D" parent="SceneObjects"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 37.5, -0.5, 0)

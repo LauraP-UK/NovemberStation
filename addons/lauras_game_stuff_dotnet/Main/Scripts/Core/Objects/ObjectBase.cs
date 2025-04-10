@@ -15,6 +15,11 @@ public abstract class ObjectBase<T> : IObjectBase where T : Node3D {
         _baseNode = baseNode;
         _objectTag = objectTag;
         SetNewId();
+        RegisterArbitraryAction("To JSON", 1000, (_, _) => GameManager.IsDebugMode(), (_, ev)  => {
+            if (ev is not KeyPressEvent) return;
+            GD.Print($"----- {objectTag} JSON -----");
+            GD.Print(Serialise());
+        });
     }
     
     protected void SetId(Guid id) => _id = id;

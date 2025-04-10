@@ -35,8 +35,8 @@ public partial class TestScript : Node {
         foreach (Node child in sceneObjects.GetChildren()) {
             if (child is not Node3D obj) continue;
             IObjectBase objData = gameManager.RegisterObject(obj);
-            if (objData is StorageCrateObject crate)
-                crate.StoreItem(Randf.Random(Items.CROWBAR, Items.BATTERY, Items.FLOODLIGHT, Items.GAS_CAN, Items.DIGITAL_CLOCK, Items.FIRE_EXTINGUISHER));
+            //if (objData is StorageCrateObject crate)
+            //    crate.StoreItem(Randf.Random(Items.CROWBAR, Items.BATTERY, Items.FLOODLIGHT, Items.GAS_CAN, Items.DIGITAL_CLOCK, Items.FIRE_EXTINGUISHER));
         }
 
         foreach (Node child in gameManager.GetSceneObjects().GetChildren()) {
@@ -58,21 +58,6 @@ public partial class TestScript : Node {
         GD.Print($"Dynamic Objects: {_objSpawns.Count}");
 
         Scheduler.ScheduleRepeating(0L, 1000L, _ => _objects.RemoveWhere(pair => GameUtils.IsNodeInvalid(pair.Value.GetBaseNode3D())));
-
-        using FileAccess file = FileAccess.Open("user://SerialiseTest.json", FileAccess.ModeFlags.Read);
-        string json = file.GetAsText();
-
-        ObjectAtlas.CreatedObject createdObjectFromJson = ObjectAtlas.CreatedObjectFromJson(json);
-
-        if (createdObjectFromJson.Success) {
-            foreach (IObjectBase objectBase in GetObjects().Values) {
-                if (objectBase is not StorageCrateObject storageCrate) continue;
-                storageCrate.StoreItem(createdObjectFromJson.Object, createdObjectFromJson.Node);
-                break;
-            }
-        } else {
-            GD.PrintErr($"Failed to create object from JSON.\nGot: {createdObjectFromJson}");
-        }
     }
 
     // Called every frame. 'delta' is the elapsed time since the previous frame.

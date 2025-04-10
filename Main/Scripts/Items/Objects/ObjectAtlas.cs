@@ -111,9 +111,7 @@ public static class ObjectAtlas {
     }
     
     private static string GetInitStateTag(Node3D node) {
-        if (node.HasMeta(INIT_STATE_TAG)) return node.GetMeta(INIT_STATE_TAG).AsString();
-        GD.PrintErr($"WARN: ObjectAtlas.GetInitStateTag() : Node3D '{node.Name}' does not have the required meta tag '{INIT_STATE_TAG}'.");
-        return "";
+        return node.HasMeta(INIT_STATE_TAG) ? node.GetMeta(INIT_STATE_TAG).AsString() : "";
     }
 
     public static IObjectBase CreateObject(Node3D node) {
@@ -126,11 +124,10 @@ public static class ObjectAtlas {
         IObjectBase objectBase = CreateObject(clazz, node);
 
         string initStateJson = GetInitStateTag(node);
-        if (initStateJson != "") {
-            GD.Print($"INFO: ObjectAtlas.CreateObject() : Object '{tag}' with init state:\n{initStateJson}");
-            Serialiser.ObjectSaveData objectSaveData = DeserialiseObject(initStateJson);
-            objectBase.BuildFromData(objectSaveData.Data);
-        }
+        if (initStateJson == "") return objectBase;
+        
+        Serialiser.ObjectSaveData objectSaveData = DeserialiseObject(initStateJson);
+        objectBase.BuildFromData(objectSaveData.Data);
         return objectBase;
     }
 
