@@ -38,6 +38,11 @@ public class Player : ActorBase, IViewable, IHotbarActor {
 
     public IObjectBase GetHandItem() => _handItem;
     public Camera3D GetCamera() => _camera;
+    public void AssumeCameraControl() {
+        Camera3D camera3D = GetCamera();
+        camera3D.MakeCurrent();
+        camera3D.SetPosition(Vector3.Zero);
+    }
     public Node3D GetCrouchNode() => _crouchNode;
     public Node3D GetLeanNode() => _leanNode;
     public Node3D GetHandOrientation() => _handOrientation;

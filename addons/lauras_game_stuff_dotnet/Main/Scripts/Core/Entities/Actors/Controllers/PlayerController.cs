@@ -1,7 +1,7 @@
 using System;
 using Godot;
 
-public class PlayerController : ControllerBase {
+public class PlayerController : ControllerBase<Player> {
     private const float
         HOLD_DISTANCE = 2.1f,
         HOLD_DISTANCE_MIN = 0.5f,
@@ -141,7 +141,7 @@ public class PlayerController : ControllerBase {
         bool isDown = button == MouseButton.WheelDown;
 
         if (!IsHoldingObject() && GetContextObject() == null) {
-            Player player = GetActor<Player>();
+            Player player = GetActor();
             Hotbar hotbar = player.GetHotbar();
 
             hotbar.ChangeIndex(isDown ? 1 : -1);
@@ -173,20 +173,20 @@ public class PlayerController : ControllerBase {
     private void OnMouseClick(MouseInputEvent ev, Vector2 position) {
         if (ev.GetMouseButton() != MouseButton.Left || !ev.IsPressed() || ev.IsCaptured()) return;
         if (_heldObject != null) return;
-        IObjectBase handItem = GetActor<Player>().GetHandItem();
+        IObjectBase handItem = GetActor().GetHandItem();
         switch (handItem) {
             case IUsable usable when handItem.TestAction<IUsable>(GetActor(), ev): usable.Use(GetActor(), ev); break;
             case IDrinkable drinkable when handItem.TestAction<IDrinkable>(GetActor(), ev): drinkable.Drink(GetActor(), ev); break;
         }
 
-        GetActor<Player>().GetHotbar().ResyncInventory();
+        GetActor().GetHotbar().ResyncInventory();
     }
 
     [EventListener]
     private void OnMouseMiddleClick(MouseInputEvent ev, Vector2 position) {
         if (ev.GetMouseButton() != MouseButton.Middle || !ev.IsPressed() || ev.IsCaptured()) return;
         if (_heldObject != null) return;
-        Player owner = GetActor<Player>();
+        Player owner = GetActor();
         IObjectBase objectBase = owner.GetHandItem();
         if (objectBase == null) return;
 
@@ -240,7 +240,7 @@ public class PlayerController : ControllerBase {
     private bool IsHoldingObject() => _heldObject != null;
 
     protected override void OnUpdate(float delta) {
-        Player player = GetActor<Player>();
+        Player player = GetActor();
 
         if (!IsAsleep()) {
             Vector3 targetLean = GetAmalgamatedLean(_lastDirection) * _leanInertia;
@@ -269,7 +269,7 @@ public class PlayerController : ControllerBase {
         SetLocked(false);
         ShowUI(true);
         GameManager.ResetEngineSpeed();
-        ((Player)GetActor()).GetCamera().MakeCurrent();
+        GetActor().AssumeCameraControl();
     }
 
     public ActionKey? GetCurrentContextAction() {
@@ -314,7 +314,7 @@ public class PlayerController : ControllerBase {
         _holdDistanceModifier = 1.0f;
         _rotationOffset = Vector2.Zero;
 
-        RaycastResult raycast = Raycast.Trace(GetActor<Player>(), obj.GlobalPosition);
+        RaycastResult raycast = Raycast.Trace(GetActor(), obj.GlobalPosition);
         if (raycast.HasHit()) {
             _holdDistanceModifier = Mathsf.Remap(
                 HOLD_DISTANCE * HOLD_DISTANCE_MIN,
@@ -333,7 +333,7 @@ public class PlayerController : ControllerBase {
     }
 
     private void UpdateHeldObjectPosition(double delta) {
-        Camera3D camera = ((Player)GetActor()).GetCamera();
+        Camera3D camera = GetActor().GetCamera();
 
         Vector3 targetPosition = camera.GlobalTransform.Origin + -camera.GlobalTransform.Basis.Z * (HOLD_DISTANCE * _holdDistanceModifier);
         Vector3 currentPosition = _heldObject.GlobalTransform.Origin;
@@ -351,7 +351,7 @@ public class PlayerController : ControllerBase {
     private Direction FindClosestFace(RigidBody3D obj) {
         Transform3D globalTransform = obj.GlobalTransform;
         Basis globalBasis = globalTransform.Basis;
-        Vector3 playerLookVector = -((Player)GetActor()).GetCamera().GlobalTransform.Basis.Z.Normalized();
+        Vector3 playerLookVector = -GetActor().GetCamera().GlobalTransform.Basis.Z.Normalized();
 
         Direction closestDirection = null;
         float maxDot = float.NegativeInfinity;
@@ -371,7 +371,7 @@ public class PlayerController : ControllerBase {
 
     private void RotateFaceToPlayer(RigidBody3D obj, float delta) {
         Vector3 targetRotation;
-        Vector3 playerRotation = ((Player)GetActor()).GetCamera().GlobalRotation;
+        Vector3 playerRotation = GetActor().GetCamera().GlobalRotation;
         float playerYaw = playerRotation.Y;
 
         Quaternion currentRotation = obj.GlobalTransform.Basis.GetRotationQuaternion();
@@ -406,7 +406,7 @@ public class PlayerController : ControllerBase {
     }
 
     private void HandleLookRot(float delta) {
-        Player player = GetActor<Player>();
+        Player player = GetActor();
         float smoothness = player.GetLookSmoothness();
         _currentLook = _currentLook.MoveToward(_targetLook, smoothness * delta);
         

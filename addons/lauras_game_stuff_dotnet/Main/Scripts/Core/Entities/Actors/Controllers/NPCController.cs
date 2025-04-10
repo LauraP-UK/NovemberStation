@@ -1,7 +1,7 @@
 
-public class NPCController : ControllerBase {
+public class NPCController : ControllerBase<NPC> {
     
-    public NPCController(ActorBase actor) : base(actor) {}
+    public NPCController(NPC actor) : base(actor) {}
     protected override void OnUpdate(float delta) {
         
     }

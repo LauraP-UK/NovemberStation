@@ -1,7 +1,7 @@
 using System;
 using Godot;
 
-public abstract class ControllerBase : Listener {
+public abstract class ControllerBase<T> : Listener, IActorController where T : ActorBase {
     private const float
         JUMP_VELOCITY = 6.0f,
         WALK_SPEED = 4.5f,
@@ -20,10 +20,8 @@ public abstract class ControllerBase : Listener {
         MIN_IMPULSE_THRESHOLD = 1.25f,
         CROUCH_TRANSLATE = 0.7f,
         CROUCH_JUMP_HEIGHT = CROUCH_TRANSLATE * 0.9f;
-    
-    private static readonly float GRAVITY = (float) ProjectSettings.GetSetting("physics/3d/default_gravity");
 
-    private ActorBase _actor { get; }
+    private T _actor { get; }
     private ulong _lastFrameOnFloor = ulong.MinValue;
     private bool _snappedToStairs, _lockedMode, _crouchingLastFrame;
     private Vector3? _savedCamGlobalPosition;
@@ -33,15 +31,14 @@ public abstract class ControllerBase : Listener {
     protected bool _sprinting = false, _jumping, _crouching, _tryUncrouch, _inputThisFrame;
     protected readonly float _actorHeight = -1.0f;
 
-    protected ControllerBase(ActorBase actor) {
+    protected ControllerBase(T actor) {
         _actor = actor;
         _actor.SetController(this);
         if (GetActor().GetCollisionShape().GetShape() is CapsuleShape3D capsule)
             _actorHeight = capsule.Height;
     }
 
-    protected ActorBase GetActor() => _actor;
-    protected T GetActor<T>() where T : ActorBase => (T) _actor;
+    protected T GetActor() => _actor;
     protected float GetSpeed() => _crouching ? CROUCH_SPEED : _sprinting ? SPRINT_SPEED : WALK_SPEED;
     public void SetLocked(bool locked) => _lockedMode = locked;
     public bool IsLocked() => _lockedMode;
@@ -186,7 +183,7 @@ public abstract class ControllerBase : Listener {
         CharacterBody3D model = GetActor().GetModel();
         Vector3 velocity = VectorUtils.RoundTo(model.GetVelocity(), 4);
 
-        velocity.Y -= GRAVITY * delta;
+        velocity.Y -= GameManager.GRAVITY * delta;
         model.SetVelocity(velocity);
 
         float currentSpeedInDirection = velocity.Dot(_intendedDirection);

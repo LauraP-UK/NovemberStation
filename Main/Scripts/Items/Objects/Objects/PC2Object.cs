@@ -134,7 +134,7 @@ public class PC2Object : ObjectBase<Node3D>, IUsable {
     }
 
     private void Release() {
-        _gameManager.GetPlayer().GetCamera().SetCurrent(true);
+        _gameManager.GetPlayer().AssumeCameraControl();
         PlayerController playerController = _gameManager.GetPlayer().GetController<PlayerController>();
         playerController.SetLocked(false);
         playerController.ShowUI(true);

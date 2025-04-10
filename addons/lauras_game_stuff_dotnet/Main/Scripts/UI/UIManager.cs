@@ -31,17 +31,18 @@ public static class UIManager {
 
         GameManager gameManager = GameManager.I();
         Player player = gameManager.GetPlayer();
+        PlayerController controller = player.GetController<PlayerController>();
 
         if (menu == _primaryUIOpen) {
             _primaryUIOpen = null;
-            player.GetController<PlayerController>().ShowUI(true);
+            controller.ShowUI(true);
         }
 
         FormBase form = _menus[menu];
         _menus.Remove(menu);
         if (form != null && form.LockMovement()) {
-            player.GetController().SetLocked(false);
-            player.GetController<PlayerController>().ShowUI(true);
+            controller.SetLocked(false);
+            controller.ShowUI(true);
             gameManager.SetMouseControl(false);
         }
 
@@ -63,8 +64,9 @@ public static class UIManager {
         _menus.Add(menu.GetMenu(), menu);
 
         if (menu.LockMovement()) {
-            gameManager.GetPlayer().GetController().SetLocked(true);
-            gameManager.GetPlayer().GetController<PlayerController>().ShowUI(false);
+            PlayerController controller = gameManager.GetPlayer().GetController<PlayerController>();
+            controller.SetLocked(true);
+            controller.ShowUI(false);
             gameManager.SetMouseControl(true);
         }
 

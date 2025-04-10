@@ -5,7 +5,7 @@ public abstract class ActorBase : IActor {
     private readonly Guid _uuid = Guid.NewGuid();
     private readonly CharacterBody3D _model;
 
-    private ControllerBase _controller;
+    private IActorController _controller;
     private string _name;
 
     protected ActorBase(CharacterBody3D model) {
@@ -20,9 +20,9 @@ public abstract class ActorBase : IActor {
     public CollisionShape3D GetCollisionShape() => GetModel().GetNode<CollisionShape3D>("CapsuleCollider");
     public RayCast3D GetBelowRaycast() => GetModel().GetNode<RayCast3D>("StairsRaycasts/BelowCast");
     public RayCast3D GetFrontRaycast() => GetModel().GetNode<RayCast3D>("StairsRaycasts/FrontCast");
-    public ControllerBase GetController() => _controller;
-    public T GetController<T>() where T : ControllerBase => (T) _controller;
-    public void SetController(ControllerBase controller) => _controller = controller;
+    public IActorController GetController() => _controller;
+    public T GetController<T>() where T : IActorController => (T) _controller;
+    public void SetController(IActorController controller) => _controller = controller;
     public void SetName(string name) => _name = name;
     public void SetPosition(Vector3 position, Vector3 rotation = default) {
         _model.Position = position;

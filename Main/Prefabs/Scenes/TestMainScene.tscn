@@ -106,7 +106,7 @@ sky_mode = 1
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.62835, 0, 5.5933)
 
 [node name="SleepCamContainer" type="Node3D" parent="."]
-transform = Transform3D(-0.376224, -0.372416, -0.848388, 0, 0.915663, -0.401948, 0.926529, -0.151223, -0.344494, -29.353, 1.549, -15.756)
+transform = Transform3D(-0.376224, -0.372416, -0.848388, 0, 0.915663, -0.401948, 0.926529, -0.151223, -0.344494, -24.5655, 1.549, -13.3226)
 
 [node name="SleepCam" type="Camera3D" parent="SleepCamContainer"]
 fov = 60.0

@@ -4,6 +4,8 @@ using Godot;
 public class GameManager {
     
     private const bool DEBUG_MODE = true;
+
+    public static readonly float GRAVITY = (float) ProjectSettings.GetSetting("physics/3d/default_gravity");
     
     private static GameManager instance;
 
