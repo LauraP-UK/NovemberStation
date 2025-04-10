@@ -1,6 +1,3 @@
-[gd_resource type="FontVariation" load_steps=2 format=3 uid="uid://27v5fhe0jcwq"]
-
-[ext_resource type="FontFile" uid="uid://cmhg2emxqb8jg" path="res://Main/Fonts/DS-Digital/DS-DIGIT.TTF" id="1_haudp"]
+[gd_resource type="FontVariation" format=3 uid="uid://27v5fhe0jcwq"]
 
 [resource]
-base_font = ExtResource("1_haudp")
