@@ -35,18 +35,20 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.7, 0)
 [node name="LeanControl" type="Node3D" parent="HeadOrigin"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1, 0)
 
-[node name="CamContainer" type="Node3D" parent="HeadOrigin/LeanControl"]
+[node name="CrouchOrigin" type="Node3D" parent="HeadOrigin/LeanControl"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
 
-[node name="CrouchControl" type="Node3D" parent="HeadOrigin/LeanControl/CamContainer"]
+[node name="CrouchControl" type="Node3D" parent="HeadOrigin/LeanControl/CrouchOrigin"]
 
-[node name="Camera" type="Camera3D" parent="HeadOrigin/LeanControl/CamContainer/CrouchControl"]
+[node name="CamContainer" type="Node3D" parent="HeadOrigin/LeanControl/CrouchOrigin/CrouchControl"]
+
+[node name="Camera" type="Camera3D" parent="HeadOrigin/LeanControl/CrouchOrigin/CrouchControl/CamContainer"]
 current = true
 
-[node name="HandPoint" type="Node3D" parent="HeadOrigin/LeanControl/CamContainer/CrouchControl/Camera"]
+[node name="HandPoint" type="Node3D" parent="HeadOrigin/LeanControl/CrouchOrigin/CrouchControl/CamContainer/Camera"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.319661, -0.331089, -0.422314)
 
-[node name="ObjOrientation" type="Node3D" parent="HeadOrigin/LeanControl/CamContainer/CrouchControl/Camera/HandPoint"]
+[node name="ObjOrientation" type="Node3D" parent="HeadOrigin/LeanControl/CrouchOrigin/CrouchControl/CamContainer/Camera/HandPoint"]
 transform = Transform3D(0.535855, -0.524747, -1.78552e-08, -3.1994e-08, -7.15151e-09, -0.75, 0.524747, 0.535855, -2.74946e-08, 0, 0.06, 0)
 
 [node name="StairsRaycasts" type="Node3D" parent="."]

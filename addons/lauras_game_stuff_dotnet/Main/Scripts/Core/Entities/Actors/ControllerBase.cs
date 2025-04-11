@@ -24,7 +24,7 @@ public abstract class ControllerBase<T> : Listener, IActorController where T : A
     private T _actor { get; }
     private ulong _lastFrameOnFloor = ulong.MinValue;
     private bool _snappedToStairs, _lockedMode, _crouchingLastFrame;
-    private Vector3? _savedCamGlobalPosition;
+    private Vector3? _lastCamGlobalPosition = null;
 
     protected float _inertia, _leanInertia;
     protected Vector3 _intendedDirection = Vector3.Zero, _lastDirection = Vector3.Zero, _leanTarget = Vector3.Zero;
@@ -123,33 +123,28 @@ public abstract class ControllerBase<T> : Listener, IActorController where T : A
 
 
     /* --- ---  MOVEMENT  --- --- */
-    private void SaveCameraPosition() {
-        if (GetActor() is not IViewable actor) return;
-        _savedCamGlobalPosition ??= actor.GetCamera().GlobalPosition;
-    }
     
     protected bool IsSurfaceTooSteep(Vector3 normal) => normal.AngleTo(Vector3.Up) > GetActor().GetModel().FloorMaxAngle;
     
     protected bool CanUncrouch() => !GetActor().GetModel().TestMove(GetActor().GetModel().Transform, new Vector3(0.0f, CROUCH_TRANSLATE, 0.0f));
 
     private void SlideCamToOrigin(float delta) {
-        if (_savedCamGlobalPosition == null || GetActor() is not IViewable actor) return;
-        Camera3D camera = actor.GetCamera();
-        
-        Vector3 globalPosition = camera.GetGlobalPosition();
-        globalPosition.Y = _savedCamGlobalPosition.Value.Y;
-        camera.SetGlobalPosition(globalPosition);
-        
-        Vector3 position = camera.GetPosition();
-        position.Y = Mathf.Clamp(position.Y, -0.7f, 0.7f);
-        camera.SetPosition(position);
+        if (GetActor() is not IViewable actor) return;
 
-        float moveAmount = Math.Max(GetActor().GetModel().Velocity.Length() * delta, WALK_SPEED / 2 * delta);
-        position.Y = Mathf.MoveToward(position.Y, 0.0f, moveAmount);
-        camera.SetPosition(position);
-        _savedCamGlobalPosition = camera.GlobalPosition;
-        
-        if (position.Y == 0.0f) _savedCamGlobalPosition = null;
+        Camera3D camera = actor.GetCamera();
+        Node3D camTarget = actor.GetCamContainer();
+
+        Vector3 targetGlobal = camTarget.GlobalPosition;
+        Vector3 currentGlobal = _lastCamGlobalPosition ?? camera.GlobalPosition;
+
+        currentGlobal.X = targetGlobal.X;
+        currentGlobal.Z = targetGlobal.Z;
+
+        float moveAmount = Math.Max(GetActor().GetModel().Velocity.Length(), WALK_SPEED);
+        currentGlobal.Y = Mathf.MoveToward(currentGlobal.Y, targetGlobal.Y, moveAmount * delta);
+
+        camera.GlobalPosition = currentGlobal;
+        _lastCamGlobalPosition = currentGlobal;
     }
     
     protected void HandleGroundPhysics(float delta) {
@@ -232,8 +227,6 @@ public abstract class ControllerBase<T> : Listener, IActorController where T : A
 
             if (!frontCast.IsColliding() || IsSurfaceTooSteep(frontCast.GetCollisionNormal()))
                 return false;
-
-            SaveCameraPosition();
             
             model.SetGlobalPosition(stepPosClearance.Origin + downCheckResult.GetTravel());
             model.ApplyFloorSnap();
@@ -255,9 +248,6 @@ public abstract class ControllerBase<T> : Listener, IActorController where T : A
         if (!model.IsOnFloor() && model.GetVelocity().Y <= 0 && (wasOnFloor || _snappedToStairs) && floorBelow) {
             PhysicsTestMotionResult3D result = new();
             if (RunBodyTestMotion(model.GlobalTransform, new Vector3(0.0f, -MAX_STEP_HEIGHT, 0.0f), result)) {
-                
-                SaveCameraPosition();
-                
                 float transY = result.GetTravel().Y;
                 Vector3 position = model.GetPosition();
                 model.SetPosition(new Vector3(position.X, position.Y += transY, position.Z));

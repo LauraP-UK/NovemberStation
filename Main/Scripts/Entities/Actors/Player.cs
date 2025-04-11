@@ -5,7 +5,7 @@ using Godot;
 
 public class Player : ActorBase, IViewable, IHotbarActor {
     private readonly Camera3D _camera;
-    private readonly Node3D _crouchNode, _handNode, _handOrientation, _leanNode;
+    private readonly Node3D _crouchNode, _handNode, _handOrientation, _leanNode, _camContainer;
     
     private IObjectBase _handItem;
     private readonly Hotbar _hotbar;
@@ -14,10 +14,11 @@ public class Player : ActorBase, IViewable, IHotbarActor {
 
     public Player(CharacterBody3D body) : base(body) {
         _leanNode = GetModel().GetNode<Node3D>("HeadOrigin/LeanControl");
-        _crouchNode = GetModel().GetNode<Node3D>("HeadOrigin/LeanControl/CamContainer/CrouchControl");
-        _camera = GetModel().GetNode<Camera3D>("HeadOrigin/LeanControl/CamContainer/CrouchControl/Camera");
-        _handNode = GetModel().GetNode<Node3D>("HeadOrigin/LeanControl/CamContainer/CrouchControl/Camera/HandPoint");
-        _handOrientation = GetModel().GetNode<Node3D>("HeadOrigin/LeanControl/CamContainer/CrouchControl/Camera/HandPoint/ObjOrientation");
+        _camContainer = GetModel().GetNode<Node3D>("HeadOrigin/LeanControl/CrouchOrigin/CrouchControl/CamContainer");
+        _crouchNode = GetModel().GetNode<Node3D>("HeadOrigin/LeanControl/CrouchOrigin/CrouchControl");
+        _camera = GetModel().GetNode<Camera3D>("HeadOrigin/LeanControl/CrouchOrigin/CrouchControl/CamContainer/Camera");
+        _handNode = GetModel().GetNode<Node3D>("HeadOrigin/LeanControl/CrouchOrigin/CrouchControl/CamContainer/Camera/HandPoint");
+        _handOrientation = GetModel().GetNode<Node3D>("HeadOrigin/LeanControl/CrouchOrigin/CrouchControl/CamContainer/Camera/HandPoint/ObjOrientation");
 
         List<VisualInstance3D> children = GetVisualModel()
             .GetChildren()
@@ -43,6 +44,8 @@ public class Player : ActorBase, IViewable, IHotbarActor {
         camera3D.MakeCurrent();
         camera3D.SetPosition(Vector3.Zero);
     }
+    public Node3D GetHandNode() => _handNode;
+    public Node3D GetCamContainer() => _camContainer;
     public Node3D GetCrouchNode() => _crouchNode;
     public Node3D GetLeanNode() => _leanNode;
     public Node3D GetHandOrientation() => _handOrientation;
