@@ -2,9 +2,12 @@ using System;
 using Godot;
 
 public static class Loader {
-    private static readonly SmartDictionary<string, PackedScene> _cache = new();
+    private static readonly Cache<string, PackedScene> _cache = new(() => null, -1);
     public static PackedScene SafeLoad(string path, bool throwError = false) {
-        if (_cache.TryGetValue(path.ToLowerInvariant(), out PackedScene load)) return load;
+        string pathLower = path.ToLowerInvariant();
+        PackedScene fromCache = _cache.GetFromCache(pathLower);
+        if (fromCache != null) return fromCache;
+        
         if (!ResourceLoader.Exists(path)) {
             GD.PrintErr($"ERROR: Loader.SafeLoad() : Resource not found: {path}");
             if (throwError) throw new InvalidOperationException($"ERROR: Loader.SafeLoad() : Resource not found: {path}");
@@ -17,7 +20,7 @@ public static class Loader {
             return null;
         }
 
-        _cache.Add(path.ToLowerInvariant(), packedScene);
+        _cache.AddToCache(pathLower, packedScene);
         return packedScene;
     }
     public static T SafeInstantiate<T>(string path, bool throwError = false) where T : Node {
@@ -33,5 +36,5 @@ public static class Loader {
         if (throwError) throw new InvalidOperationException($"ERROR: Loader.SafeInstantiate() : PackedScene not found: {path}");
         return null;
     }
-    public static void ClearCache() => _cache.Clear();
+    public static void ClearCache() => _cache.ClearCache();
 }

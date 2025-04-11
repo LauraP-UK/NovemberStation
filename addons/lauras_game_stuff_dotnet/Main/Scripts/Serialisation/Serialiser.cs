@@ -4,12 +4,15 @@ using System.Text.Json;
 using Godot;
 
 public static class Serialiser {
-    
+    private static readonly Cache<string, SmartDictionary<string, object>> _cache = new(() => new SmartDictionary<string, object>());
+
     public static string Serialise<T>(T obj) {
-        return JsonSerializer.Serialize(obj, new JsonSerializerOptions {
-            WriteIndented = true,
-            IncludeFields = false
-        });
+        return JsonSerializer.Serialize(
+            obj, new JsonSerializerOptions {
+                WriteIndented = true,
+                IncludeFields = false
+            }
+        );
     }
 
     public static T Deserialise<T>(string json) => JsonSerializer.Deserialize<T>(json);
@@ -30,9 +33,9 @@ public static class Serialiser {
 
         return default;
     }
-    
+
     public static T GetSpecificData<T>(string key, string json) {
-        object result = ObjectSerialiserCache.GetFromCache(json, key);
+        object result = _cache.GetFromCache(json).GetOrDefault(key, null);
         if (result != null) {
             if (result is T converted) return converted;
             try {
@@ -50,7 +53,11 @@ public static class Serialiser {
         if (!dataElement.TryGetProperty(key, out JsonElement target)) return default;
 
         object raw = ExtractData(target);
-        ObjectSerialiserCache.AddToCache(json, key, raw);
+        _cache.AddToCache(json, (cache) => {
+            SmartDictionary<string,object> kVs = cache.GetFromCache(json);
+            kVs.Add(key, raw);
+            return kVs;
+        });
         if (raw is T tVal) return tVal;
 
         try {
@@ -60,7 +67,7 @@ public static class Serialiser {
             return default;
         }
     }
-    
+
     public static string ModifySpecificData<T>(string key, Func<T, T> transform, string json) {
         T current = GetSpecificData<T>(key, json);
         if (current != null) return SetSpecificData(key, transform(current), json);
@@ -78,8 +85,7 @@ public static class Serialiser {
         }
 
         Dictionary<string, object> dataDict = new();
-        foreach (JsonProperty prop in dataElement.EnumerateObject())
-            dataDict[prop.Name] = ExtractData(prop.Value);
+        foreach (JsonProperty prop in dataElement.EnumerateObject()) dataDict[prop.Name] = ExtractData(prop.Value);
 
         dataDict[key] = value;
 

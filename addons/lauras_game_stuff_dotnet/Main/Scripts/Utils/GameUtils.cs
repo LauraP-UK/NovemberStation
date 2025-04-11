@@ -2,6 +2,8 @@
 using Godot;
 
 public static class GameUtils {
+    
+    private static readonly Cache<Node, Node> _sceneRootNodeCache = new(() => null);
 
     public static string FindSceneFilePath(Node node) {
         Node current = node;
@@ -14,10 +16,15 @@ public static class GameUtils {
     }
     
     public static Node FindSceneRoot(Node node) {
+        Node cachedRoot = _sceneRootNodeCache.GetFromCache(node);
+        if (cachedRoot != null) return cachedRoot;
+        
         Node current = node;
         while (current != null) {
-            if (current.SceneFilePath != "")
-                return current;
+            if (current.SceneFilePath != "") {
+                _sceneRootNodeCache.AddToCache(node, current);
+                return current;                
+            }
             Node parent = current.GetParent();
             if (parent == null) return current;
             current = parent;

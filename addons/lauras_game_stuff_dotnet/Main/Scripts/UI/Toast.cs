@@ -16,7 +16,7 @@ public static class Toast {
     }
 
     public static void Warn(ICollection<Player> viewers, string message) {
-        Pop(viewers, message, 5000L, "res://Main/Textures/UI/Symbols/WarningIconUpsidedown.png");
+        Pop(viewers, message, 5000L, "res://Main/Textures/UI/Symbols/WarningIcon.png", Colors.DarkGoldenrod);
     }
 
     public static void Error(Player viewer, string message) {
@@ -24,7 +24,7 @@ public static class Toast {
     }
 
     public static void Error(ICollection<Player> viewers, string message) {
-        Pop(viewers, message, 5000L, "res://Main/Textures/UI/Symbols/WarningIconUpsidedown.png", Colors.DarkRed);
+        Pop(viewers, message, 5000L, "res://Main/Textures/UI/Symbols/WarningIcon.png", Colors.DarkRed);
     }
     
     private static void Pop(ICollection<Player> viewers, string message, long duration, string iconPath, Color color = default) {

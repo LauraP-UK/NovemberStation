@@ -57,10 +57,7 @@ public abstract class FormElement<T> : IFormElement where T : Control {
     }
     
     private void SetupOnReady() {
-        AddAction(Node.SignalName.Ready, _ => {
-            ConnectSignals();
-            //EventManager.RegisterListeners(this);
-        });
+        AddAction(Node.SignalName.Ready, _ => ConnectSignals());
         ConnectSignal(Node.SignalName.Ready, true);
     }
     

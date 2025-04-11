@@ -27,7 +27,7 @@ public class GameManager {
         
         EventManager eventManager = new();
         GameAction.Init();
-        ObjectSerialiserCache.GetFromCache("dummy", "call");
+        //ObjectSerialiserCache.GetFromCache("dummy", "call");
     }
     
     public void SetActiveScene(Node scene) => _activeScene = scene;
