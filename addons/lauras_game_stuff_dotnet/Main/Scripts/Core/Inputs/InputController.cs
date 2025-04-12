@@ -1,8 +1,8 @@
 using Godot;
 
 public class InputController {
-    public static void ProcessInput(InputEvent @event) {
-        switch (@event) {
+    public static void ProcessInput(InputEvent ev) {
+        switch (ev) {
             case InputEventKey { Pressed: true } eventKey:
                 new KeyPressEvent(eventKey.Keycode).Fire();
                 break;

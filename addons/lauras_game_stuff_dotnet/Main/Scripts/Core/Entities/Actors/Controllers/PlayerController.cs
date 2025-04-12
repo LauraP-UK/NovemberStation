@@ -18,8 +18,8 @@ public class PlayerController : ControllerBase<Player> {
     private static readonly Vector3
         FORWARD_LEAN_ROTATION = new(-7.5f, 0.0f, 0.0f),
         BACKWARD_LEAN_ROTATION = new(2.0f, 0.0f, 0.0f),
-        LEFT_LEAN_ROTATION = new(0.0f, 0.0f, 3.0f),
-        RIGHT_LEAN_ROTATION = new(0.0f, 0.0f, -3.0f);
+        LEFT_LEAN_ROTATION = new(0.0f, 0.0f, 2.0f),
+        RIGHT_LEAN_ROTATION = new(0.0f, 0.0f, -2.0f);
 
     private bool _asleep, _altAction, _toggleCrouch, _uiVisible = true, _debugObjects = false;
     private float _holdDistanceModifier = 1.0f;

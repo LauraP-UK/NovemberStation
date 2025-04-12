@@ -18,7 +18,7 @@ public abstract class ControllerBase<T> : Listener, IActorController where T : A
         MAX_STEP_HEIGHT = 0.5f,
         APPROX_ACTOR_MASS = 80.0f,
         MIN_IMPULSE_THRESHOLD = 1.25f,
-        CROUCH_TRANSLATE = 0.7f,
+        CROUCH_TRANSLATE = 1.075f,
         CROUCH_JUMP_HEIGHT = CROUCH_TRANSLATE * 0.9f;
 
     private T _actor { get; }
@@ -140,8 +140,8 @@ public abstract class ControllerBase<T> : Listener, IActorController where T : A
         currentGlobal.X = targetGlobal.X;
         currentGlobal.Z = targetGlobal.Z;
 
-        float moveAmount = Math.Max(GetActor().GetModel().Velocity.Length(), WALK_SPEED);
-        currentGlobal.Y = Mathf.MoveToward(currentGlobal.Y, targetGlobal.Y, moveAmount * delta);
+        float moveAmount = Math.Max(0.001f, targetGlobal.DistanceSquaredTo(currentGlobal) * (_snappedToStairs ? 10.0f : 40.0f));
+        currentGlobal.Y = Mathf.MoveToward(currentGlobal.Y, targetGlobal.Y, moveAmount * delta * 8.0f);
 
         camera.GlobalPosition = currentGlobal;
         _lastCamGlobalPosition = currentGlobal;

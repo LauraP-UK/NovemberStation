@@ -7,23 +7,27 @@ public partial class TestScript : Node {
     private readonly SmartDictionary<ulong, IObjectBase> _objects = new();
 
     public TestScript() {
+        GD.Print(@"
+            ╔═══════════════════════════════════════╗
+            ║      Н О Я Б Р Ь   С Т А Н Ц И Я      ║
+            ║         — NOVEMBER STATION —          ║
+            ║     Awaiting signal... █▒▒▒▒▒▒▒▒▒     ║
+            ╚═══════════════════════════════════════╝
+        ");
         GameManager.Init();
         GameManager.I().SetActiveScene(this);
     }
 
-    public override void _Input(InputEvent @event) => InputController.ProcessInput(@event);
+    public override void _Input(InputEvent ev) => InputController.ProcessInput(ev);
 
     // Called when the node enters the scene tree for the first time.
     public override void _Ready() {
-        GD.Print("Start");
-
         EventManager.HookWindowResize(GetViewport());
         UIManager.SetUILayer();
 
         GameManager gameManager = GameManager.I();
+        gameManager.SetMouseControl(false);
         gameManager.SetSceneObjects(GetTree().Root.GetNode<Node3D>("Main/SceneObjects"));
-
-        Input.MouseMode = Input.MouseModeEnum.Captured;
 
         Player player = (Player)Characters.PLAYER.CreateActor();
         GetTree().Root.GetNode<Node>("Main/PlayerHolder").AddChild(player.GetModel());
@@ -34,9 +38,7 @@ public partial class TestScript : Node {
         Node3D sceneObjects = GetTree().Root.GetNode<Node3D>("Main/SceneObjects");
         foreach (Node child in sceneObjects.GetChildren()) {
             if (child is not Node3D obj) continue;
-            IObjectBase objData = gameManager.RegisterObject(obj);
-            //if (objData is StorageCrateObject crate)
-            //    crate.StoreItem(Randf.Random(Items.CROWBAR, Items.BATTERY, Items.FLOODLIGHT, Items.GAS_CAN, Items.DIGITAL_CLOCK, Items.FIRE_EXTINGUISHER));
+            gameManager.RegisterObject(obj);
         }
 
         foreach (Node child in gameManager.GetSceneObjects().GetChildren()) {
