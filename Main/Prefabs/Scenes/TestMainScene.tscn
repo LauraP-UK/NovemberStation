@@ -1,6 +1,6 @@
 [gd_scene load_steps=35 format=3 uid="uid://bea3c2ji0la15"]
 
-[ext_resource type="Script" path="res://Main/TestScript.cs" id="1_htyov"]
+[ext_resource type="Script" uid="uid://bkx3f86ut2kq0" path="res://Main/TestScript.cs" id="1_htyov"]
 [ext_resource type="PackedScene" uid="uid://bis7ttpok81r1" path="res://Main/Prefabs/PhysicsObjects/PaperSheet.tscn" id="2_6j61f"]
 [ext_resource type="PackedScene" uid="uid://thihe8g234f1" path="res://Main/Prefabs/PhysicsObjects/Bed.tscn" id="2_f5v0u"]
 [ext_resource type="PackedScene" uid="uid://5meuarkmnj54" path="res://Main/Prefabs/PhysicsObjects/Floodlight.tscn" id="2_f38n5"]
@@ -14,7 +14,7 @@
 [ext_resource type="Texture2D" uid="uid://c5q1hp1s028lo" path="res://Main/Textures/Sandbox/Noise1.png" id="6_eukhs"]
 [ext_resource type="PackedScene" uid="uid://bglqvyeeifjom" path="res://Main/Prefabs/PhysicsObjects/Crowbar.tscn" id="8_crd5k"]
 [ext_resource type="PackedScene" uid="uid://o5oomgbbvvf7" path="res://Main/Prefabs/StaticObjects/Scenery/StaticCube.tscn" id="11_8d7ou"]
-[ext_resource type="Script" path="res://Main/Prefabs/StaticObjects/Scenery/StaticCubeTool.gd" id="12_g2rax"]
+[ext_resource type="Script" uid="uid://bqhdssrxvqiyh" path="res://Main/Prefabs/StaticObjects/Scenery/StaticCubeTool.gd" id="12_g2rax"]
 [ext_resource type="PackedScene" uid="uid://ftntxba32cpi" path="res://Main/Prefabs/StaticObjects/Scenery/Tree.tscn" id="13_ijdbg"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_vlb6p"]
@@ -51,10 +51,10 @@ albedo_texture = ExtResource("3_foc71")
 texture_filter = 0
 
 [sub_resource type="BoxMesh" id="BoxMesh_ud0el"]
-size = Vector3(25, 1, 25)
+size = Vector3(25, 1, 50)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_cfnm2"]
-size = Vector3(25, 1, 25)
+size = Vector3(25, 1, 50)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_twa2s"]
 size = Vector3(1, 0.05, 0.3)
