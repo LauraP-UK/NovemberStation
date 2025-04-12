@@ -1,9 +1,8 @@
-using System.Collections.Generic;
+using System;
 using Godot;
 
 public partial class TestScript : Node {
-    private readonly Dictionary<RigidBody3D, Vector3> _objSpawns = new();
-
+    private readonly SmartDictionary<Guid, Vector3> _objSpawns = new();
     private readonly SmartDictionary<ulong, IObjectBase> _objects = new();
 
     public TestScript() {
@@ -34,17 +33,13 @@ public partial class TestScript : Node {
         Vector3 spawnPoint = GetTree().Root.GetNode<Node3D>("Main/PlayerSpawn").GlobalPosition;
         player.SetPosition(spawnPoint, new Vector3(0.0f, -90.0f, 0.0f));
         gameManager.SetPlayer(player);
-
-        Node3D sceneObjects = GetTree().Root.GetNode<Node3D>("Main/SceneObjects");
-        foreach (Node child in sceneObjects.GetChildren()) {
-            if (child is not Node3D obj) continue;
-            gameManager.RegisterObject(obj);
-        }
-
+        
         foreach (Node child in gameManager.GetSceneObjects().GetChildren()) {
-            if (child is not RigidBody3D obj) continue;
-            _objSpawns.Add(obj, obj.GlobalPosition);
-            obj.AngularDamp = 0.5f;
+            if (child is not Node3D obj) continue;
+            IObjectBase objData = gameManager.RegisterObject(obj);
+            if (child is not RigidBody3D rigid) continue;
+            _objSpawns.Add(objData.GetGUID(), obj.GlobalPosition);
+            rigid.AngularDamp = 0.5f;
         }
 
         Node3D sunObj = Loader.SafeInstantiate<Node3D>("res://Main/Prefabs/Sandbox/Sun.tscn");
@@ -81,10 +76,12 @@ public partial class TestScript : Node {
         foreach (Node child in sceneObjects.GetChildren()) {
             if (child is not RigidBody3D physicsObj) continue;
             if (!(physicsObj.GlobalPosition.Y < -20)) continue;
-            if (_objSpawns.TryGetValue(physicsObj, out Vector3 origPosition))
-                physicsObj.GlobalPosition = origPosition;
+            IObjectBase objClass = gameManager.GetObjectClass(physicsObj.GetInstanceId());
+            Vector3 respawnAt = _objSpawns.GetOrDefault(objClass.GetGUID(), default);
+            if (respawnAt != default)
+                physicsObj.GlobalPosition = respawnAt;
             else {
-                Toast.Error(player, $"Deleted {gameManager.GetObjectClass(physicsObj.GetInstanceId()).GetDisplayName()}");
+                Toast.Error(player, $"Deleted {objClass.GetDisplayName()}");
                 physicsObj.QueueFree();
             }
         }

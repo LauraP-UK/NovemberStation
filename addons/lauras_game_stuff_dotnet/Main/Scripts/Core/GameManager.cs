@@ -4,6 +4,7 @@ using Godot;
 public class GameManager {
     
     private const bool DEBUG_MODE = true;
+    public const float SLEEP_ENGINE_SPEED = 30.0f;
 
     public static readonly float GRAVITY = (float) ProjectSettings.GetSetting("physics/3d/default_gravity");
     

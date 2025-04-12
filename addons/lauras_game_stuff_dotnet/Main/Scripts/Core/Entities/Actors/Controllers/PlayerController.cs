@@ -214,6 +214,8 @@ public class PlayerController : ControllerBase<Player> {
 
     [EventListener(PriorityLevels.TERMINUS)]
     private void OnPlayerJump(PlayerJumpEvent ev, ActorBase player) {
+        if (!GetActor().Equals(player)) return;
+        
         if (!GetActor().GetModel().IsOnFloor() || TimeSinceLastJump() < JUMP_COOLDOWN_MILLIS) return;
         _jumping = true;
         _lastJump = GetCurrentTimeMillis();
@@ -221,6 +223,8 @@ public class PlayerController : ControllerBase<Player> {
 
     [EventListener(PriorityLevels.TERMINUS)]
     private void OnPlayerMove(PlayerMoveEvent ev, Player player) {
+        if (!GetActor().Equals(player)) return;
+        
         Vector3 direction = ev.GetDirection();
         if (!direction.Equals(Vector3.Zero)) {
             _intendedDirection = GetActor().GetModel().GlobalTransform.Basis * direction;
@@ -231,7 +235,7 @@ public class PlayerController : ControllerBase<Player> {
         Vector2 turnDelta = ev.GetTurnDelta();
         if (turnDelta.Equals(Vector2.Zero)) return;
         if (_altAction && _heldObject != null) _rotationOffset += turnDelta * 0.02f;
-        else _targetLook += turnDelta * 0.5f;
+        else _targetLook += turnDelta * 0.25f;
     }
 
     /* --- ---  METHODS  --- --- */
@@ -244,7 +248,7 @@ public class PlayerController : ControllerBase<Player> {
         Player player = GetActor();
 
         if (!IsAsleep()) {
-            Vector3 targetLean = GetAmalgamatedLean(_lastDirection) * _leanInertia;
+            Vector3 targetLean = GetCombinedLean(_lastDirection) * _leanInertia;
             _leanTarget = _leanTarget.Lerp(targetLean, 10.0f * delta);
             player.GetLeanNode().RotationDegrees = _leanTarget;
             HandleLookRot(delta);
@@ -261,7 +265,7 @@ public class PlayerController : ControllerBase<Player> {
         _asleep = true;
         SetLocked(true);
         ShowUI(false);
-        GameManager.SetEngineSpeed(30.0f);
+        GameManager.SetEngineSpeed(GameManager.SLEEP_ENGINE_SPEED);
         GameManager.I().GetSleepCamera().MakeCurrent();
     }
 
@@ -281,7 +285,7 @@ public class PlayerController : ControllerBase<Player> {
     public Node3D GetContextObject() => _heldObject ?? _contextObject;
     public bool IsAsleep() => _asleep;
 
-    private Vector3 GetAmalgamatedLean(Vector3 dir) {
+    private Vector3 GetCombinedLean(Vector3 dir) {
         Vector3 toReturn = Vector3.Zero;
         float leanFactor = _sprinting ? 1.0f : 0.25f;
         toReturn.Z = dir.X switch {
