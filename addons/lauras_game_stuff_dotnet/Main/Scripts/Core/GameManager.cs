@@ -26,9 +26,18 @@ public class GameManager {
         if (instance != null) throw new InvalidOperationException("ERROR: GameManager.Init() : GameManager instance already exists.");
         new GameManager();
         
+        GD.Print(
+            @"
+            ╔═══════════════════════════════════════╗
+            ║      Н О Я Б Р Ь   С Т А Н Ц И Я      ║
+            ║         — NOVEMBER STATION —          ║
+            ║     Awaiting signal... █▒▒▒▒▒▒▒▒▒     ║
+            ╚═══════════════════════════════════════╝
+        "
+        );
+        
         EventManager eventManager = new();
         GameAction.Init();
-        //ObjectSerialiserCache.GetFromCache("dummy", "call");
     }
     
     public void SetActiveScene(Node scene) => _activeScene = scene;

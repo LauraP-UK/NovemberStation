@@ -6,13 +6,6 @@ public partial class TestScript : Node {
     private readonly SmartDictionary<ulong, IObjectBase> _objects = new();
 
     public TestScript() {
-        GD.Print(@"
-            ╔═══════════════════════════════════════╗
-            ║      Н О Я Б Р Ь   С Т А Н Ц И Я      ║
-            ║         — NOVEMBER STATION —          ║
-            ║     Awaiting signal... █▒▒▒▒▒▒▒▒▒     ║
-            ╚═══════════════════════════════════════╝
-        ");
         GameManager.Init();
         GameManager.I().SetActiveScene(this);
     }
@@ -33,7 +26,7 @@ public partial class TestScript : Node {
         Vector3 spawnPoint = GetTree().Root.GetNode<Node3D>("Main/PlayerSpawn").GlobalPosition;
         player.SetPosition(spawnPoint, new Vector3(0.0f, -90.0f, 0.0f));
         gameManager.SetPlayer(player);
-        
+
         foreach (Node child in gameManager.GetSceneObjects().GetChildren()) {
             if (child is not Node3D obj) continue;
             IObjectBase objData = gameManager.RegisterObject(obj);
@@ -79,7 +72,7 @@ public partial class TestScript : Node {
             if (!(curPos.Y < -20)) continue;
             IObjectBase objClass = gameManager.GetObjectClass(physicsObj.GetInstanceId());
             Vector3 respawnAt = _objSpawns.GetOrDefault(objClass.GetGUID(), default);
-            if (respawnAt == default) respawnAt = new Vector3(0,1,0);
+            if (respawnAt == default) respawnAt = new Vector3(0, 1, 0);
             RaycastResult highestPoint = gameManager.HighestPoint(curPos, physicsObj);
             if (highestPoint.HasHit()) {
                 RaycastResult.HitBodyData hit = highestPoint.GetClosestHit();
@@ -88,16 +81,15 @@ public partial class TestScript : Node {
                 Vector3 up = hit.HitNormal;
                 Vector3 forward = physicsObj.GlobalTransform.Basis.Z.Normalized();
 
-                if (Mathf.Abs(up.Dot(forward)) > 0.99f)
-                    forward = Vector3.Back;
+                if (Mathf.Abs(up.Dot(forward)) > 0.99f) forward = Vector3.Back;
 
                 Basis surfaceBasis = Basis.LookingAt(forward, up);
                 physicsObj.GlobalTransform = new Transform3D(surfaceBasis, physicsObj.GlobalTransform.Origin);
-            }
-            else {
+            } else {
                 physicsObj.GlobalPosition = respawnAt;
                 physicsObj.GlobalRotation = Vector3.Zero;
             }
+
             physicsObj.LinearVelocity = Vector3.Zero;
         }
     }
