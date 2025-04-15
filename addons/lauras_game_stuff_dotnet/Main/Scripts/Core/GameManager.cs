@@ -5,46 +5,50 @@ public static class GameManager {
     private const bool DEBUG_MODE = true;
     public const float SLEEP_ENGINE_SPEED = 30.0f;
 
-    public static readonly float GRAVITY = (float) ProjectSettings.GetSetting("physics/3d/default_gravity");
+    public static readonly float GRAVITY = (float)ProjectSettings.GetSetting("physics/3d/default_gravity");
+
+    private static readonly string CONSOLE_SPLASH;
 
     private static Node _sceneObjects;
     private static Player _player;
-    
+
     private static bool _init, _debugObjects;
-    
+
+    static GameManager() {
+        // Very important!
+        if (ProjectSettings.HasSetting("game/framework_console_splash")) {
+            string splash = (string)ProjectSettings.GetSetting("game/framework_console_splash");
+            splash = splash.Replace("\\n", "\n");
+            CONSOLE_SPLASH = splash;
+        } else
+            CONSOLE_SPLASH = "";
+    }
+
     public static void Init() {
         if (_init) throw new InvalidOperationException("ERROR: GameManager.Init() : GameManager instance already exists.");
         _init = true;
-        
-        GD.Print(
-            @"
-            ╔═══════════════════════════════════════╗
-            ║      Н О Я Б Р Ь   С Т А Н Ц И Я      ║
-            ║         — NOVEMBER STATION —          ║
-            ║     Awaiting signal... █▒▒▒▒▒▒▒▒▒     ║
-            ╚═══════════════════════════════════════╝
-        "
-        );
-        
+        GD.Print(CONSOLE_SPLASH);
         GameAction.Init();
     }
+
     public static void SetSceneObjects(Node sceneObjects) => _sceneObjects = sceneObjects;
-    
+
     public static Node GetSceneObjects() {
         if (_sceneObjects == null) throw new InvalidOperationException("ERROR: GameManager.GetSceneObjects() : Scene objects are null. Set the scene objects first.");
         return _sceneObjects;
     }
-    
+
     public static Camera3D GetSleepCamera() => MainLauncher.FindNode<Camera3D>("Main/SleepCamContainer/SleepCam");
-    
+
     public static void SetPlayer(Player player) => _player = player;
+
     public static Player GetPlayer() {
         if (_player == null) throw new InvalidOperationException("ERROR: GameManager.GetPlayer() : Player is null. Set the player first.");
         return _player;
     }
-    
+
     /* --- System Methods --- */
-    
+
     public static void Process(double delta) {
         Scheduler.Process();
         MovementActionTracker.Process();
@@ -52,7 +56,8 @@ public static class GameManager {
         if (!IsPaused()) {
             if (_player != null) GetPlayer().GetController().Update((float)delta);
             foreach ((ulong _, IObjectBase obj) in MainLauncher.GetGameBootstrapper().GetObjects())
-                if (obj is IProcess processObj) processObj.Process((float)delta);
+                if (obj is IProcess processObj)
+                    processObj.Process((float)delta);
         }
 
         if (_debugObjects) {
@@ -64,7 +69,7 @@ public static class GameManager {
             }
         }
     }
-    
+
     public static void PhysicsProcess(double delta) {
         if (!IsPaused() && _player != null) GetPlayer().GetController().PhysicsUpdate((float)delta);
     }
@@ -73,7 +78,7 @@ public static class GameManager {
     public static void ResetEngineSpeed() => SetEngineSpeed(1.0f);
 
     /* --- Game Methods --- */
-    
+
     public static void PopPauseMenu() => new PauseMenu().Open();
 
     public static void Quit() {
@@ -88,8 +93,8 @@ public static class GameManager {
     public static Viewport GetMasterViewport() => GetTree().Root.GetViewport();
     public static Camera3D GetActiveCamera() => MainLauncher.GetGameViewport().GetCamera3D();
     public static bool IsActiveCameraPlayer() => GetActiveCamera().Equals(GetPlayer().GetCamera());
-    public static T GetObjectClass<T>(ulong id) where T : IObjectBase => (T) GetObjectClass(id);
-    public static IObjectBase GetObjectClass(ulong id)  => MainLauncher.GetGameBootstrapper().GetObjects().GetOrDefault(id, null);
+    public static T GetObjectClass<T>(ulong id) where T : IObjectBase => (T)GetObjectClass(id);
+    public static IObjectBase GetObjectClass(ulong id) => MainLauncher.GetGameBootstrapper().GetObjects().GetOrDefault(id, null);
 
     public static IObjectBase RegisterObject(Node3D node) {
         Node root = GameUtils.FindSceneRoot(node);
@@ -97,10 +102,12 @@ public static class GameManager {
             GD.PrintErr($"WARN: GameManager.RegisterObject() : Failed to find root Node3D for '{node.Name}'. Got '{root.GetType().Name}' instead.");
             return null;
         }
+
         IObjectBase objBase = ObjectAtlas.CreateObject(rootNode);
         RegisterObject(rootNode, objBase);
         return objBase;
     }
+
     public static void RegisterObject(Node3D rootNode, IObjectBase objBase) {
         SceneBootstrapper activeScene = MainLauncher.GetGameBootstrapper();
         if (objBase != null) activeScene.GetObjects().Add(rootNode.GetInstanceId(), objBase);
@@ -118,11 +125,11 @@ public static class GameManager {
 
     public static void SetMouseControl(bool mouseAvailable) => Input.MouseMode = mouseAvailable ? Input.MouseModeEnum.Visible : Input.MouseModeEnum.Captured;
     public static void SetMouseVisible(bool visible) => Input.MouseMode = visible ? Input.MouseModeEnum.Visible : Input.MouseModeEnum.Hidden;
-    
+
     public static bool IsDebugMode() => DEBUG_MODE;
 
     public static void DebugObjects(bool debug) => _debugObjects = debug;
-    
+
     public static RaycastResult HighestPoint(Vector3 location, params CollisionObject3D[] ignore) {
         Vector3 start = location + new Vector3(0.0f, 500.0f, 0.0f);
         Vector3 end = location + new Vector3(0.0f, -500.0f, 0.0f);

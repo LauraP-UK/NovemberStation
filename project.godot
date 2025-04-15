@@ -33,6 +33,10 @@ project/assembly_name="NovemberStation"
 
 enabled=PackedStringArray("res://addons/debug_drawing/plugin.cfg", "res://addons/terrain_3d/plugin.cfg")
 
+[game]
+
+framework_console_splash="\\n            ╔═══════════════════════════════════════╗\\n            ║      Н О Я Б Р Ь   С Т А Н Ц И Я      ║\\n            ║         — NOVEMBER STATION —          ║\\n            ║     Awaiting signal... █▒▒▒▒▒▒▒▒▒     ║\\n            ╚═══════════════════════════════════════╝\\n        "
+
 [input]
 
 ui_accept={
