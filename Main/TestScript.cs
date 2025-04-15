@@ -7,7 +7,6 @@ public partial class TestScript : Node {
 
     public TestScript() {
         GameManager.Init();
-        GameManager.I().SetActiveScene(this);
     }
 
     public override void _Input(InputEvent ev) => InputController.ProcessInput(ev);
@@ -16,7 +15,7 @@ public partial class TestScript : Node {
     public override void _Ready() {
         EventManager.HookWindowResize(GetViewport());
         UIManager.SetUILayer();
-
+        
         GameManager gameManager = GameManager.I();
         gameManager.SetMouseControl(false);
         gameManager.SetSceneObjects(GetTree().Root.GetNode<Node3D>("Main/SceneObjects"));
@@ -26,6 +25,7 @@ public partial class TestScript : Node {
         Vector3 spawnPoint = GetTree().Root.GetNode<Node3D>("Main/PlayerSpawn").GlobalPosition;
         player.SetPosition(spawnPoint, new Vector3(0.0f, -90.0f, 0.0f));
         gameManager.SetPlayer(player);
+        player.AssumeCameraControl();
 
         foreach (Node child in gameManager.GetSceneObjects().GetChildren()) {
             if (child is not Node3D obj) continue;

@@ -12,7 +12,7 @@ public static class UIManager {
             _uiLayer = uiLayer;
             return;
         }
-        _uiLayer = GameManager.I().GetTree().Root.GetNodeOrNull<CanvasLayer>("Main/UILayer");
+        _uiLayer = MainLauncher.FindNode<CanvasLayer>("Main/UILayer");
     }
 
     public static CanvasLayer GetUILayer() {
@@ -95,6 +95,8 @@ public static class UIManager {
             Pressed = ev.IsPressed()
         };
         
+        GD.Print($"Pushing mouse input!");
+        
         viewport.PushInput(mouseButton);
     }
     
@@ -111,7 +113,7 @@ public static class UIManager {
     }
 
     public static Vector3 GetMouseHitCoords(Camera3D camera) {
-        Vector2 mousePos = GameManager.I().GetViewport().GetMousePosition();
+        Vector2 mousePos = GameManager.I().GetMasterViewport().GetMousePosition();
         Vector3 from = camera.GetGlobalPosition();
         Vector3 to = camera.ProjectPosition(mousePos, 1f);
     
