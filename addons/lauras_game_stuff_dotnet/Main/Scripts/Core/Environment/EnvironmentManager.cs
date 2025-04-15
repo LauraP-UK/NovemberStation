@@ -5,6 +5,8 @@ public static class EnvironmentManager {
     
     private static WorldEnvironment _worldEnvironment;
     private static EnvironmentType _lastEnvironment = Environments.MORNING_CLEAR, _lastNext;
+
+    private static readonly EaseType _ease = Easing.IN;
     
     private const long SUN_FADE_TIME = 5000L;
     private const double DAY_START = 0.34D, SUN_RISE = 0.25D, SUN_SET = 0.75D;
@@ -13,6 +15,7 @@ public static class EnvironmentManager {
     private static bool _forcePause;
     private static float _daySpeed = 1.0f;
     private static int _dayIndex;
+    private static SchedulerTask _midnightEvent;
     
     private static Node3D _sunContainer, _sunObj;
     private static DirectionalLight3D _sunLight;
@@ -35,8 +38,10 @@ public static class EnvironmentManager {
             if (GameManager.IsDebugMode()) Toast.Error(player, "Day cycle reset!");
             _dayTime = 0L;
             _dayIndex++;
-            _daySpeed = 0.0f;
-            Scheduler.ScheduleOnce(30000L, _ => _daySpeed = 1.0f);
+            if (Randf.RandomChanceIn(1, 10)) {
+                _daySpeed = 0.0f;
+                _midnightEvent = Scheduler.ScheduleOnce(30000L, _ => _daySpeed = 1.0f);
+            }
             EnvironmentSchedule.SetSchedule(GetDay() + 1, EnvironmentSchedule.GetRandomPhases(EnvironmentSchedule.GetSchedule(_dayIndex)[^1].Item2));
             dayLength = EnvironmentSchedule.GetDayLength(GetDay());
         }
@@ -49,7 +54,7 @@ public static class EnvironmentManager {
         EnvironmentType currentEnvironment = EnvironmentSchedule.GetEnvironmentFromTime(GetDay(), _dayTime);
         EnvironmentType nextEnvironment = EnvironmentSchedule.GetNextEnvironment(GetDay(), _dayTime);
         float ratio = EnvironmentSchedule.GetDistanceThroughCurrentEnvironment(GetDay(), _dayTime);
-        EnvironmentType blend = currentEnvironment.Equals(nextEnvironment) ? currentEnvironment : currentEnvironment.BlendWith(nextEnvironment, ratio);
+        EnvironmentType blend = currentEnvironment.Equals(nextEnvironment) ? currentEnvironment : currentEnvironment.BlendWith(nextEnvironment, ratio, _ease);
 
         if (GameManager.IsDebugMode() && (!currentEnvironment.Equals(_lastEnvironment) || !nextEnvironment.Equals(_lastNext)))
             Toast.Info(player, $"Time: {currentEnvironment.GetName()} : Blending with {nextEnvironment.GetName()}");
@@ -58,10 +63,10 @@ public static class EnvironmentManager {
         
         if (_worldEnvironment != null) blend.Apply(_worldEnvironment);
 
-        float sunRotationDegs = Mathsf.Remap(0L, dayLength, _dayTime, 180.0f, -180.0f);
-        Vector3 sunRot = new(Mathf.DegToRad(sunRotationDegs), 0.0f, 0.0f);
-        _sunContainer?.SetRotation(sunRot);
-        _sunObj?.SetRotation(sunRot);
+        float sunRotationDegs = Mathsf.Remap(0L, dayLength, _dayTime, -180.0f, 180.0f);
+        Vector3 sunRot = new(sunRotationDegs, 180.0f, 0.0f);
+        _sunContainer?.SetRotationDegrees(sunRot);
+        _sunObj?.SetRotationDegrees(sunRot);
         _sunObj?.SetPosition(player.GetPosition());
         
         if (_sunLight == null) return;
@@ -104,18 +109,22 @@ public static class EnvironmentManager {
                     break;
                 case Key.Y:
                     _forcePause = !_forcePause;
+                    _midnightEvent?.Cancel();
                     if (GameManager.IsDebugMode()) Toast.Info(GameManager.I().GetPlayer(), $"Time {( _forcePause ? "paused" : "resumed")}");
                     break;
                 case Key.G:
                     _daySpeed += 1.0f;
+                    _midnightEvent?.Cancel();
                     if (GameManager.IsDebugMode()) Toast.Info(GameManager.I().GetPlayer(), $"Day Speed: {_daySpeed}");
                     break;
                 case Key.H:
                     _daySpeed -= 1.0f;
+                    _midnightEvent?.Cancel();
                     if (GameManager.IsDebugMode()) Toast.Info(GameManager.I().GetPlayer(), $"Day Speed: {_daySpeed}");
                     break;
                 case Key.J:
                     _daySpeed = 1.0f;
+                    _midnightEvent?.Cancel();
                     if (GameManager.IsDebugMode()) Toast.Info(GameManager.I().GetPlayer(), $"Day Speed: {_daySpeed}");
                     break;
             }

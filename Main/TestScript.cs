@@ -75,15 +75,30 @@ public partial class TestScript : Node {
 
         foreach (Node child in sceneObjects.GetChildren()) {
             if (child is not RigidBody3D physicsObj) continue;
-            if (!(physicsObj.GlobalPosition.Y < -20)) continue;
+            Vector3 curPos = physicsObj.GlobalPosition;
+            if (!(curPos.Y < -20)) continue;
             IObjectBase objClass = gameManager.GetObjectClass(physicsObj.GetInstanceId());
             Vector3 respawnAt = _objSpawns.GetOrDefault(objClass.GetGUID(), default);
-            if (respawnAt != default)
-                physicsObj.GlobalPosition = respawnAt;
-            else {
-                Toast.Error(player, $"Deleted {objClass.GetDisplayName()}");
-                physicsObj.QueueFree();
+            if (respawnAt == default) respawnAt = new Vector3(0,1,0);
+            RaycastResult highestPoint = gameManager.HighestPoint(curPos, physicsObj);
+            if (highestPoint.HasHit()) {
+                RaycastResult.HitBodyData hit = highestPoint.GetClosestHit();
+                physicsObj.GlobalPosition = hit.HitAtPosition + hit.HitNormal * 0.2f;
+
+                Vector3 up = hit.HitNormal;
+                Vector3 forward = physicsObj.GlobalTransform.Basis.Z.Normalized();
+
+                if (Mathf.Abs(up.Dot(forward)) > 0.99f)
+                    forward = Vector3.Back;
+
+                Basis surfaceBasis = Basis.LookingAt(forward, up);
+                physicsObj.GlobalTransform = new Transform3D(surfaceBasis, physicsObj.GlobalTransform.Origin);
             }
+            else {
+                physicsObj.GlobalPosition = respawnAt;
+                physicsObj.GlobalRotation = Vector3.Zero;
+            }
+            physicsObj.LinearVelocity = Vector3.Zero;
         }
     }
 

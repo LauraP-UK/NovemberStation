@@ -10,7 +10,7 @@ size = Vector3(1, 8.56516, 12.689)
 albedo_color = Color(0.0552, 0.06016, 0.08, 1)
 metallic = 0.5
 metallic_specular = 1.0
-roughness = 0.25
+roughness = 0.1
 
 [sub_resource type="PlaneMesh" id="PlaneMesh_wn8l4"]
 size = Vector2(13, 8.5)

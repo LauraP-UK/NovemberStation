@@ -31,7 +31,7 @@ project/assembly_name="NovemberStation"
 
 [editor_plugins]
 
-enabled=PackedStringArray("res://addons/debug_drawing/plugin.cfg")
+enabled=PackedStringArray("res://addons/debug_drawing/plugin.cfg", "res://addons/terrain_3d/plugin.cfg")
 
 [input]
 
@@ -58,7 +58,7 @@ ui_focus_prev={
 
 [physics]
 
-3d/physics_engine="JoltPhysics3D"
+3d/physics_engine="Jolt Physics (Extension)"
 3d/default_gravity=13.0
 3d/solver/solver_iterations=32
 3d/solver/contact_max_allowed_penetration=0.001

@@ -69,7 +69,7 @@ public class GameManager {
                 CollisionShape3D shape = (CollisionShape3D)obj.GetBaseNode3D().FindChild("BBox");
                 if (shape == null) continue;
                 BoundingBox bb = BoundingBox.FromCollisionMesh(shape);
-                bb.DrawDebugLines(shape.GlobalTransform, Colors.Yellow);
+                bb.DrawDebugLines(shape.GlobalTransform, Colors.Red);
             }
         }
     }
@@ -129,4 +129,10 @@ public class GameManager {
     public static bool IsDebugMode() => DEBUG_MODE;
 
     public void DebugObjects(bool debug) => _debugObjects = debug;
+    
+    public RaycastResult HighestPoint(Vector3 location, params CollisionObject3D[] ignore) {
+        Vector3 start = location + new Vector3(0.0f, 500.0f, 0.0f);
+        Vector3 end = location + new Vector3(0.0f, -500.0f, 0.0f);
+        return Raycast.Trace(start, end, ignore);
+    }
 }
