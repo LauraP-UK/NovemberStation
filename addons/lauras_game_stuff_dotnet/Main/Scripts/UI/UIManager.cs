@@ -13,6 +13,7 @@ public static class UIManager {
             return;
         }
         _uiLayer = MainLauncher.FindNode<CanvasLayer>("Main/UILayer");
+        GameManager.SetCanvasLayerFocus(false);
     }
 
     public static CanvasLayer GetUILayer() {
@@ -34,6 +35,7 @@ public static class UIManager {
 
         if (menu == _primaryUIOpen) {
             _primaryUIOpen = null;
+            GameManager.SetCanvasLayerFocus(false);
             controller.ShowUI(true);
         }
 
@@ -55,6 +57,7 @@ public static class UIManager {
         
         if (isPrimaryMenu) {
             _primaryUIOpen = menu.GetMenu();
+            GameManager.SetCanvasLayerFocus(true);
             GameManager.GetPlayer().GetController<PlayerController>().ShowUI(false);
         }
         menu.AddToScene(GetUILayer());
@@ -85,14 +88,14 @@ public static class UIManager {
     public static void SubViewportClick(SubViewport viewport, Camera3D camera3D, MeshInstance3D mesh, MouseInputEvent ev) {
         Vector2 uiPos = GetSubViewportUIPos(viewport, camera3D, mesh);
 
-        InputEvent mouseButton = new InputEventMouseButton {
+        InputEventMouseButton mouseButton = new(){
             Position = uiPos,
             GlobalPosition = uiPos,
-            ButtonIndex = ev.GetMouseButton(),
-            Pressed = ev.IsPressed()
+            ButtonIndex =  ev.GetMouseButton(),
+            Pressed = ev.IsPressed(),
+            DoubleClick = false, // Optional
+            Canceled = false     // Optional
         };
-        
-        GD.Print($"Pushing mouse input!");
         
         viewport.PushInput(mouseButton);
     }
@@ -100,7 +103,7 @@ public static class UIManager {
     public static void SubViewportMouseMove(SubViewport viewport, Camera3D camera3D, MeshInstance3D mesh, MouseMoveEvent ev) {
         Vector2 uiPos = GetSubViewportUIPos(viewport, camera3D, mesh);
 
-        InputEvent mouseMotion = new InputEventMouseMotion {
+        InputEventMouseMotion mouseMotion = new(){
             Position = uiPos,
             GlobalPosition = uiPos,
             Relative = ev.GetDelta()

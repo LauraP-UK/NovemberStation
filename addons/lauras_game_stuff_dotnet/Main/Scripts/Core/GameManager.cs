@@ -1,8 +1,11 @@
 using System;
 using Godot;
+using Godot.Collections;
 
 public static class GameManager {
     private const bool DEBUG_MODE = true;
+    private const string FRAMEWORK_VERSION = "4.4.1";
+
     public const float SLEEP_ENGINE_SPEED = 30.0f;
 
     public static readonly float GRAVITY = (float)ProjectSettings.GetSetting("physics/3d/default_gravity");
@@ -16,12 +19,7 @@ public static class GameManager {
 
     static GameManager() {
         // Very important!
-        if (ProjectSettings.HasSetting("game/framework_console_splash")) {
-            string splash = (string)ProjectSettings.GetSetting("game/framework_console_splash");
-            splash = splash.Replace("\\n", "\n");
-            CONSOLE_SPLASH = splash;
-        } else
-            CONSOLE_SPLASH = "";
+        CONSOLE_SPLASH = LoadConsoleSplash();
     }
 
     public static void Init() {
@@ -29,6 +27,26 @@ public static class GameManager {
         _init = true;
         GD.Print(CONSOLE_SPLASH);
         GameAction.Init();
+    }
+
+    private static string LoadConsoleSplash() {
+        string splash;
+        Dictionary versionInfo = Engine.GetVersionInfo();
+        string version = $"{versionInfo["major"]}.{versionInfo["minor"]}.{versionInfo["patch"]}";
+        
+        if (ProjectSettings.HasSetting("game/framework_console_splash")) {
+            splash = (string)ProjectSettings.GetSetting("game/framework_console_splash");
+            splash = splash.Replace("\\n", "\n");
+        } else {
+            splash =  
+                $"        [ WELCOME TO THE PLEASURE DOME ]\n" +
+                $"        This is a game framework for Godot {FRAMEWORK_VERSION} (Running: {version})\n" +
+                $"        It is designed to be modular and extensible.\n" +
+                $"        Please report any bugs or issues to the GitHub repository.\n" +
+                $"        Have fun!\n\n";
+        }
+
+        return splash;
     }
 
     public static void SetSceneObjects(Node sceneObjects) => _sceneObjects = sceneObjects;
@@ -120,8 +138,8 @@ public static class GameManager {
         }
     }
 
-    public static void Pause(bool pause) => MainLauncher.GetGameBootstrapper().Pause(pause);
-    public static bool IsPaused() => MainLauncher.GetGameBootstrapper().IsPaused();
+    public static void Pause(bool pause) => MainLauncher.I().GetTree().SetPause(pause);
+    public static bool IsPaused() => MainLauncher.I().GetTree().IsPaused();
 
     public static void SetMouseControl(bool mouseAvailable) => Input.MouseMode = mouseAvailable ? Input.MouseModeEnum.Visible : Input.MouseModeEnum.Captured;
     public static void SetMouseVisible(bool visible) => Input.MouseMode = visible ? Input.MouseModeEnum.Visible : Input.MouseModeEnum.Hidden;
@@ -134,5 +152,9 @@ public static class GameManager {
         Vector3 start = location + new Vector3(0.0f, 500.0f, 0.0f);
         Vector3 end = location + new Vector3(0.0f, -500.0f, 0.0f);
         return Raycast.Trace(start, end, ignore);
+    }
+
+    public static void SetCanvasLayerFocus(bool focused) {
+        MainLauncher.SetMouseFilter(!focused);
     }
 }

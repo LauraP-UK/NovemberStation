@@ -1,7 +1,7 @@
 ﻿using System;
 using Godot;
 
-public class PC2Object : ObjectBase<Node3D>, IUsable {
+public class PCObject : ObjectBase<Node3D>, IUsable {
     private const string
         SCREEN_VIEWPORT_PATH = "ScreenStatic/Screen/ScreenViewport",
         SCREEN_PATH = "ScreenStatic/Screen",
@@ -15,7 +15,7 @@ public class PC2Object : ObjectBase<Node3D>, IUsable {
     
     private readonly ShopMenu _shopMenu;
 
-    public PC2Object(Node3D pcNode, bool dataOnly = false) : base(pcNode, "pc2_obj") {
+    public PCObject(Node3D pcNode, bool dataOnly = false) : base(pcNode, "pc_obj") {
         if (dataOnly) return;
         RegisterAction<IUsable>((_,_) => true, Use);
 
@@ -104,7 +104,7 @@ public class PC2Object : ObjectBase<Node3D>, IUsable {
             });
             display.SetKeyboardEnabled(false);
             display.SetCaptureInput(false);
-            display.SetListener(new ShopScreenListener2(this, display));
+            display.SetListener(new ShopScreenListener(this, display));
             display.SetRegisterListenerOnReady(false);
         });
         _shopMenu.DisplayOn(_viewport);
