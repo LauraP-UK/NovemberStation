@@ -4,14 +4,10 @@ using System.Linq;
 using System.Reflection;
 using Godot;
 
-public class EventManager {
-    private static EventManager instance;
+public static class EventManager {
+    private static readonly SmartDictionary<Type, SmartSet<EventActionHolder>> _listeners = new();
 
-    private readonly SmartDictionary<Type, SmartSet<EventActionHolder>> _listeners = new();
-
-    public EventManager() {
-        if (instance == null) instance = this;
-        else throw new InvalidOperationException("ERROR: EventManager.<init> : Multiple EventManagers attempted to be initialised.");
+    static EventManager() {
         Scheduler.ScheduleRepeating(5000L, 5000L, _ => CleanupListeners());
     }
     
@@ -21,11 +17,6 @@ public class EventManager {
             ev.SetSize(viewport.GetVisibleRect().Size);
             ev.Fire();
         }));
-    }
-    
-    public static EventManager I() {
-        if (instance == null) throw new InvalidOperationException("ERROR: EventManager.I() : EventManager has not been initialised, make sure to create it first!");
-        return instance;
     }
 
     public static void RegisterListeners(object target) {
@@ -44,13 +35,13 @@ public class EventManager {
             Type contextType = parameters[1].ParameterType;
 
             Delegate callback = method.CreateDelegate(typeof(Action<,>).MakeGenericType(eventType, contextType), target);
-            I().RegisterListener(eventType, callback, priority, target);
+            RegisterListener(eventType, callback, priority, target);
         }
     }
     
-    public static void UnregisterListeners(object owner) => I().UnregisterByOwner(owner);
+    public static void UnregisterListeners(object owner) => UnregisterByOwner(owner);
 
-    public void RegisterListener(Type eventType, Delegate callback, int priority, object owner = null) {
+    public static void RegisterListener(Type eventType, Delegate callback, int priority, object owner = null) {
         if (!_listeners.ContainsKey(eventType)) _listeners[eventType] = new SmartSet<EventActionHolder>();
 
         object actualOwner = owner ?? callback.Target;
@@ -66,22 +57,22 @@ public class EventManager {
         _listeners[eventType].Add(toAdd);
     }
     
-    public void RegisterListener<TEvent, TContext>(Action<TEvent, TContext> callback, int priority, object owner = null) where TEvent : EventBase<TContext> {
+    public static void RegisterListener<TEvent, TContext>(Action<TEvent, TContext> callback, int priority, object owner = null) where TEvent : EventBase<TContext> {
         RegisterListener(typeof(TEvent), callback, priority, owner);
     }
 
-    public void UnregisterByOwner(object owner) {
+    public static void UnregisterByOwner(object owner) {
         foreach (Type key in _listeners.Keys)
             _listeners[key].RemoveWhere(listener => ReferenceEquals(listener.Owner, owner) || listener.Owner.Equals(owner));
     }
-    public void UnregisterListener<TEvent, TContext>(Action<TEvent, object> callback) where TEvent : EventBase<TContext> {
+    public static void UnregisterListener<TEvent, TContext>(Action<TEvent, object> callback) where TEvent : EventBase<TContext> {
         Type eventID = typeof(TEvent);
 
         if (_listeners.TryGetValue(eventID, out SmartSet<EventActionHolder> list))
             list.RemoveWhere(listener => ReferenceEquals(listener.Callback, callback));
     }
 
-    public void FireEvent<TContext>(EventBase<TContext> ev) {
+    public static void FireEvent<TContext>(EventBase<TContext> ev) {
         Type eventID = ev.GetType();
         if (!_listeners.TryGetValue(eventID, out SmartSet<EventActionHolder> listenerList))
             return;
@@ -113,7 +104,7 @@ public class EventManager {
         listenerList.RemoveAll(toRemove);
     }
 
-    private void CleanupListeners() {
+    private static void CleanupListeners() {
         foreach (Type key in _listeners.Keys)
             _listeners[key].RemoveWhere(listener => listener.Owner == null);
     }

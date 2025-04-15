@@ -13,7 +13,6 @@ public class PC2Object : ObjectBase<Node3D>, IUsable {
     private readonly Camera3D _camera;
     private readonly Node3D _spawnPoint;
     
-    private readonly GameManager _gameManager = GameManager.I();
     private readonly ShopMenu _shopMenu;
 
     public PC2Object(Node3D pcNode, bool dataOnly = false) : base(pcNode, "pc2_obj") {
@@ -43,17 +42,16 @@ public class PC2Object : ObjectBase<Node3D>, IUsable {
             
             form.SetOnReady(form => {
                 Items.GetItemButtons().ForEach(btn => {
-                    GameManager gameManager = GameManager.I();
                     btn.OnPressed(btn => {
                         ItemType itemType = btn.GetItemType();
                         RigidBody3D rigidBody3D = itemType.CreateInstance();
-                        gameManager.GetSceneObjects().AddChild(rigidBody3D);
+                        GameManager.GetSceneObjects().AddChild(rigidBody3D);
                         rigidBody3D.SetPosition(_spawnPoint.GlobalPosition + new Vector3(0,0.5f,0));
 
-                        IObjectBase objData = gameManager.RegisterObject(rigidBody3D);
+                        IObjectBase objData = GameManager.RegisterObject(rigidBody3D);
                         itemType.TryOnDataSpawn(objData);
                         
-                        Toast.Info(gameManager.GetPlayer(), $"Purchased {itemType.GetItemName()} for {itemType.GetItemCost()}{ShopItemDisplayButton.CREDITS_SYMBOL}");
+                        Toast.Info(GameManager.GetPlayer(), $"Purchased {itemType.GetItemName()} for {itemType.GetItemCost()}{ShopItemDisplayButton.CREDITS_SYMBOL}");
                     });
 
                     btn.SetTopLevelLayout(form.GetTopLevelLayout());
@@ -121,11 +119,11 @@ public class PC2Object : ObjectBase<Node3D>, IUsable {
     
     private void View() {
         _camera.SetCurrent(true);
-        PlayerController playerController = _gameManager.GetPlayer().GetController<PlayerController>();
+        PlayerController playerController = GameManager.GetPlayer().GetController<PlayerController>();
         playerController.SetLocked(true);
         playerController.ShowUI(false);
-        _gameManager.SetMouseControl(true);
-        _gameManager.SetMouseVisible(false);
+        GameManager.SetMouseControl(true);
+        GameManager.SetMouseVisible(false);
         TestDisplayForm form = _shopMenu.GetForm();
         ScrollDisplayList display = form.GetScrollDisplay();
         display.SetKeyboardEnabled(true);
@@ -134,11 +132,11 @@ public class PC2Object : ObjectBase<Node3D>, IUsable {
     }
 
     private void Release() {
-        _gameManager.GetPlayer().AssumeCameraControl();
-        PlayerController playerController = _gameManager.GetPlayer().GetController<PlayerController>();
+        GameManager.GetPlayer().AssumeCameraControl();
+        PlayerController playerController = GameManager.GetPlayer().GetController<PlayerController>();
         playerController.SetLocked(false);
         playerController.ShowUI(true);
-        _gameManager.SetMouseControl(false);
+        GameManager.SetMouseControl(false);
         TestDisplayForm form = _shopMenu.GetForm();
         ScrollDisplayList display = form.GetScrollDisplay();
         display.SetKeyboardEnabled(false);

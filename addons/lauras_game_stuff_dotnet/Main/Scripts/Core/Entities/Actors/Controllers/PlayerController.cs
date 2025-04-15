@@ -62,7 +62,7 @@ public class PlayerController : ControllerBase<Player> {
         if (IsLocked()) return;
         if (key != Key.F2 || !GameManager.IsDebugMode()) return;
         _debugObjects = !_debugObjects;
-        GameManager.I().DebugObjects(_debugObjects);
+        GameManager.DebugObjects(_debugObjects);
     }
 
     [EventListener]
@@ -201,10 +201,10 @@ public class PlayerController : ControllerBase<Player> {
             result.HasHit() ? result.GetClosestHit().HitAtPosition + result.GetClosestHit().HitNormal * 0.2f : result.GetEnd();
 
         Node3D objNode = (Node3D)obj.Node;
-        GameManager.I().GetSceneObjects().AddChild(obj.Node);
+        GameManager.GetSceneObjects().AddChild(obj.Node);
         objNode.SetGlobalPosition(spawn);
         objNode.SetGlobalRotation(new Vector3(0, owner.GetCamera().GlobalRotation.Y, 0));
-        GameManager.I().RegisterObject(objNode, obj.Object);
+        GameManager.RegisterObject(objNode, obj.Object);
 
         owner.GetHotbar().ResyncInventory();
 
@@ -266,7 +266,7 @@ public class PlayerController : ControllerBase<Player> {
         SetLocked(true);
         ShowUI(false);
         GameManager.SetEngineSpeed(GameManager.SLEEP_ENGINE_SPEED);
-        GameManager.I().GetSleepCamera().MakeCurrent();
+        GameManager.GetSleepCamera().MakeCurrent();
     }
 
     public void WakeUp() {
@@ -433,7 +433,7 @@ public class PlayerController : ControllerBase<Player> {
 
     /* --- ---  UI  --- --- */
     private void HandleContextMenu() {
-        Camera3D activeCamera = GameManager.I().GetActiveCamera();
+        Camera3D activeCamera = GameManager.GetActiveCamera();
         RaycastResult raycastResult = _heldObject != null ? Raycast.TraceActive(_heldObject) : Raycast.TraceActive(3.0f);
         RaycastResult.HitBodyData contextObjResult = _heldObject != null ? raycastResult.GetViaBody(_heldObject) : raycastResult.GetClosestHit();
 
@@ -460,7 +460,7 @@ public class PlayerController : ControllerBase<Player> {
             return;
         }
 
-        IObjectBase objectData = GameManager.I().GetObjectClass<IObjectBase>(instanceId);
+        IObjectBase objectData = GameManager.GetObjectClass<IObjectBase>(instanceId);
         if (objectData != null && instanceId != _lastActionID) {
             HideContextBox();
             _lastActionID = instanceId;

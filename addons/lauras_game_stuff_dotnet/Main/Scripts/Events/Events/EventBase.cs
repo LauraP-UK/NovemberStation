@@ -9,7 +9,7 @@ public abstract class EventBase<TContext> : IEventBase {
     
     public void Fire() {
         if (_log.Count != 0) Log("EventBase.Fire", "Firing event", 100);
-        EventManager.I().FireEvent(this);
+        EventManager.FireEvent(this);
     }
 
     public string GetLog() => _log.Aggregate("", (current, item) => current + $"{item._timestamp} - {item._from} ({item._priority}): {item._message}\n");

@@ -175,7 +175,7 @@ public class ContextMenuForm : FormBase {
     }
 
     private float HandleActions(IObjectBase objData, float actionsAlpha) {
-        Player player = GameManager.I().GetPlayer();
+        Player player = GameManager.GetPlayer();
 
         VBoxContainerElement listContainer = GetListContainer();
         List<ActionDisplayButton> currentButtons = listContainer.GetDisplayObjects().Select(obj => (ActionDisplayButton)obj).ToList();

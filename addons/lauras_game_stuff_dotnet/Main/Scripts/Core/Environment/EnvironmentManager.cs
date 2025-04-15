@@ -31,7 +31,7 @@ public static class EnvironmentManager {
     
     public static void Process(double delta) {
         long dayLength = EnvironmentSchedule.GetDayLength(GetDay());
-        Player player = GameManager.I().GetPlayer();
+        Player player = GameManager.GetPlayer();
 
         if (!_forcePause) _dayTime += (long)(delta * 1000L * _daySpeed);
         if (_dayTime >= dayLength) {
@@ -78,7 +78,7 @@ public static class EnvironmentManager {
     }
 
     private static void AddTime(long time) {
-        if (GameManager.IsDebugMode()) Toast.Info(GameManager.I().GetPlayer(), $"{(time >= 0 ? "Adding" : "Subtracting")} {Mathsf.Round(time / 1000L, 2)} seconds");
+        if (GameManager.IsDebugMode()) Toast.Info(GameManager.GetPlayer(), $"{(time >= 0 ? "Adding" : "Subtracting")} {Mathsf.Round(time / 1000L, 2)} seconds");
         _dayTime = (long)Mathf.Wrap(_dayTime + time, 0L, EnvironmentSchedule.GetDayLength(GetDay()));
     }
     
@@ -100,6 +100,7 @@ public static class EnvironmentManager {
         [EventListener]
         public void OnKeyPressed(KeyPressEvent ev, Key key) {
             if (ev.IsCaptured()) return;
+            Player player = GameManager.GetPlayer();
             switch (key) {
                 case Key.R:
                     AddTime(TIME_ADD);
@@ -110,22 +111,22 @@ public static class EnvironmentManager {
                 case Key.Y:
                     _forcePause = !_forcePause;
                     _midnightEvent?.Cancel();
-                    if (GameManager.IsDebugMode()) Toast.Info(GameManager.I().GetPlayer(), $"Time {( _forcePause ? "paused" : "resumed")}");
+                    if (GameManager.IsDebugMode()) Toast.Info(player, $"Time {( _forcePause ? "paused" : "resumed")}");
                     break;
                 case Key.G:
                     _daySpeed += 1.0f;
                     _midnightEvent?.Cancel();
-                    if (GameManager.IsDebugMode()) Toast.Info(GameManager.I().GetPlayer(), $"Day Speed: {_daySpeed}");
+                    if (GameManager.IsDebugMode()) Toast.Info(player, $"Day Speed: {_daySpeed}");
                     break;
                 case Key.H:
                     _daySpeed -= 1.0f;
                     _midnightEvent?.Cancel();
-                    if (GameManager.IsDebugMode()) Toast.Info(GameManager.I().GetPlayer(), $"Day Speed: {_daySpeed}");
+                    if (GameManager.IsDebugMode()) Toast.Info(player, $"Day Speed: {_daySpeed}");
                     break;
                 case Key.J:
                     _daySpeed = 1.0f;
                     _midnightEvent?.Cancel();
-                    if (GameManager.IsDebugMode()) Toast.Info(GameManager.I().GetPlayer(), $"Day Speed: {_daySpeed}");
+                    if (GameManager.IsDebugMode()) Toast.Info(player, $"Day Speed: {_daySpeed}");
                     break;
             }
         }

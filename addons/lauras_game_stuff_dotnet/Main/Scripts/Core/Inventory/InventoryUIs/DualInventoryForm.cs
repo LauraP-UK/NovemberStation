@@ -100,10 +100,10 @@ public class DualInventoryForm : InventoryForm {
         AddItemFailCause result = to.GetInventory().CanAddItem(json);
         switch (result) {
             case AddItemFailCause.SUBCLASS_FAIL:
-                Toast.Error(GameManager.I().GetPlayer(), subclassFailMessage);
+                Toast.Error(GameManager.GetPlayer(), subclassFailMessage);
                 return false;
             case AddItemFailCause.FILTER_FAIL:
-                Toast.Error(GameManager.I().GetPlayer(), filterFailMessage);
+                Toast.Error(GameManager.GetPlayer(), filterFailMessage);
                 return false;
             case AddItemFailCause.SUCCESS:
             default:

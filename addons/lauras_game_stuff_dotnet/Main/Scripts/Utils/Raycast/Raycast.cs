@@ -3,7 +3,7 @@ using Godot.Collections;
 
 public static class Raycast {
     public static RaycastResult TraceActive(float distance) {
-        Camera3D camera3D = GameManager.I().GetActiveCamera();
+        Camera3D camera3D = GameManager.GetActiveCamera();
         Vector3 origin = camera3D.GetGlobalTransform().Origin;
         Vector3 forward = -camera3D.GetGlobalTransform().Basis.Z.Normalized();
         Vector3 target = origin + forward * distance;
@@ -12,13 +12,13 @@ public static class Raycast {
     }
 
     public static RaycastResult TraceActive(Node3D to) {
-        Camera3D camera3D = GameManager.I().GetActiveCamera();
+        Camera3D camera3D = GameManager.GetActiveCamera();
         Vector3 origin = camera3D.GetGlobalTransform().Origin;
         return Trace(origin, to.GlobalPosition);
     }
 
     public static RaycastResult TraceActive(Vector3 end) {
-        Camera3D camera3D = GameManager.I().GetActiveCamera();
+        Camera3D camera3D = GameManager.GetActiveCamera();
         Vector3 origin = camera3D.GetGlobalTransform().Origin;
         return Trace(origin, end);
     }
@@ -93,5 +93,5 @@ public static class Raycast {
         return raycastResult;
     }
 
-    private static PhysicsDirectSpaceState3D GetWorld() => PhysicsServer3D.SpaceGetDirectState(GameManager.I().GetWorldRid());
+    private static PhysicsDirectSpaceState3D GetWorld() => PhysicsServer3D.SpaceGetDirectState(GameManager.GetWorldRid());
 }

@@ -151,7 +151,7 @@ public class HotbarItem : FormBase {
         _itemIcon.GetElement().SetVisible(true);
         _removeContainer.GetElement().SetVisible(true);
 
-        (bool up, bool down) = GameManager.I().GetPlayer().GetHotbar().GetHotbarItemMovement(GetIndex());
+        (bool up, bool down) = GameManager.GetPlayer().GetHotbar().GetHotbarItemMovement(GetIndex());
 
         _upContainer.GetElement().SetVisible(up);
         _downContainer.GetElement().SetVisible(down);

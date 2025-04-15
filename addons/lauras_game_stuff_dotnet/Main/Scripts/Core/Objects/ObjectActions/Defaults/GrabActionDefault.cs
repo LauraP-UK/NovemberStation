@@ -41,7 +41,7 @@ public class GrabActionDefault : BaseActionDefault {
     
     private static void FireEmptyEvent() {
         ActorPickUpEvent pickUpEvent = new();
-        pickUpEvent.SetActor(GameManager.I().GetPlayer());
+        pickUpEvent.SetActor(GameManager.GetPlayer());
         pickUpEvent.SetItem(null);
         pickUpEvent.Fire();
         _isHeld = false;

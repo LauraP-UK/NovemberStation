@@ -25,14 +25,14 @@ public class UseGameAction : GameActionBase {
     }
 
     private void Handle(IEventBase ev) {
-        Player player = GameManager.I().GetPlayer();
+        Player player = GameManager.GetPlayer();
         PlayerController controller = player.GetController<PlayerController>();
         
         ActionKey? actionType = controller.GetCurrentContextAction() ?? _lastAction;
         Node3D obj = controller.GetContextObject();
 
         if (obj == null) return;
-        IObjectBase objectClass = GameManager.I().GetObjectClass(GameUtils.FindSceneRoot(obj).GetInstanceId());
+        IObjectBase objectClass = GameManager.GetObjectClass(GameUtils.FindSceneRoot(obj).GetInstanceId());
         if (actionType == null || objectClass == null) return;
 
         if (false) {

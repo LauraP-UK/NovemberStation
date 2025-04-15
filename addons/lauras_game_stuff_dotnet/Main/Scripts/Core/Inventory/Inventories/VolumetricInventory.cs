@@ -30,7 +30,7 @@ public class VolumetricInventory : InventoryBase, IVolumetricInventory, IOwnable
     }
     public float GetRemainingSize() => Mathsf.Round(GetMaxSize() - GetUsedSize(), 2);
     public AddItemFailCause CanAddItem(Node3D node) {
-        IObjectBase objectData = GameManager.I().GetObjectClass(node.GetInstanceId());
+        IObjectBase objectData = GameManager.GetObjectClass(node.GetInstanceId());
         return CanAddInternal(objectData);
     }
     protected override AddItemFailCause CanAddInternal(IObjectBase item) {

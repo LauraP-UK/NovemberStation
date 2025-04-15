@@ -72,7 +72,7 @@ public class Player : ActorBase, IViewable, IHotbarActor {
         itemType.SetCollision(false, item);
         _handItem = objClass;
         
-        GameManager.I().RegisterObject(item, objClass);
+        GameManager.RegisterObject(item, objClass);
         
         return objClass;
     }
@@ -86,7 +86,7 @@ public class Player : ActorBase, IViewable, IHotbarActor {
         }
         
         RigidBody3D item = itemType.CreateInstance();
-        IObjectBase objClass = GameManager.I().RegisterObject(item);
+        IObjectBase objClass = GameManager.RegisterObject(item);
         
         GetHandOrientation().AddChild(item);
         itemType.ApplyHeldOrientation(GetHandOrientation());
@@ -96,7 +96,7 @@ public class Player : ActorBase, IViewable, IHotbarActor {
         _handItem = objClass;
         itemType.TryOnDataSpawn(objClass);
         
-        GameManager.I().RegisterObject(item, objClass);
+        GameManager.RegisterObject(item, objClass);
         
         return objClass;
     }
@@ -111,7 +111,7 @@ public class Player : ActorBase, IViewable, IHotbarActor {
 
     public AddItemFailCause StoreItem(ItemType itemType) {
         RigidBody3D node = itemType.CreateInstance();
-        IObjectBase obj = GameManager.I().RegisterObject(node);
+        IObjectBase obj = GameManager.RegisterObject(node);
         AddItemFailCause result = StoreItem(obj, node);
         node.QueueFree();
         return result;

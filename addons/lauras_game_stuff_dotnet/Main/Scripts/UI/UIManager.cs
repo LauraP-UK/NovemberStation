@@ -29,8 +29,7 @@ public static class UIManager {
             return;
         }
 
-        GameManager gameManager = GameManager.I();
-        Player player = gameManager.GetPlayer();
+        Player player = GameManager.GetPlayer();
         PlayerController controller = player.GetController<PlayerController>();
 
         if (menu == _primaryUIOpen) {
@@ -43,10 +42,10 @@ public static class UIManager {
         if (form != null && form.LockMovement()) {
             controller.SetLocked(false);
             controller.ShowUI(true);
-            gameManager.SetMouseControl(false);
+            GameManager.SetMouseControl(false);
         }
 
-        if (form != null && form.PausesGame()) gameManager.Pause(false);
+        if (form != null && form.PausesGame()) GameManager.Pause(false);
 
         form?.RemoveFromScene();
     }
@@ -54,23 +53,21 @@ public static class UIManager {
     public static void OpenMenu(FormBase menu, bool isPrimaryMenu = false) {
         if (HasMenu(menu.GetMenu().Name.ToString()) || _primaryUIOpen != null) return;
         
-        GameManager gameManager = GameManager.I();
-
         if (isPrimaryMenu) {
             _primaryUIOpen = menu.GetMenu();
-            gameManager.GetPlayer().GetController<PlayerController>().ShowUI(false);
+            GameManager.GetPlayer().GetController<PlayerController>().ShowUI(false);
         }
         menu.AddToScene(GetUILayer());
         _menus.Add(menu.GetMenu(), menu);
 
         if (menu.LockMovement()) {
-            PlayerController controller = gameManager.GetPlayer().GetController<PlayerController>();
+            PlayerController controller = GameManager.GetPlayer().GetController<PlayerController>();
             controller.SetLocked(true);
             controller.ShowUI(false);
-            gameManager.SetMouseControl(true);
+            GameManager.SetMouseControl(true);
         }
 
-        if (menu.PausesGame()) gameManager.Pause(true);
+        if (menu.PausesGame()) GameManager.Pause(true);
     }
 
     public static void Process(double delta) {
@@ -113,7 +110,7 @@ public static class UIManager {
     }
 
     public static Vector3 GetMouseHitCoords(Camera3D camera) {
-        Vector2 mousePos = GameManager.I().GetMasterViewport().GetMousePosition();
+        Vector2 mousePos = GameManager.GetMasterViewport().GetMousePosition();
         Vector3 from = camera.GetGlobalPosition();
         Vector3 to = camera.ProjectPosition(mousePos, 1f);
     

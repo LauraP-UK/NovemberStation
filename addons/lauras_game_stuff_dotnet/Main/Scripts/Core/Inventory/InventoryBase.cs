@@ -10,7 +10,7 @@ public abstract class InventoryBase : IInventory {
     private readonly SmartDictionary<string, List<(string json, Guid guid)>> _inventory = new(); // ObjectMetaTag Type, List of Object Json
     private readonly SmartSet<Action> _onAdd = new(), _onRemove = new();
 
-    public AddItemFailCause AddItem(Node3D node) => AddItem(GameManager.I().GetObjectClass(node.GetInstanceId()));
+    public AddItemFailCause AddItem(Node3D node) => AddItem(GameManager.GetObjectClass(node.GetInstanceId()));
     public AddItemFailCause AddItem(IObjectBase item) {
         AddItemFailCause result = CanAddInternal(item);
         if (result != AddItemFailCause.SUCCESS) return result;
