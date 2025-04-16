@@ -18,7 +18,6 @@ public static class GameManager {
     private static bool _init, _debugObjects;
 
     static GameManager() {
-        // Very important!
         CONSOLE_SPLASH = LoadConsoleSplash();
     }
 

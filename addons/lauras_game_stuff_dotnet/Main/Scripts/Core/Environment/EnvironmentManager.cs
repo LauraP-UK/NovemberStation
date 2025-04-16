@@ -2,33 +2,46 @@
 using Godot;
 
 public static class EnvironmentManager {
-    
-    private static WorldEnvironment _worldEnvironment;
+    private static WorldEnvironment _worldEnvironment, _backdropEnvironment;
     private static EnvironmentType _lastEnvironment = Environments.MORNING_CLEAR, _lastNext;
 
     private static readonly EaseType _ease = Easing.IN;
-    
+
     private const long SUN_FADE_TIME = 5000L;
     private const double DAY_START = 0.34D, SUN_RISE = 0.25D, SUN_SET = 0.75D;
+
+    private const string WORLD_ENVIRONMENT_PATH = "Main/WorldEnvironment",
+        SUN_CONTAINER_PATH = "Main/SunContainer",
+        SUN_LIGHT_PATH = "Main/SunContainer/Sun";
 
     private static long _dayTime = Mathsf.Lerp(0L, EnvironmentSchedule.GetDayLength(0), DAY_START);
     private static bool _forcePause;
     private static float _daySpeed = 1.0f;
     private static int _dayIndex;
     private static SchedulerTask _midnightEvent;
-    
-    private static Node3D _sunContainer, _sunObj;
-    private static DirectionalLight3D _sunLight;
+
+    private static Node3D _worldSunContainer, _backdropSunContainer, _backdropSunObj;
+    private static DirectionalLight3D _worldSunLight, _backdropSunLight;
     private static EnvListeners _envListeners;
-    
-    public static void Init(WorldEnvironment worldEnvironment, Node3D sunContainer, Node3D sunObj, DirectionalLight3D sunLight) {
+
+    public static void Init() {
         if (_envListeners == null && GameManager.IsDebugMode()) EventManager.RegisterListeners(_envListeners = new EnvListeners());
-        _worldEnvironment = worldEnvironment;
-        _sunContainer = sunContainer;
-        _sunObj = sunObj;
-        _sunLight = sunLight;
+
+        _worldEnvironment = MainLauncher.FindNode<WorldEnvironment>(WORLD_ENVIRONMENT_PATH);
+        _backdropEnvironment = MainLauncher.FindNode<WorldEnvironment>(WORLD_ENVIRONMENT_PATH, true);
+
+        _worldSunContainer = MainLauncher.FindNode<Node3D>(SUN_CONTAINER_PATH);
+        _backdropSunContainer = MainLauncher.FindNode<Node3D>(SUN_CONTAINER_PATH, true);
+
+        _worldSunLight = MainLauncher.FindNode<DirectionalLight3D>(SUN_LIGHT_PATH);
+        _backdropSunLight = MainLauncher.FindNode<DirectionalLight3D>(SUN_LIGHT_PATH, true);
+
+        Node3D sunObj = Loader.SafeInstantiate<Node3D>("res://Main/Prefabs/Sandbox/Sun.tscn");
+        _backdropSunObj = sunObj;
+
+        MainLauncher.GetBackdropBootstrapper().AddChild(sunObj);
     }
-    
+
     public static void Process(double delta) {
         long dayLength = EnvironmentSchedule.GetDayLength(GetDay());
         Player player = GameManager.GetPlayer();
@@ -42,10 +55,11 @@ public static class EnvironmentManager {
                 _daySpeed = 0.0f;
                 _midnightEvent = Scheduler.ScheduleOnce(30000L, _ => _daySpeed = 1.0f);
             }
+
             EnvironmentSchedule.SetSchedule(GetDay() + 1, EnvironmentSchedule.GetRandomPhases(EnvironmentSchedule.GetSchedule(_dayIndex)[^1].Item2));
             dayLength = EnvironmentSchedule.GetDayLength(GetDay());
         }
-        
+
         long sunRiseStart = Mathsf.Lerp(0L, dayLength, SUN_RISE) - SUN_FADE_TIME;
         long sunRiseEnd = Mathsf.Lerp(0L, dayLength, SUN_RISE) + SUN_FADE_TIME;
         long sunSetStart = Mathsf.Lerp(0L, dayLength, SUN_SET) - SUN_FADE_TIME;
@@ -60,29 +74,38 @@ public static class EnvironmentManager {
             Toast.Info(player, $"Time: {currentEnvironment.GetName()} : Blending with {nextEnvironment.GetName()}");
         _lastEnvironment = currentEnvironment;
         _lastNext = nextEnvironment;
-        
+
         if (_worldEnvironment != null) blend.Apply(_worldEnvironment);
+        if (_backdropEnvironment != null) blend.Apply(_backdropEnvironment);
 
         float sunRotationDegs = Mathsf.Remap(0L, dayLength, _dayTime, -180.0f, 180.0f);
         Vector3 sunRot = new(sunRotationDegs, 180.0f, 0.0f);
-        _sunContainer?.SetRotationDegrees(sunRot);
-        _sunObj?.SetRotationDegrees(sunRot);
-        _sunObj?.SetPosition(player.GetPosition());
-        
-        if (_sunLight == null) return;
-        
-        if (_dayTime >= sunRiseStart && _dayTime < sunRiseEnd) _sunLight.LightEnergy = Mathsf.Remap(sunRiseStart, sunRiseEnd, _dayTime, 0.0f, 1.0f);
-        else if (_dayTime >= sunRiseEnd && _dayTime < sunSetStart) _sunLight.LightEnergy = 1.0f;
-        else if (_dayTime >= sunSetStart && _dayTime < sunSetEnd) _sunLight.LightEnergy = Mathsf.Remap(sunSetStart, sunSetEnd, _dayTime, 1.0f, 0.0f);
-        else _sunLight.LightEnergy = 0.0f;
+        _worldSunContainer?.SetRotationDegrees(sunRot);
+        _backdropSunContainer?.SetRotationDegrees(sunRot);
+        _backdropSunObj?.SetRotationDegrees(sunRot);
+
+        float sunLightEnergy;
+
+        if (_dayTime >= sunRiseStart && _dayTime < sunRiseEnd)
+            sunLightEnergy = Mathsf.Remap(sunRiseStart, sunRiseEnd, _dayTime, 0.0f, 1.0f);
+        else if (_dayTime >= sunRiseEnd && _dayTime < sunSetStart)
+            sunLightEnergy = 1.0f;
+        else if (_dayTime >= sunSetStart && _dayTime < sunSetEnd)
+            sunLightEnergy = Mathsf.Remap(sunSetStart, sunSetEnd, _dayTime, 1.0f, 0.0f);
+        else
+            sunLightEnergy = 0.0f;
+
+        if (_worldSunLight != null) _worldSunLight.LightEnergy = sunLightEnergy;
+        if (_backdropSunLight != null) _backdropSunLight.LightEnergy = sunLightEnergy;
     }
 
     private static void AddTime(long time) {
         if (GameManager.IsDebugMode()) Toast.Info(GameManager.GetPlayer(), $"{(time >= 0 ? "Adding" : "Subtracting")} {Mathsf.Round(time / 1000L, 2)} seconds");
         _dayTime = (long)Mathf.Wrap(_dayTime + time, 0L, EnvironmentSchedule.GetDayLength(GetDay()));
     }
-    
+
     public static int GetDay() => _dayIndex;
+
     public static (int hours, int minutes) GetTimeAs24H() {
         double normalized = (double)_dayTime / EnvironmentSchedule.GetDayLength(GetDay());
         normalized = Math.Clamp(normalized, 0.0, 1.0); // Just in case
@@ -96,22 +119,18 @@ public static class EnvironmentManager {
 
     private class EnvListeners {
         private const long TIME_ADD = 15000L;
-        
+
         [EventListener]
         public void OnKeyPressed(KeyPressEvent ev, Key key) {
             if (ev.IsCaptured()) return;
             Player player = GameManager.GetPlayer();
             switch (key) {
-                case Key.R:
-                    AddTime(TIME_ADD);
-                    break;
-                case Key.T:
-                    AddTime(-TIME_ADD);
-                    break;
+                case Key.R: AddTime(TIME_ADD); break;
+                case Key.T: AddTime(-TIME_ADD); break;
                 case Key.Y:
                     _forcePause = !_forcePause;
                     _midnightEvent?.Cancel();
-                    if (GameManager.IsDebugMode()) Toast.Info(player, $"Time {( _forcePause ? "paused" : "resumed")}");
+                    if (GameManager.IsDebugMode()) Toast.Info(player, $"Time {(_forcePause ? "paused" : "resumed")}");
                     break;
                 case Key.G:
                     _daySpeed += 1.0f;

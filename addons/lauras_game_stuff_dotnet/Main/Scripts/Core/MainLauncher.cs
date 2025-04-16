@@ -23,6 +23,9 @@ public partial class MainLauncher : Control {
         _instance = this;
         GameManager.Init();
     }
+    
+    [EventListener]
+    private void OnWindowResized(WindowResizeEvent ev, Vector2 size) => SetViewportSize(size);
 
     public override void _Input(InputEvent ev) => InputController.ProcessInput(ev);
 
@@ -43,8 +46,11 @@ public partial class MainLauncher : Control {
         _mainWorldViewport.AddChild(mainWorld);
         
         EventManager.RegisterListeners(this);
-        SetViewPortSize(GetTree().Root.GetViewport().GetVisibleRect().Size);
+        SetViewportSize(GetTree().Root.GetViewport().GetVisibleRect().Size);
     }
+    
+    /* --- Static Methods --- */
+    
     public static MainLauncher I() => _instance;
 
     public static Viewport GetGameViewport() {
@@ -67,11 +73,8 @@ public partial class MainLauncher : Control {
         launcher._backdropControl.SetMouseFilter(ignore ? MouseFilterEnum.Ignore : MouseFilterEnum.Pass);
         launcher._worldControl.SetMouseFilter(ignore ? MouseFilterEnum.Ignore : MouseFilterEnum.Pass);
     }
-    
-    [EventListener]
-    private void OnWindowResized(WindowResizeEvent ev, Vector2 size) => SetViewPortSize(size);
 
-    private static void SetViewPortSize(Vector2 size) {
+    private static void SetViewportSize(Vector2 size) {
         Vector2I viewportSize = new((int)size.X, (int)size.Y);
         I()._mainWorldViewport.SetSize(viewportSize);
         I()._backdropViewport.SetSize(viewportSize);

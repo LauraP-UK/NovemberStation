@@ -54,6 +54,7 @@ public partial class MainBootstrapper : SceneBootstrapper {
     protected override void OnReady() {
         EventManager.HookWindowResize(MainLauncher.I().GetTree().Root.GetViewport());
         UIManager.SetUILayer();
+        EnvironmentManager.Init();
 
         GameManager.SetMouseControl(false);
         GameManager.SetSceneObjects(MainLauncher.FindNode<Node3D>("Main/SceneObjects"));
@@ -72,19 +73,8 @@ public partial class MainBootstrapper : SceneBootstrapper {
             _objSpawns.Add(objData.GetGUID(), obj.GlobalPosition);
             rigid.AngularDamp = 0.5f;
         }
-
-        Node3D sunObj = Loader.SafeInstantiate<Node3D>("res://Main/Prefabs/Sandbox/Sun.tscn");
-        AddChild(sunObj);
-
-        EnvironmentManager.Init(
-            MainLauncher.FindNode<WorldEnvironment>("Main/WorldEnvironment"),
-            MainLauncher.FindNode<Node3D>("Main/SunContainer"),
-            sunObj,
-            MainLauncher.FindNode<DirectionalLight3D>("Main/SunContainer/Sun")
-        );
-
+        
         GD.Print($"Dynamic Objects: {_objSpawns.Count}");
-
         Scheduler.ScheduleRepeating(0L, 1000L, _ => _objects.RemoveWhere(pair => GameUtils.IsNodeInvalid(pair.Value.GetBaseNode3D())));
     }
 
