@@ -207,6 +207,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.62835, 0, 5.5933)
 transform = Transform3D(-0.407998, 0.32558, 0.852957, -0.00814145, 0.932918, -0.359997, -0.912946, -0.153822, -0.377978, 19.8778, 2.81648, -14.6444)
 
 [node name="SleepCam" type="Camera3D" parent="SleepCamContainer"]
+editor_description = "SleepCam"
 fov = 70.0
 size = 0.001
 
@@ -292,6 +293,7 @@ metadata/init_state = "{  \"MetaTag\": \"cube_obj\",  \"TypeID\": \"storage_crat
 
 [node name="UILayer" type="CanvasLayer" parent="."]
 process_mode = 3
+follow_viewport_enabled = true
 
 [node name="Trees" type="Node3D" parent="."]
 

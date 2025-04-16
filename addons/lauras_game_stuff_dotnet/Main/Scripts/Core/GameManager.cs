@@ -157,4 +157,6 @@ public static class GameManager {
     public static void SetCanvasLayerFocus(bool focused) {
         MainLauncher.SetMouseFilter(!focused);
     }
+
+    public static void SyncBackdropCamera(Vector3 rotation) => MainLauncher.GetBackdropBootstrapper().SetCameraRotation(rotation);
 }

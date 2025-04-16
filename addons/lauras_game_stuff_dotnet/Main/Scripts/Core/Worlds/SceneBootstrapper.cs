@@ -1,6 +1,4 @@
-﻿using Godot;
-
-public abstract partial class SceneBootstrapper : Node3D {
+﻿public abstract partial class SceneBootstrapper : Bootstrapper {
     protected abstract void OnPhysicsProcess(double delta);
     protected abstract void OnProcess(double delta);
     protected abstract void OnReady();

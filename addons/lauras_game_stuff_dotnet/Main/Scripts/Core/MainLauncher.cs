@@ -13,7 +13,8 @@ public partial class MainLauncher : Control {
     private static MainLauncher _instance;
 
     private SubViewport _mainWorldViewport, _backdropViewport;
-    private SceneBootstrapper _main, _backdrop;
+    private SceneBootstrapper _world;
+    private BackdropBootstrapper _backdrop;
 
     private Control _mainControl, _backdropControl, _worldControl;
 
@@ -33,8 +34,12 @@ public partial class MainLauncher : Control {
         _backdropViewport = GetTree().Root.GetNode<SubViewport>(BACKDROP_VIEWPORT_PATH);
         _mainWorldViewport = GetTree().Root.GetNode<SubViewport>(MAIN_VIEWPORT_PATH);
 
+        Node3D mainBackdrop = Worlds.MAIN_BACKDROP.CreateWorld(null);
+        _backdrop = mainBackdrop as BackdropBootstrapper;
+        _backdropViewport.AddChild(mainBackdrop);
+        
         Node3D mainWorld = Worlds.MAIN_WORLD.CreateWorld(null);
-        _main = mainWorld as SceneBootstrapper;
+        _world = mainWorld as SceneBootstrapper;
         _mainWorldViewport.AddChild(mainWorld);
     }
     public static MainLauncher I() => _instance;
@@ -50,7 +55,8 @@ public partial class MainLauncher : Control {
         return null;
     }
 
-    public static SceneBootstrapper GetGameBootstrapper() => I()._main;
+    public static SceneBootstrapper GetGameBootstrapper() => I()._world;
+    public static BackdropBootstrapper GetBackdropBootstrapper() => I()._backdrop;
 
     public static void SetMouseFilter(bool ignore) {
         MainLauncher launcher = I();

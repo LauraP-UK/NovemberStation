@@ -267,6 +267,7 @@ public class PlayerController : ControllerBase<Player> {
         ShowUI(false);
         GameManager.SetEngineSpeed(GameManager.SLEEP_ENGINE_SPEED);
         GameManager.GetSleepCamera().MakeCurrent();
+        GameManager.SyncBackdropCamera(GameManager.GetSleepCamera().GlobalRotation);
     }
 
     public void WakeUp() {
@@ -429,11 +430,14 @@ public class PlayerController : ControllerBase<Player> {
         camera3D.RotationDegrees = new Vector3(newPitch, cameraRotation.Y, cameraRotation.Z);
 
         _targetLook = Vector2.Zero;
+        
+        GameManager.SyncBackdropCamera(camera3D.GlobalRotation);
     }
 
     /* --- ---  UI  --- --- */
     private void HandleContextMenu() {
         Camera3D activeCamera = GameManager.GetActiveCamera();
+        GD.Print($"Active Camera: {activeCamera.EditorDescription}");
         RaycastResult raycastResult = _heldObject != null ? Raycast.TraceActive(_heldObject) : Raycast.TraceActive(3.0f);
         RaycastResult.HitBodyData contextObjResult = _heldObject != null ? raycastResult.GetViaBody(_heldObject) : raycastResult.GetClosestHit();
 

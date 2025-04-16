@@ -8,7 +8,7 @@ public static class Worlds {
     );
     public static readonly World MAIN_BACKDROP = World.Create(
         "MainBackdrop",
-        "res://addons/lauras_game_stuff_dotnet/Main/Scenes/Worlds/TODO_BACKDROP.tscn",
+        "res://Main/Prefabs/Scenes/TestBackdrop.tscn",
         (packedScene, args) => Loader.SafeInstantiate<Node3D>(packedScene, true),
         true
     );
