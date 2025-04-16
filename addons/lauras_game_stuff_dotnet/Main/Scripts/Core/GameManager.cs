@@ -106,7 +106,7 @@ public static class GameManager {
         Scheduler.ScheduleOnce(50, _ => GetTree().Quit());
     }
 
-    public static SceneTree GetTree() => MainLauncher.GetGameBootstrapper().GetTree();
+    public static SceneTree GetTree() => MainLauncher.I().GetTree();
     public static Rid GetWorldRid() => GetTree().Root.GetWorld3D().Space;
     public static Viewport GetMasterViewport() => GetTree().Root.GetViewport();
     public static Camera3D GetActiveCamera() => MainLauncher.GetGameViewport().GetCamera3D();
@@ -149,8 +149,8 @@ public static class GameManager {
     public static void DebugObjects(bool debug) => _debugObjects = debug;
 
     public static RaycastResult HighestPoint(Vector3 location, params CollisionObject3D[] ignore) {
-        Vector3 start = location + new Vector3(0.0f, 500.0f, 0.0f);
-        Vector3 end = location + new Vector3(0.0f, -500.0f, 0.0f);
+        Vector3 start = new(location.X, 500.0f, location.Z);
+        Vector3 end =  new(location.X, -19.5f, location.Z);
         return Raycast.Trace(start, end, ignore);
     }
 

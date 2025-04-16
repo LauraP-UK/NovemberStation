@@ -41,6 +41,9 @@ public partial class MainLauncher : Control {
         Node3D mainWorld = Worlds.MAIN_WORLD.CreateWorld(null);
         _world = mainWorld as SceneBootstrapper;
         _mainWorldViewport.AddChild(mainWorld);
+        
+        EventManager.RegisterListeners(this);
+        SetViewPortSize(GetTree().Root.GetViewport().GetVisibleRect().Size);
     }
     public static MainLauncher I() => _instance;
 
@@ -63,5 +66,14 @@ public partial class MainLauncher : Control {
         launcher._mainControl.SetMouseFilter(ignore ? MouseFilterEnum.Ignore : MouseFilterEnum.Stop);
         launcher._backdropControl.SetMouseFilter(ignore ? MouseFilterEnum.Ignore : MouseFilterEnum.Pass);
         launcher._worldControl.SetMouseFilter(ignore ? MouseFilterEnum.Ignore : MouseFilterEnum.Pass);
+    }
+    
+    [EventListener]
+    private void OnWindowResized(WindowResizeEvent ev, Vector2 size) => SetViewPortSize(size);
+
+    private static void SetViewPortSize(Vector2 size) {
+        Vector2I viewportSize = new((int)size.X, (int)size.Y);
+        I()._mainWorldViewport.SetSize(viewportSize);
+        I()._backdropViewport.SetSize(viewportSize);
     }
 }

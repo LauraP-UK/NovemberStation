@@ -52,7 +52,7 @@ public partial class MainBootstrapper : SceneBootstrapper {
     }
     
     protected override void OnReady() {
-        EventManager.HookWindowResize(GetViewport());
+        EventManager.HookWindowResize(MainLauncher.I().GetTree().Root.GetViewport());
         UIManager.SetUILayer();
 
         GameManager.SetMouseControl(false);

@@ -129,6 +129,7 @@ public class PCObject : ObjectBase<Node3D>, IUsable {
         display.SetKeyboardEnabled(true);
         display.SetCaptureInput(true);
         display.GetListener().Register();
+        GameManager.SyncBackdropCamera(_camera.GlobalRotation);
     }
 
     private void Release() {

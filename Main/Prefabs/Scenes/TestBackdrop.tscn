@@ -91,9 +91,12 @@ lod0_range = 128.0
 
 [sub_resource type="Terrain3DTextureAsset" id="Terrain3DTextureAsset_rayf3"]
 name = "Grass006_alb_ht"
+albedo_color = Color(0.521569, 0.592157, 0.345098, 1)
 albedo_texture = ExtResource("2_cegp7")
 normal_texture = ExtResource("3_pk086")
 roughness = 1.0
+uv_scale = 0.7
+detiling_rotation = 0.369
 
 [sub_resource type="Terrain3DTextureAsset" id="Terrain3DTextureAsset_s2te2"]
 name = "Rock032_alb_ht"
@@ -101,6 +104,8 @@ id = 1
 albedo_texture = ExtResource("4_rayf3")
 normal_texture = ExtResource("5_vpqo2")
 roughness = 0.1
+uv_scale = 0.7
+detiling_rotation = 0.172
 
 [sub_resource type="Terrain3DAssets" id="Terrain3DAssets_s2te2"]
 mesh_list = Array[Terrain3DMeshAsset]([SubResource("Terrain3DMeshAsset_vpqo2")])
@@ -128,5 +133,6 @@ mesh = SubResource("BoxMesh_j43vs")
 data_directory = "res://Main/Prefabs/BackdropScenes/TestTerrain"
 material = SubResource("Terrain3DMaterial_pk086")
 assets = SubResource("Terrain3DAssets_s2te2")
+collision_mode = 0
 top_level = true
 metadata/_edit_lock_ = true

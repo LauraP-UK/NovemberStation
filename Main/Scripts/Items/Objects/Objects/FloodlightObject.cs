@@ -29,7 +29,7 @@ public class FloodlightObject : ObjectBase<RigidBody3D>, IGrabbable, IUsable, IC
         RegisterAction<IUsable>((_, _) => true, Use);
         RegisterAction<ICollectable>((_, _) => true, Collect);
         RegisterArbitraryAction("Open Battery Slot", 10, (_, _) => true, Recharge);
-        RegisterArbitraryAction("Save to File", 20, (_, _) => true, SerialiseTest);
+        //RegisterArbitraryAction("Save to File", 20, (_, _) => true, SerialiseTest);
 
         string finding = "NULL";
         try {

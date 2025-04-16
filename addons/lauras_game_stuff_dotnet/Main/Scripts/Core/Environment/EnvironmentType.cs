@@ -62,7 +62,6 @@ public class EnvironmentType {
         ease ??= Easing.LINEAR;
         
         weight = ease.Ease(0.0f, 1.0f, weight);
-        GD.Print($"Blend weight: {weight}  |  Ease: {ease.GetName()}");
 
         return new EnvironmentType($"Blended_{_name}_{other._name}",
             Mathsf.Lerp(_backgroundEnergyMult, other._backgroundEnergyMult, weight),

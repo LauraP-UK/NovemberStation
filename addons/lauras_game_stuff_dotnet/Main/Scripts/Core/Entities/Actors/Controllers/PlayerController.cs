@@ -437,7 +437,6 @@ public class PlayerController : ControllerBase<Player> {
     /* --- ---  UI  --- --- */
     private void HandleContextMenu() {
         Camera3D activeCamera = GameManager.GetActiveCamera();
-        GD.Print($"Active Camera: {activeCamera.EditorDescription}");
         RaycastResult raycastResult = _heldObject != null ? Raycast.TraceActive(_heldObject) : Raycast.TraceActive(3.0f);
         RaycastResult.HitBodyData contextObjResult = _heldObject != null ? raycastResult.GetViaBody(_heldObject) : raycastResult.GetClosestHit();
 
