@@ -27,22 +27,22 @@ public class EnvironmentType {
         _glowStrength = glowStrength;
     }
 
-    public void Apply(WorldEnvironment worldEnv) {
+    public void Apply(WorldEnvironment worldEnv, float weight = 1.0f) {
         if (worldEnv == null || worldEnv.Environment == null) {
             GD.PrintErr("ERROR: EnvironmentType.Apply() : Invalid WorldEnvironment node.");
             return;
         }
 
         Environment env = worldEnv.Environment;
-        env.AmbientLightColor = _ambientLightColor;
-        env.AmbientLightEnergy = _ambientLightEnergy;
+        env.AmbientLightColor = _ambientLightColor * weight;
+        env.AmbientLightEnergy = _ambientLightEnergy * weight;
         env.FogEnabled = _fogEnabled;
-        env.FogLightColor = _fogColor;
-        env.FogLightEnergy = _fogLightEnergy;
+        env.FogLightColor = _fogColor * weight;
+        env.FogLightEnergy = _fogLightEnergy * weight;
         env.FogAerialPerspective = _aerialPerspective;
-        env.FogDensity = _fogDensity;
+        env.FogDensity = _fogDensity * weight;
         env.GlowEnabled = _glowEnabled;
-        env.GlowStrength = _glowStrength;
+        env.GlowStrength = _glowStrength * weight;
         env.BackgroundEnergyMultiplier = _backgroundEnergyMult;
         env.AmbientLightSkyContribution = _skyContribution;
     }

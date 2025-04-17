@@ -6,9 +6,10 @@ public static class EnvironmentManager {
     private static EnvironmentType _lastEnvironment = Environments.MORNING_CLEAR, _lastNext;
 
     private static readonly EaseType _ease = Easing.IN;
+    private static readonly long _standardDayLength = EnvironmentSchedule.GetDayLength(0);
 
     private const long SUN_FADE_TIME = 5000L;
-    private const double DAY_START = 0.34D;
+    private const double DAY_START = 0.34D, LUNAR_CYCLE = 29.53D;
     private const double SUN_RISE = 0.25D, SUN_SET = 0.75D;
     private const double STAR_APPEARANCE_START = SUN_SET - 0.01D, STAR_APPEARANCE_END = SUN_SET + 0.05D;
     private const double STAR_FADE_START = SUN_RISE - 0.05D, STAR_FADE_END = SUN_RISE + 0.01D;
@@ -23,9 +24,9 @@ public static class EnvironmentManager {
     private static bool _forcePause;
     private static float _daySpeed = 1.0f;
     private static int _dayIndex;
-    private static SchedulerTask _midnightEvent;
 
-    private static Node3D _worldSunContainer, _backdropSunContainer, _backdropSunObj;
+    private static SchedulerTask _midnightEvent;
+    private static Node3D _worldSunContainer, _backdropSunContainer, _backdropSunObj, _backdropMoonObj;
     private static DirectionalLight3D _worldSunLight, _backdropSunLight;
     private static MeshInstance3D _starfield;
     private static EnvListeners _envListeners;
@@ -47,7 +48,11 @@ public static class EnvironmentManager {
         Node3D sunObj = Loader.SafeInstantiate<Node3D>("res://Main/Prefabs/Sandbox/Sun.tscn");
         _backdropSunObj = sunObj;
 
+        Node3D moonObj = Loader.SafeInstantiate<Node3D>("res://Main/Prefabs/Sandbox/Moon.tscn");
+        _backdropMoonObj = moonObj;
+
         MainLauncher.GetBackdropBootstrapper().AddChild(sunObj);
+        MainLauncher.GetBackdropBootstrapper().AddChild(moonObj);
     }
 
     public static void Process(double delta) {
@@ -84,7 +89,7 @@ public static class EnvironmentManager {
         _lastNext = nextEnvironment;
 
         if (_worldEnvironment != null) blend.Apply(_worldEnvironment);
-        if (_backdropEnvironment != null) blend.Apply(_backdropEnvironment);
+        if (_backdropEnvironment != null) blend.Apply(_backdropEnvironment, 0.25f);
 
         float sunRotationDegs = Mathsf.Remap(0L, dayLength, _dayTime, -180.0f, 180.0f);
         Vector3 sunRot = new(sunRotationDegs, 180.0f, 0.0f);
@@ -92,6 +97,10 @@ public static class EnvironmentManager {
         _worldSunContainer?.SetRotationDegrees(sunRot);
         _backdropSunContainer?.SetRotationDegrees(sunRot);
         _backdropSunObj?.SetRotationDegrees(sunRot);
+
+        float moonRotationDegs = (float)(GetAccumulatedTime() / (_standardDayLength * LUNAR_CYCLE) % 1.0f * 360.0f) + sunRotationDegs + 120.0f;
+        Vector3 moonRot = new(moonRotationDegs, 180.0f, 0.0f);
+        _backdropMoonObj?.SetRotationDegrees(moonRot);
 
         if (_starfield != null) {
             long starAppearStart = Mathsf.Lerp(0L, dayLength, STAR_APPEARANCE_START);
@@ -109,7 +118,7 @@ public static class EnvironmentManager {
             else
                 starfieldAlpha = 0.0f;
 
-            _starfield.SetRotationDegrees(new Vector3(sunRotationDegs, 180.0f, 90.0f));
+            _starfield.SetRotationDegrees(new Vector3(sunRotationDegs + 190.0f, 180.0f, 90.0f));
             StandardMaterial3D mat = _starfield.GetActiveMaterial(0) as StandardMaterial3D;
             Color albedo = mat.GetAlbedo();
             albedo.A = starfieldAlpha;
@@ -118,17 +127,12 @@ public static class EnvironmentManager {
 
         float sunLightEnergy;
 
-        if (_dayTime >= sunRiseStart && _dayTime < sunRiseEnd)
-            sunLightEnergy = Mathsf.Remap(sunRiseStart, sunRiseEnd, _dayTime, 0.0f, 1.0f);
-        else if (_dayTime >= sunRiseEnd && _dayTime < sunSetStart)
-            sunLightEnergy = 1.0f;
-        else if (_dayTime >= sunSetStart && _dayTime < sunSetEnd)
-            sunLightEnergy = Mathsf.Remap(sunSetStart, sunSetEnd, _dayTime, 1.0f, 0.0f);
-        else
-            sunLightEnergy = 0.0f;
+        if (_dayTime >= sunRiseStart && _dayTime < sunRiseEnd) sunLightEnergy = Mathsf.Remap(sunRiseStart, sunRiseEnd, _dayTime, 0.0f, 1.0f);
+        else if (_dayTime >= sunRiseEnd && _dayTime < sunSetStart) sunLightEnergy = 1.0f;
+        else if (_dayTime >= sunSetStart && _dayTime < sunSetEnd)  sunLightEnergy = Mathsf.Remap(sunSetStart, sunSetEnd, _dayTime, 1.0f, 0.0f);
+        else sunLightEnergy = 0.0f;
 
         if (_worldSunLight != null) _worldSunLight.LightEnergy = sunLightEnergy;
-        if (_backdropSunLight != null) _backdropSunLight.LightEnergy = sunLightEnergy;
     }
 
     private static void AddTime(long time) {
@@ -138,9 +142,15 @@ public static class EnvironmentManager {
 
     public static int GetDay() => _dayIndex;
 
+    public static long GetAccumulatedTime() {
+        long time = 0L;
+        for (int i = 0; i < GetDay(); i++) time += EnvironmentSchedule.GetDayLength(i);
+        return time + _dayTime;
+    }
+
     public static (int hours, int minutes) GetTimeAs24H() {
         double normalized = (double)_dayTime / EnvironmentSchedule.GetDayLength(GetDay());
-        normalized = Math.Clamp(normalized, 0.0, 1.0); // Just in case
+        normalized = Math.Clamp(normalized, 0.0, 1.0);
 
         double totalMinutes = normalized * 24 * 60;
         int hour = (int)(totalMinutes / 60);
