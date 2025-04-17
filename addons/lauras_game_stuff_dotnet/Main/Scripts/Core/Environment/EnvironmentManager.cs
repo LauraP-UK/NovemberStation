@@ -8,11 +8,16 @@ public static class EnvironmentManager {
     private static readonly EaseType _ease = Easing.IN;
 
     private const long SUN_FADE_TIME = 5000L;
-    private const double DAY_START = 0.34D, SUN_RISE = 0.25D, SUN_SET = 0.75D;
+    private const double DAY_START = 0.34D;
+    private const double SUN_RISE = 0.25D, SUN_SET = 0.75D;
+    private const double STAR_APPEARANCE_START = SUN_SET - 0.01D, STAR_APPEARANCE_END = SUN_SET + 0.05D;
+    private const double STAR_FADE_START = SUN_RISE - 0.05D, STAR_FADE_END = SUN_RISE + 0.01D;
 
-    private const string WORLD_ENVIRONMENT_PATH = "Main/WorldEnvironment",
+    private const string
+        WORLD_ENVIRONMENT_PATH = "Main/WorldEnvironment",
         SUN_CONTAINER_PATH = "Main/SunContainer",
-        SUN_LIGHT_PATH = "Main/SunContainer/Sun";
+        SUN_LIGHT_PATH = "Main/SunContainer/Sun",
+        STARFIELD_PATH = "Main/Starfield";
 
     private static long _dayTime = Mathsf.Lerp(0L, EnvironmentSchedule.GetDayLength(0), DAY_START);
     private static bool _forcePause;
@@ -22,6 +27,7 @@ public static class EnvironmentManager {
 
     private static Node3D _worldSunContainer, _backdropSunContainer, _backdropSunObj;
     private static DirectionalLight3D _worldSunLight, _backdropSunLight;
+    private static MeshInstance3D _starfield;
     private static EnvListeners _envListeners;
 
     public static void Init() {
@@ -35,6 +41,8 @@ public static class EnvironmentManager {
 
         _worldSunLight = MainLauncher.FindNode<DirectionalLight3D>(SUN_LIGHT_PATH);
         _backdropSunLight = MainLauncher.FindNode<DirectionalLight3D>(SUN_LIGHT_PATH, true);
+
+        _starfield = MainLauncher.FindNode<MeshInstance3D>(STARFIELD_PATH, true);
 
         Node3D sunObj = Loader.SafeInstantiate<Node3D>("res://Main/Prefabs/Sandbox/Sun.tscn");
         _backdropSunObj = sunObj;
@@ -80,9 +88,33 @@ public static class EnvironmentManager {
 
         float sunRotationDegs = Mathsf.Remap(0L, dayLength, _dayTime, -180.0f, 180.0f);
         Vector3 sunRot = new(sunRotationDegs, 180.0f, 0.0f);
+
         _worldSunContainer?.SetRotationDegrees(sunRot);
         _backdropSunContainer?.SetRotationDegrees(sunRot);
         _backdropSunObj?.SetRotationDegrees(sunRot);
+
+        if (_starfield != null) {
+            long starAppearStart = Mathsf.Lerp(0L, dayLength, STAR_APPEARANCE_START);
+            long starAppearEnd = Mathsf.Lerp(0L, dayLength, STAR_APPEARANCE_END);
+            long starFadeStart = Mathsf.Lerp(0L, dayLength, STAR_FADE_START);
+            long starFadeEnd = Mathsf.Lerp(0L, dayLength, STAR_FADE_END);
+
+            float starfieldAlpha;
+            if (_dayTime >= starAppearStart && _dayTime < starAppearEnd)
+                starfieldAlpha = Mathsf.Remap(starAppearStart, starAppearEnd, _dayTime, 0.0f, 1.0f);
+            else if ((_dayTime >= starAppearEnd && _dayTime < dayLength) || (_dayTime >= 0.0f && _dayTime < starFadeStart))
+                starfieldAlpha = 1.0f;
+            else if (_dayTime >= starFadeStart && _dayTime < starFadeEnd)
+                starfieldAlpha = Mathsf.Remap(starFadeStart, starFadeEnd, _dayTime, 1.0f, 0.0f);
+            else
+                starfieldAlpha = 0.0f;
+
+            _starfield.SetRotationDegrees(new Vector3(sunRotationDegs, 180.0f, 90.0f));
+            StandardMaterial3D mat = _starfield.GetActiveMaterial(0) as StandardMaterial3D;
+            Color albedo = mat.GetAlbedo();
+            albedo.A = starfieldAlpha;
+            mat.SetAlbedo(albedo);
+        }
 
         float sunLightEnergy;
 
