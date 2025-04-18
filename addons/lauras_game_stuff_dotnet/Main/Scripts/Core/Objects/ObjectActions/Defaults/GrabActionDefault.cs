@@ -15,7 +15,8 @@ public class GrabActionDefault : BaseActionDefault {
             return;
         }
 
-        RaycastResult.HitBodyData hitData = result.GetViaBody(node);
+        Node root = GameUtils.FindSceneRoot(node);
+        RaycastResult.HitBodyData hitData = result.GetViaRoot(root as Node3D);
         if (hitData == null) {
             GD.PrintErr($"ERROR: GrabActionDefault.Handle() : hitData is null for {node.Name}");
             FireEmptyEvent();

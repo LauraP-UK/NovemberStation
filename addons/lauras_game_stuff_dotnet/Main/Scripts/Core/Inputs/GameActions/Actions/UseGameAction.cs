@@ -34,15 +34,39 @@ public class UseGameAction : GameActionBase {
         if (obj == null) return;
         IObjectBase objectClass = GameManager.GetObjectClass(GameUtils.FindSceneRoot(obj).GetInstanceId());
         if (actionType == null || objectClass == null) return;
+        
+        IInteractionZone zone = objectClass.FindInteractionZoneFor(obj);
 
         if (false) {
-            objectClass.TryGetAction((ActionKey)actionType, out Func<ActorBase, IEventBase, bool> test, out Action<ActorBase, IEventBase> method);
+            Func<ActorBase, IEventBase, bool> test;
+            Action<ActorBase, IEventBase> method;
+            if (zone == null) {
+                objectClass.TryGetAction((ActionKey)actionType, out Func<ActorBase, IEventBase, bool> testOut, out Action<ActorBase, IEventBase> methodOut);
+                test = testOut;
+                method = methodOut;
+            } else {
+                zone.TryGetAction((ActionKey)actionType, out Func<ActorBase, IEventBase, bool> testOut, out Action<ActorBase, IEventBase> methodOut);
+                test = testOut;
+                method = methodOut;
+            }
+            
             if (test.Invoke(player, ev)) method.Invoke(player, ev);
             _lastAction = actionType;
         }
         else {
             try {
-                objectClass.TryGetAction((ActionKey)actionType, out Func<ActorBase, IEventBase, bool> test, out Action<ActorBase, IEventBase> method);
+                Func<ActorBase, IEventBase, bool> test;
+                Action<ActorBase, IEventBase> method;
+                if (zone == null) {
+                    objectClass.TryGetAction((ActionKey)actionType, out Func<ActorBase, IEventBase, bool> testOut, out Action<ActorBase, IEventBase> methodOut);
+                    test = testOut;
+                    method = methodOut;
+                } else {
+                    zone.TryGetAction((ActionKey)actionType, out Func<ActorBase, IEventBase, bool> testOut, out Action<ActorBase, IEventBase> methodOut);
+                    test = testOut;
+                    method = methodOut;
+                }
+            
                 if (test.Invoke(player, ev)) method.Invoke(player, ev);
                 _lastAction = actionType;
             } catch (Exception e) {

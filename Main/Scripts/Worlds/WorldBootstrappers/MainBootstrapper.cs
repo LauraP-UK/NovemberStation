@@ -68,10 +68,16 @@ public partial class MainBootstrapper : SceneBootstrapper {
 
         foreach (Node child in GameManager.GetSceneObjects().GetChildren()) {
             if (child is not Node3D obj) continue;
-            IObjectBase objData = GameManager.RegisterObject(obj);
-            if (child is not RigidBody3D rigid) continue;
-            _objSpawns.Add(objData.GetGUID(), obj.GlobalPosition);
-            rigid.AngularDamp = 0.5f;
+
+            if (obj is RigidBody3D rigid) {
+                IObjectBase objData = GameManager.RegisterObject(obj);
+                _objSpawns.Add(objData.GetGUID(), obj.GlobalPosition);
+                rigid.AngularDamp = 0.5f;
+            } else {
+                GameManager.RegisterObject(obj);
+                //SmartSet<IObjectBase> processObject = GameManager.ProcessObject(obj);
+            }
+            //SmartSet<IObjectBase> objs = GameManager.ProcessObject(obj);
         }
         
         GD.Print($"Dynamic Objects: {_objSpawns.Count}");

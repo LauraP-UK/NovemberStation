@@ -1,5 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
+using Godot;
 
 public static class ActionAtlas {
     public const string
@@ -9,12 +12,22 @@ public static class ActionAtlas {
     private static readonly SmartDictionary<ActionKey, (string name, int index)> _customRegistry = new();
 
     static ActionAtlas() {
-        Register<IGrabbable>("Grab", 0);
-        Register<IShovable>("Shove", 1);
-        Register<ICollectable>("Collect", 2);
-        Register<IUsable>("Use", 3);
-        Register<IDrinkable>("Drink", 4);
-        Register<IWritable>("Write On", 5);
+        IEnumerable<Type> types = Assembly.GetExecutingAssembly()
+            .GetTypes()
+            .Where(t => t.IsInterface && typeof(IObjectAction).IsAssignableFrom(t) && t != typeof(IObjectAction));
+        
+        SmartDictionary<int,Type> usedIndices = new();
+        
+        foreach (Type type in types) {
+            ObjectActionAttribute attribute = type.GetCustomAttribute<ObjectActionAttribute>();
+            if (attribute == null) throw new Exception($"ERROR: ActionAtlas.<init> : Interface '{type.Name}' is missing required [ObjectAction(...)] attribute.");
+            if (usedIndices.ContainsKey(attribute.Index)) throw new Exception($"ERROR: ActionAtlas<init> : Index {attribute.Index} is already used by the {usedIndices.GetOrDefault(attribute.Index, null)} action!");
+            usedIndices.Add(attribute.Index, type);
+            GD.Print($"INFO: ActionAtlas.<init> : Registering action: {attribute.Name} ({attribute.Index})");
+            _registry.Add(type, (attribute.Name, attribute.Index));
+        }
+        
+        GD.Print("[ActionAtlas] INFO: Registered all object actions.");
     }
 
     private static void Register<T>(string actionName, int index) where T : IObjectAction => _registry.Add(typeof(T), (actionName, index));

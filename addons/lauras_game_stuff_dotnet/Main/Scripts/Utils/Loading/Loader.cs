@@ -5,7 +5,7 @@ public static class Loader {
     private static readonly Cache<string, PackedScene> _cache = new(() => null, -1);
     public static PackedScene SafeLoad(string path, bool throwError = false) {
         string pathLower = path.ToLowerInvariant();
-        PackedScene fromCache = _cache.GetFromCache(pathLower);
+        PackedScene fromCache = _cache.GetFromCache(pathLower, false);
         if (fromCache != null) return fromCache;
         
         if (!ResourceLoader.Exists(path)) {

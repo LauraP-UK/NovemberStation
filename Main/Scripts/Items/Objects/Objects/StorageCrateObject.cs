@@ -16,14 +16,14 @@ public class StorageCrateObject : ObjectBase<RigidBody3D>, IGrabbable, IShovable
             dualInvDisplayMenu.ModifyForm(form => form.SetOtherInventory(this));
             dualInvDisplayMenu.Open();
         });
-        RegisterArbitraryAction("Show Serialised Data", 30, (_, _) => _inventory.GetUsedSize() > 0.0f, (_, ev) => {
+        /*RegisterArbitraryAction("Show Serialised Data", 30, (_, _) => _inventory.GetUsedSize() > 0.0f, (_, ev) => {
             if (ev is not KeyPressEvent) return;
             string serialise = GetInventory().Serialise();
             GD.Print($"Crate serialised data: {serialise}");
             GetInventory().Deserialise(serialise);
 
             GD.Print(serialise);
-        });
+        });*/
     }
 
     public void Grab(ActorBase actorBase, IEventBase ev) => GrabActionDefault.Invoke(actorBase, GetBaseNode(), ev);

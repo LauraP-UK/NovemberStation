@@ -6,18 +6,20 @@ public class PCObject : ObjectBase<Node3D>, IUsable {
         SCREEN_VIEWPORT_PATH = "ScreenStatic/Screen/ScreenViewport",
         SCREEN_PATH = "ScreenStatic/Screen",
         CAMERA_PATH = "ScreenStatic/CamPos/Camera3D",
-        SPAWN_POINT_PATH = "Body/SpawnPoint";
+        SPAWN_POINT_PATH = "Body/SpawnPoint",
+        BODY_PATH = "ScreenStatic";
 
     private readonly SubViewport _viewport;
     private readonly MeshInstance3D _screen;
     private readonly Camera3D _camera;
     private readonly Node3D _spawnPoint;
+    private readonly StaticBody3D _body;
     
     private readonly ShopMenu _shopMenu;
 
     public PCObject(Node3D pcNode, bool dataOnly = false) : base(pcNode, "pc_obj") {
         if (dataOnly) return;
-        RegisterAction<IUsable>((_,_) => true, Use);
+        //RegisterAction<IUsable>((_,_) => true, Use);
 
         string finding = "NULL";
         try {
@@ -29,11 +31,18 @@ public class PCObject : ObjectBase<Node3D>, IUsable {
             _camera = FindNode<Camera3D>(CAMERA_PATH);
             finding = SPAWN_POINT_PATH;
             _spawnPoint = FindNode<Node3D>(SPAWN_POINT_PATH);
+            finding = BODY_PATH;
+            _body = FindNode<StaticBody3D>(BODY_PATH);
         }
         catch (Exception e) {
             GD.PrintErr($"WARN: PC2Object.<init> : Failed to find required {finding} node.");
             return;
         }
+        
+        AddInteractionZone(InteractionZoneBuilder<StaticBody3D, PCObject>.Builder("Screen", _body, this)
+            .WithDisplayName("PC")
+            .WithAction<IUsable>((_,_) => true, Use)
+            .Build());
         
         _shopMenu = new ShopMenu();
         _shopMenu.ModifyForm(form => {
@@ -115,8 +124,9 @@ public class PCObject : ObjectBase<Node3D>, IUsable {
     public MeshInstance3D GetScreen() => _screen;
     public Camera3D GetCamera() => _camera;
     public ShopMenu GetShopMenu() => _shopMenu;
-    
-    
+    public override bool DisplayContextMenu() => false;
+
+
     private void View() {
         _camera.SetCurrent(true);
         PlayerController playerController = GameManager.GetPlayer().GetController<PlayerController>();

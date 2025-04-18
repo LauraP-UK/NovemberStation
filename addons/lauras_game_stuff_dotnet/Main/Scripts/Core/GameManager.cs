@@ -113,6 +113,26 @@ public static class GameManager {
     public static T GetObjectClass<T>(ulong id) where T : IObjectBase => (T)GetObjectClass(id);
     public static IObjectBase GetObjectClass(ulong id) => MainLauncher.GetGameBootstrapper().GetObjects().GetOrDefault(id, null);
 
+    public static SmartSet<IObjectBase> ProcessObject(Node3D node) {
+        Node root = GameUtils.FindSceneRoot(node);
+        if (root is not Node3D rootNode) {
+            GD.PrintErr($"WARN: GameManager.RegisterObject() : Failed to find root Node3D for '{node.Name}'. Got '{root.GetType().Name}' instead.");
+            return null;
+        }
+        
+        SmartSet<IObjectBase> objects = [];
+        
+        SmartSet<Node> allChildren = GameUtils.GetAllChildren(rootNode);
+        foreach (Node child in allChildren) {
+            if (child is not Node3D childNode) continue;
+            string tag = ObjectAtlas.TryGetTag(childNode);
+            if (string.IsNullOrEmpty(tag)) continue;
+            IObjectBase objectBase = ObjectAtlas.CreateObject(rootNode);
+            RegisterObject(childNode, objectBase);
+            objects.Add(objectBase);
+        }
+        return objects;
+    }
     public static IObjectBase RegisterObject(Node3D node) {
         Node root = GameUtils.FindSceneRoot(node);
         if (root is not Node3D rootNode) {

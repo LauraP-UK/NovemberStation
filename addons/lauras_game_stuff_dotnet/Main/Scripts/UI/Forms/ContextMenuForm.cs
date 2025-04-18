@@ -91,15 +91,21 @@ public class ContextMenuForm : FormBase {
         _menuElement.GetElement().Hide();
     }
 
-    public void Draw(int actionIndex, Vector2 minPos, Vector2 maxPos, float mainAlpha, float titleAlpha, float actionsAlpha, IObjectBase objData = null) {
+    public void Draw(int actionIndex, Vector2 minPos, Vector2 maxPos, float mainAlpha, float titleAlpha, float actionsAlpha, IObjectBase objData = null, IInteractionZone zone = null) {
         SetNWCorner(minPos);
         SetSECorner(maxPos);
         VBoxContainerElement listContainer = GetListContainer();
 
         if (objData != null) {
-            HandleDisplayName(objData, titleAlpha);
-            HandleContextInfo(objData, titleAlpha);
-            actionsAlpha = HandleActions(objData, actionsAlpha);
+            if (zone == null) {
+                HandleDisplayName(objData.GetDisplayName(), titleAlpha);
+                HandleContextInfo(objData.GetContext(), titleAlpha);
+                actionsAlpha = HandleActions(objData.GetValidActions(GameManager.GetPlayer(), null), actionsAlpha);
+            } else {
+                HandleDisplayName(zone.GetDisplayName(), titleAlpha);
+                HandleContextInfo(zone.GetContext(), titleAlpha);
+                actionsAlpha = HandleActions(zone.GetValidActions(GameManager.GetPlayer(), null), actionsAlpha);
+            }
         }
         else if (listContainer.IsEmpty()) actionsAlpha = 0.0f;
 
@@ -118,10 +124,9 @@ public class ContextMenuForm : FormBase {
         return (ActionDisplayButton)listContainer.GetDisplayObjects()[wrappedI];
     }
 
-    private void HandleDisplayName(IObjectBase objData, float titleAlpha) {
+    private void HandleDisplayName(string displayName, float titleAlpha) {
         VBoxContainerElement nameListContainer = GetNameListContainer();
 
-        string displayName = objData.GetDisplayName();
         List<IFormObject> displayNames = nameListContainer.GetDisplayObjects();
 
         NameDisplay existingNameDisplay = displayNames.Count == 0 ? null : (NameDisplay)displayNames.First();
@@ -139,10 +144,8 @@ public class ContextMenuForm : FormBase {
         nameDisplay.HandleAlpha(titleAlpha);
     }
 
-    private void HandleContextInfo(IObjectBase objData, float titleAlpha) {
+    private void HandleContextInfo(string context, float titleAlpha) {
         VBoxContainerElement contextListContainer = GetContextListContainer();
-
-        string context = objData.GetContext();
 
         if (context == "") {
             contextListContainer.ClearChildren();
@@ -174,13 +177,13 @@ public class ContextMenuForm : FormBase {
         }
     }
 
-    private float HandleActions(IObjectBase objData, float actionsAlpha) {
-        Player player = GameManager.GetPlayer();
+    private float HandleActions(List<ActionKey> validActions, float actionsAlpha) {
+        //Player player = GameManager.GetPlayer();
 
         VBoxContainerElement listContainer = GetListContainer();
         List<ActionDisplayButton> currentButtons = listContainer.GetDisplayObjects().Select(obj => (ActionDisplayButton)obj).ToList();
 
-        List<ActionKey> validActions = objData.GetValidActions(player, null);
+        //List<ActionKey> validActions = objData.GetValidActions(player, null);
         List<ActionKey> currentActions = currentButtons.Where(obj => obj.GetAction() != null).Select(obj => (ActionKey)obj.GetAction()).ToList();
 
         float minimumWidth = 0;

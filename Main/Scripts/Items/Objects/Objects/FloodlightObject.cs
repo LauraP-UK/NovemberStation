@@ -175,8 +175,7 @@ public class FloodlightObject : ObjectBase<RigidBody3D>, IGrabbable, IUsable, IC
 
     public override string GetContext() {
         float power = GetPowerRemaining();
-        string secondLine = power <= 0.0f ? "NO POWER" : $"Power: {power:00.00}%";
-        return $"Status: {(_isOn ? "ON" : "OFF")}\n{secondLine}";
+        return power <= 0.0f ? "NO POWER" : $"Power: {power:00.00}%";
     }
 
     public override string GetSummary() {

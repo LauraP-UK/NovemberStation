@@ -196,7 +196,7 @@ public static class Randf {
         IEnumerable<T> enumerable = collection as T[] ?? collection.ToArray();
         if (!enumerable.Any()) return new List<T>();
         List<T> list = enumerable.ToList();
-        Random rng = new Random();
+        Random rng = new();
         return list.OrderBy(_ => rng.Next()).ToList();
     }
 }
