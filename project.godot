@@ -11,7 +11,7 @@ config_version=5
 [application]
 
 config/name="NovemberStation"
-run/main_scene="res://Main/Prefabs/Scenes/TestMainScene.tscn"
+run/main_scene="uid://cc0h6x1ifv3ao"
 config/features=PackedStringArray("4.4", "C#", "Forward Plus")
 config/icon="res://icon.svg"
 
@@ -32,6 +32,10 @@ project/assembly_name="NovemberStation"
 [editor_plugins]
 
 enabled=PackedStringArray("res://addons/debug_drawing/plugin.cfg", "res://addons/terrain_3d/plugin.cfg")
+
+[game]
+
+framework_console_splash="\\n            ╔═══════════════════════════════════════╗\\n            ║      Н О Я Б Р Ь   С Т А Н Ц И Я      ║\\n            ║         — NOVEMBER STATION —          ║\\n            ║     Awaiting signal... █▒▒▒▒▒▒▒▒▒     ║\\n            ╚═══════════════════════════════════════╝\\n        "
 
 [input]
 

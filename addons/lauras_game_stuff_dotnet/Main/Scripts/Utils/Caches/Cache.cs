@@ -23,8 +23,9 @@ public class Cache<TKey, TValue> {
     
     public void AddToCache(TKey key, TValue value) => AddToCache(key, _ => value);
 
-    public TValue GetFromCache(TKey key) {
-        (_, TValue value) = GetOrCompute(key);
+    public TValue GetFromCache(TKey key, bool computeIfMissing = true) {
+        (_, TValue value) = computeIfMissing ? GetOrCompute(key) : _cache.GetOrDefault(key, (0, default));
+        if (value == null) return default;
         _cache.Add(key, (Time.GetTicksMsec(), value));
         return value;
     }

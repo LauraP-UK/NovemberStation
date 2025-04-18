@@ -12,7 +12,7 @@ public class SingleInvDisplayMenu : PreMadeMenu<SingleInventoryForm> {
             }
         });
         
-        form.SetPrimaryInventory(GameManager.I().GetPlayer());
+        form.SetPrimaryInventory(GameManager.GetPlayer());
         form.SetListener(FormListener.Default(form));
         
         return form;

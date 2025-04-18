@@ -50,7 +50,7 @@ public class SingleInventoryForm : InventoryForm, IProcess {
     }
 
     protected override List<InvActionButton> InitActionsList() {
-        Player player = GameManager.I().GetPlayer();
+        Player player = GameManager.GetPlayer();
 
         _placeActionBtn = new InvActionButton();
         ButtonElement placeBtn = _placeActionBtn.GetButton();

@@ -19,7 +19,7 @@ public class PauseMenu : PreMadeMenu<BinaryChoiceForm> {
         pauseMenu.OnUpperButton(_ => Close());
         pauseMenu.OnLowerButton(_ => {
             Close();
-            GameManager.I().Quit();
+            GameManager.Quit();
         });
         
         pauseMenu.SetKeyboardBehaviour((key, form, isPressed) => {

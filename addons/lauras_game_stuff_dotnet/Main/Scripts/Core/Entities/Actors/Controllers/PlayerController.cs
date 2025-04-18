@@ -62,7 +62,7 @@ public class PlayerController : ControllerBase<Player> {
         if (IsLocked()) return;
         if (key != Key.F2 || !GameManager.IsDebugMode()) return;
         _debugObjects = !_debugObjects;
-        GameManager.I().DebugObjects(_debugObjects);
+        GameManager.DebugObjects(_debugObjects);
     }
 
     [EventListener]
@@ -201,10 +201,10 @@ public class PlayerController : ControllerBase<Player> {
             result.HasHit() ? result.GetClosestHit().HitAtPosition + result.GetClosestHit().HitNormal * 0.2f : result.GetEnd();
 
         Node3D objNode = (Node3D)obj.Node;
-        GameManager.I().GetSceneObjects().AddChild(obj.Node);
+        GameManager.GetSceneObjects().AddChild(obj.Node);
         objNode.SetGlobalPosition(spawn);
         objNode.SetGlobalRotation(new Vector3(0, owner.GetCamera().GlobalRotation.Y, 0));
-        GameManager.I().RegisterObject(objNode, obj.Object);
+        GameManager.RegisterObject(objNode, obj.Object);
 
         owner.GetHotbar().ResyncInventory();
 
@@ -266,7 +266,8 @@ public class PlayerController : ControllerBase<Player> {
         SetLocked(true);
         ShowUI(false);
         GameManager.SetEngineSpeed(GameManager.SLEEP_ENGINE_SPEED);
-        GameManager.I().GetSleepCamera().MakeCurrent();
+        GameManager.GetSleepCamera().MakeCurrent();
+        GameManager.SyncBackdropCamera(GameManager.GetSleepCamera().GlobalRotation);
     }
 
     public void WakeUp() {
@@ -429,11 +430,13 @@ public class PlayerController : ControllerBase<Player> {
         camera3D.RotationDegrees = new Vector3(newPitch, cameraRotation.Y, cameraRotation.Z);
 
         _targetLook = Vector2.Zero;
+        
+        GameManager.SyncBackdropCamera(camera3D.GlobalRotation);
     }
 
     /* --- ---  UI  --- --- */
     private void HandleContextMenu() {
-        Camera3D activeCamera = GameManager.I().GetActiveCamera();
+        Camera3D activeCamera = GameManager.GetActiveCamera();
         RaycastResult raycastResult = _heldObject != null ? Raycast.TraceActive(_heldObject) : Raycast.TraceActive(3.0f);
         RaycastResult.HitBodyData contextObjResult = _heldObject != null ? raycastResult.GetViaBody(_heldObject) : raycastResult.GetClosestHit();
 
@@ -444,7 +447,7 @@ public class PlayerController : ControllerBase<Player> {
         }
 
         _contextObject = _heldObject ?? contextObjResult.Body;
-        Node sceneRoot = GameUtils.FindSceneRoot(_contextObject);
+        Node sceneRoot = _heldObject != null ? GameUtils.FindSceneRoot(_heldObject) : contextObjResult?.Root;
         if (sceneRoot == null) {
             _contextObject = null;
             HideContextBox();
@@ -452,15 +455,23 @@ public class PlayerController : ControllerBase<Player> {
         }
 
         ulong instanceId = sceneRoot.GetInstanceId();
-
-        CollisionShape3D shape = (CollisionShape3D)_contextObject.FindChild("BBox");
-        if (shape == null) {
+        Node parentTaggedNode = GameUtils.GetParentTaggedNode(_contextObject);
+        if (parentTaggedNode == null) {
             _contextObject = null;
             HideContextBox();
             return;
         }
 
-        IObjectBase objectData = GameManager.I().GetObjectClass<IObjectBase>(instanceId);
+        IObjectBase objectData = GameManager.GetObjectClass(instanceId);
+        IInteractionZone zone = null;
+        if (objectData != null) zone = objectData.FindInteractionZoneFor(_contextObject);
+
+        if (zone == null && objectData != null && !objectData.DisplayContextMenu()) {
+            _contextObject = null;
+            HideContextBox();
+            return;
+        }
+        
         if (objectData != null && instanceId != _lastActionID) {
             HideContextBox();
             _lastActionID = instanceId;
@@ -470,6 +481,13 @@ public class PlayerController : ControllerBase<Player> {
             }
         }
 
+        CollisionShape3D shape = (CollisionShape3D) (zone != null ? zone.GetBoundingBoxNode() : parentTaggedNode.FindChild("BBox"));
+        if (shape == null) {
+            _contextObject = null;
+            HideContextBox();
+            return;
+        }
+
         (Vector2 minPos, Vector2 maxPos) = Projections.Project(shape, activeCamera, shape.GlobalTransform);
 
         float distanceTo = !_uiVisible ? 10f : contextObjResult?.Distance ?? _contextObject.GlobalPosition.DistanceTo(activeCamera.GlobalPosition);
@@ -477,7 +495,7 @@ public class PlayerController : ControllerBase<Player> {
         float titleRatio = Mathsf.InverseLerpClamped(2.9f, 2.5f, distanceTo);
 
         ContextMenuForm form = _contextMenu.GetForm();
-        form?.Draw(_actionIndex, minPos, maxPos, distRatio, titleRatio, _heldObject == null ? titleRatio : 0.0f, objectData);
+        form?.Draw(_actionIndex, minPos, maxPos, distRatio, titleRatio, _heldObject == null ? titleRatio : 0.0f, objectData, zone);
     }
 
     private void HideContextBox() {

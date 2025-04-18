@@ -1,0 +1,92 @@
+[gd_scene load_steps=11 format=3 uid="uid://cojc8pwcfbm8p"]
+
+[ext_resource type="Texture2D" uid="uid://c5q1hp1s028lo" path="res://Main/Textures/Sandbox/Noise1.png" id="1_jwbio"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_jwbio"]
+size = Vector3(1, 1, 2)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_yvvgj"]
+albedo_color = Color(0.501407, 0.501406, 0.501406, 1)
+albedo_texture = ExtResource("1_jwbio")
+
+[sub_resource type="BoxMesh" id="BoxMesh_16ou8"]
+material = SubResource("StandardMaterial3D_yvvgj")
+size = Vector3(1, 1, 2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_d22i7"]
+size = Vector3(1, 1, 2)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_62i4r"]
+albedo_color = Color(0.721851, 0.0822879, 0.136792, 1)
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_y05dp"]
+material = SubResource("StandardMaterial3D_62i4r")
+top_radius = 0.15
+bottom_radius = 0.15
+height = 0.1
+radial_segments = 8
+rings = 0
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_wwvvt"]
+height = 0.1
+radius = 0.15
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_v28dp"]
+albedo_color = Color(0.0904667, 0.426202, 0.356216, 1)
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_7hye4"]
+material = SubResource("StandardMaterial3D_v28dp")
+top_radius = 0.15
+bottom_radius = 0.15
+height = 0.1
+radial_segments = 8
+rings = 0
+
+[node name="Generator" type="Node3D"]
+metadata/object_tag = "generator_obj"
+
+[node name="Main" type="Area3D" parent="."]
+collision_layer = 128
+collision_mask = 128
+
+[node name="BBox" type="CollisionShape3D" parent="Main"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
+shape = SubResource("BoxShape3D_jwbio")
+
+[node name="Box" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
+collision_layer = 2
+collision_mask = 7
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Box"]
+mesh = SubResource("BoxMesh_16ou8")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Box"]
+shape = SubResource("BoxShape3D_d22i7")
+
+[node name="Button" type="Area3D" parent="."]
+collision_layer = 128
+collision_mask = 128
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Button"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.03883, -0.39775)
+mesh = SubResource("CylinderMesh_y05dp")
+skeleton = NodePath("../..")
+
+[node name="BBox" type="CollisionShape3D" parent="Button"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.039, -0.398)
+shape = SubResource("CylinderShape3D_wwvvt")
+
+[node name="FuelInput" type="Area3D" parent="."]
+transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, 0, 0, 0)
+collision_layer = 128
+collision_mask = 128
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="FuelInput"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.03883, -0.39775)
+mesh = SubResource("CylinderMesh_7hye4")
+skeleton = NodePath("../..")
+
+[node name="BBox" type="CollisionShape3D" parent="FuelInput"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.039, -0.398)
+shape = SubResource("CylinderShape3D_wwvvt")

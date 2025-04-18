@@ -3,23 +3,24 @@ using System.Collections.Generic;
 using System.Linq;
 using Godot;
 
-public abstract class ObjectBase<T> : IObjectBase where T : Node3D {
+public abstract class ObjectBase<T> : ActionHolder, IObjectBase where T : Node3D {
     
     private readonly T _baseNode;
-    private readonly SmartDictionary<ActionKey, (Func<ActorBase, IEventBase, bool> test, Action<ActorBase, IEventBase> run)> _actions = new();
     private readonly string _objectTag;
     [SerialiseData(IObjectBase.GUID_KEY, nameof(SetIdFromString), nameof(SetNewId))]
     private Guid _id;
+    
+    protected readonly List<IInteractionZone> _interactionZones = []; 
     
     protected ObjectBase(T baseNode, string objectTag) {
         _baseNode = baseNode;
         _objectTag = objectTag;
         SetNewId();
-        RegisterArbitraryAction("To JSON", 1000, (_, _) => GameManager.IsDebugMode(), (_, ev)  => {
+        /*RegisterArbitraryAction("To JSON", 1000, (_, _) => GameManager.IsDebugMode(), (_, ev)  => {
             if (ev is not KeyPressEvent) return;
             GD.Print($"----- {objectTag} JSON -----");
             GD.Print(Serialise());
-        });
+        });*/
     }
     
     protected void SetId(Guid id) => _id = id;
@@ -32,43 +33,31 @@ public abstract class ObjectBase<T> : IObjectBase where T : Node3D {
 
     public bool IsHeldItem(IHotbarActor actor) => GetGUID().Equals(actor.GetHandItem()?.GetGUID());
 
-    protected void RegisterAction<TAction>(Func<ActorBase, IEventBase, bool> test, Action<ActorBase, IEventBase> action) where TAction : IObjectAction =>
-        _actions[new ActionKey(typeof(TAction))] = (test, action);
-    
-    protected void RegisterArbitraryAction(string name, int index, Func<ActorBase, IEventBase, bool> test, Action<ActorBase, IEventBase> action) {
-        ActionAtlas.RegisterCustom(name, index);
-        _actions[new ActionKey(name)] = (test, action);
-    }
-
-    public bool TryGetAction(ActionKey actionKey, out Func<ActorBase, IEventBase, bool> test, out Action<ActorBase, IEventBase> action) {
-        if (_actions.TryGetValue(actionKey, out (Func<ActorBase, IEventBase, bool> test, Action<ActorBase, IEventBase> run) actions)) {
-            test = actions.test;
-            action = actions.run;
-            return true;
+    protected void AddInteractionZone(IInteractionZone zone) => _interactionZones.Add(zone);
+    public IInteractionZone FindInteractionZoneFor(Node node) {
+        if (_interactionZones.Count == 0) return null;
+        switch (node) {
+            case null: return null;
+            case Node3D node3D: {
+                IInteractionZone directMatch = _interactionZones.FirstOrDefault(zone => zone.GetContainingNode().Equals(node3D));
+                if (directMatch != null) return directMatch;
+                break;
+            }
         }
-        test = null;
-        action = null;
-        return false;
-    }
+        Node current = node;
+        while (current != null) {
+            if (current is Node3D parent3D) {
+                IInteractionZone match = _interactionZones.FirstOrDefault(zone => zone.GetContainingNode().Equals(parent3D));
+                if (match != null) return match;
+            }
+            current = current.GetParent();
+        }
 
-    public List<ActionKey> GetValidActions(ActorBase actorBase, IEventBase ev) {
-        List<ActionKey> validActions = new();
-        List<KeyValuePair<ActionKey,(Func<ActorBase,IEventBase,bool> test, Action<ActorBase,IEventBase> run)>> sorted = _actions
-            .OrderBy(a => ActionAtlas.GetActionIndex(a.Key))
-            .ToList();
-
-        foreach ((ActionKey key, (Func<ActorBase, IEventBase, bool> test, _)) in sorted)
-            if (test.Invoke(actorBase, ev)) validActions.Add(key);
-
-        return validActions;
-    }
-    
-    public bool TestAction<TAction>(ActorBase actorBase, IEventBase ev) where TAction : IObjectAction {
-        (Func<ActorBase,IEventBase,bool> test, Action<ActorBase,IEventBase> run) pair = _actions.GetOrDefault(new ActionKey(typeof(TAction)), (null,null));
-        return pair.test != null && pair.test.Invoke(actorBase, ev);
+        return null;
     }
 
     public Node3D GetBaseNode3D() => GetBaseNode();
+    public virtual bool DisplayContextMenu() => true;
     public string GetObjectTag() => _objectTag;
     public abstract string GetDisplayName();
     public abstract string GetContext();

@@ -5,20 +5,21 @@ public class PCObject : ObjectBase<Node3D>, IUsable {
     private const string
         SCREEN_VIEWPORT_PATH = "ScreenStatic/Screen/ScreenViewport",
         SCREEN_PATH = "ScreenStatic/Screen",
-        CAMERA_PATH = "ScreenStatic/Screen/CameraPos/Camera3D",
-        SPAWN_POINT_PATH = "Body/SpawnPoint";
+        CAMERA_PATH = "ScreenStatic/CamPos/Camera3D",
+        SPAWN_POINT_PATH = "Body/SpawnPoint",
+        BODY_PATH = "ScreenStatic";
 
     private readonly SubViewport _viewport;
     private readonly MeshInstance3D _screen;
     private readonly Camera3D _camera;
     private readonly Node3D _spawnPoint;
+    private readonly StaticBody3D _body;
     
-    private readonly GameManager _gameManager = GameManager.I();
     private readonly ShopMenu _shopMenu;
 
     public PCObject(Node3D pcNode, bool dataOnly = false) : base(pcNode, "pc_obj") {
         if (dataOnly) return;
-        RegisterAction<IUsable>((_,_) => true, Use);
+        //RegisterAction<IUsable>((_,_) => true, Use);
 
         string finding = "NULL";
         try {
@@ -30,11 +31,18 @@ public class PCObject : ObjectBase<Node3D>, IUsable {
             _camera = FindNode<Camera3D>(CAMERA_PATH);
             finding = SPAWN_POINT_PATH;
             _spawnPoint = FindNode<Node3D>(SPAWN_POINT_PATH);
+            finding = BODY_PATH;
+            _body = FindNode<StaticBody3D>(BODY_PATH);
         }
         catch (Exception e) {
-            GD.PrintErr($"WARN: PCObject.<init> : Failed to find required {finding} node.");
+            GD.PrintErr($"WARN: PC2Object.<init> : Failed to find required {finding} node.");
             return;
         }
+        
+        AddInteractionZone(InteractionZoneBuilder<StaticBody3D, PCObject>.Builder("Screen", _body, this)
+            .WithDisplayName("PC")
+            .WithAction<IUsable>((_,_) => true, Use)
+            .Build());
         
         _shopMenu = new ShopMenu();
         _shopMenu.ModifyForm(form => {
@@ -43,14 +51,16 @@ public class PCObject : ObjectBase<Node3D>, IUsable {
             
             form.SetOnReady(form => {
                 Items.GetItemButtons().ForEach(btn => {
-                    GameManager gameManager = GameManager.I();
                     btn.OnPressed(btn => {
                         ItemType itemType = btn.GetItemType();
                         RigidBody3D rigidBody3D = itemType.CreateInstance();
-                        gameManager.GetSceneObjects().AddChild(rigidBody3D);
+                        GameManager.GetSceneObjects().AddChild(rigidBody3D);
                         rigidBody3D.SetPosition(_spawnPoint.GlobalPosition + new Vector3(0,0.5f,0));
-                    
-                        gameManager.RegisterObject(rigidBody3D);
+
+                        IObjectBase objData = GameManager.RegisterObject(rigidBody3D);
+                        itemType.TryOnDataSpawn(objData);
+                        
+                        Toast.Info(GameManager.GetPlayer(), $"Purchased {itemType.GetItemName()} for {itemType.GetItemCost()}{ShopItemDisplayButton.CREDITS_SYMBOL}");
                     });
 
                     btn.SetTopLevelLayout(form.GetTopLevelLayout());
@@ -91,7 +101,7 @@ public class PCObject : ObjectBase<Node3D>, IUsable {
                         }
                         else {
                             IFormObject focusedElement = form.GetFocusedElement();
-                            ((ShopItemDisplayButton)focusedElement)?.VisualPress(false);
+                            ((ShopItemDisplayButton) focusedElement)?.VisualPress(false);
                         }
                         break;
                     }
@@ -113,23 +123,31 @@ public class PCObject : ObjectBase<Node3D>, IUsable {
     public SubViewport GetViewport() => _viewport;
     public MeshInstance3D GetScreen() => _screen;
     public Camera3D GetCamera() => _camera;
-    
-    
+    public ShopMenu GetShopMenu() => _shopMenu;
+    public override bool DisplayContextMenu() => false;
+
+
     private void View() {
         _camera.SetCurrent(true);
-        _gameManager.GetPlayer().GetController<PlayerController>().SetLocked(true);
-        _gameManager.SetMouseControl(true);
+        PlayerController playerController = GameManager.GetPlayer().GetController<PlayerController>();
+        playerController.SetLocked(true);
+        playerController.ShowUI(false);
+        GameManager.SetMouseControl(true);
+        GameManager.SetMouseVisible(false);
         TestDisplayForm form = _shopMenu.GetForm();
         ScrollDisplayList display = form.GetScrollDisplay();
         display.SetKeyboardEnabled(true);
         display.SetCaptureInput(true);
         display.GetListener().Register();
+        GameManager.SyncBackdropCamera(_camera.GlobalRotation);
     }
 
     private void Release() {
-        _gameManager.GetPlayer().GetCamera().SetCurrent(true);
-        _gameManager.GetPlayer().GetController<PlayerController>().SetLocked(false);
-        _gameManager.SetMouseControl(false);
+        GameManager.GetPlayer().AssumeCameraControl();
+        PlayerController playerController = GameManager.GetPlayer().GetController<PlayerController>();
+        playerController.SetLocked(false);
+        playerController.ShowUI(true);
+        GameManager.SetMouseControl(false);
         TestDisplayForm form = _shopMenu.GetForm();
         ScrollDisplayList display = form.GetScrollDisplay();
         display.SetKeyboardEnabled(false);

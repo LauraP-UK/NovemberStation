@@ -256,10 +256,10 @@ public abstract class InventoryForm : FormBase {
         }
 
         Node3D objNode = (Node3D)obj.Node;
-        GameManager.I().GetSceneObjects().AddChild(obj.Node);
+        GameManager.GetSceneObjects().AddChild(obj.Node);
         objNode.SetGlobalPosition(spawn);
         if (rotation != default) objNode.SetGlobalRotation(new Vector3(0, rotation.Y, 0));
-        GameManager.I().RegisterObject(objNode, obj.Object);
+        GameManager.RegisterObject(objNode, obj.Object);
         owner.RemoveItem(objectJson);
         return true;
     }

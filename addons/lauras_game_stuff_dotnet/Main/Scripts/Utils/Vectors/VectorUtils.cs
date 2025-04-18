@@ -64,7 +64,8 @@ public static class VectorUtils {
         float maxZ = vectors.Max(v => v.Z);
         float minZ = vectors.Min(v => v.Z);
 
-        return new ExtremesInfo3D(new[] {
+        return new ExtremesInfo3D(
+        [
             new Vector3(maxX, maxY, maxZ),
             new Vector3(maxX, maxY, minZ),
             new Vector3(maxX, minY, maxZ),
@@ -73,7 +74,8 @@ public static class VectorUtils {
             new Vector3(minX, maxY, minZ),
             new Vector3(minX, minY, maxZ),
             new Vector3(minX, minY, minZ)
-        });
+        ]
+        );
     }
     
     public class ExtremesInfo3D {
@@ -100,9 +102,19 @@ public static class VectorUtils {
             max = LXLYLZ;
             centre = (min + max) / 2;
         }
-        public static ExtremesInfo3D Empty() => new(new[] {
+        public static ExtremesInfo3D Empty() => new(
+        [
             Vector3.Zero, Vector3.Zero, Vector3.Zero, Vector3.Zero,
             Vector3.Zero, Vector3.Zero, Vector3.Zero, Vector3.Zero
-        });
+        ]
+        );
+    }
+    
+    public static Vector3 RandomLocationInCube(Vector3 min, Vector3 max) {
+        return new Vector3(
+            Randf.Random(min.X, max.X),
+            Randf.Random(min.Y, max.Y),
+            Randf.Random(min.Z, max.Z)
+        );
     }
 }

@@ -16,14 +16,14 @@ public class StorageCrateObject : ObjectBase<RigidBody3D>, IGrabbable, IShovable
             dualInvDisplayMenu.ModifyForm(form => form.SetOtherInventory(this));
             dualInvDisplayMenu.Open();
         });
-        RegisterArbitraryAction("Show Serialised Data", 30, (_, _) => _inventory.GetUsedSize() > 0.0f, (_, ev) => {
+        /*RegisterArbitraryAction("Show Serialised Data", 30, (_, _) => _inventory.GetUsedSize() > 0.0f, (_, ev) => {
             if (ev is not KeyPressEvent) return;
             string serialise = GetInventory().Serialise();
             GD.Print($"Crate serialised data: {serialise}");
             GetInventory().Deserialise(serialise);
 
             GD.Print(serialise);
-        });
+        });*/
     }
 
     public void Grab(ActorBase actorBase, IEventBase ev) => GrabActionDefault.Invoke(actorBase, GetBaseNode(), ev);
@@ -36,7 +36,7 @@ public class StorageCrateObject : ObjectBase<RigidBody3D>, IGrabbable, IShovable
     public string GetName() => GetDisplayName();
     public AddItemFailCause StoreItem(ItemType itemType) {
         RigidBody3D node = itemType.CreateInstance();
-        IObjectBase obj = GameManager.I().RegisterObject(node);
+        IObjectBase obj = GameManager.RegisterObject(node);
         AddItemFailCause result = StoreItem(obj, node);
         node.QueueFree();
         return result;

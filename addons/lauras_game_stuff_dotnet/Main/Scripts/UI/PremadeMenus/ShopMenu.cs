@@ -2,8 +2,6 @@ using Godot;
 
 public class ShopMenu : PreMadeMenu<TestDisplayForm> {
     protected override FormBase Build() {
-        GameManager gameManager = GameManager.I();
-
         TestDisplayForm testDisplayForm = new(GetFormName());
         
         testDisplayForm.SetPauseGame(true);
@@ -17,11 +15,11 @@ public class ShopMenu : PreMadeMenu<TestDisplayForm> {
                 btn.OnPressed(btn => {
                     ItemType itemType = btn.GetItemType();
                     RigidBody3D rigidBody3D = itemType.CreateInstance();
-                    gameManager.GetSceneObjects().AddChild(rigidBody3D);
-                    Vector3 spawn = Raycast.Trace(gameManager.GetPlayer(), 2.0f).GetEnd();
+                    GameManager.GetSceneObjects().AddChild(rigidBody3D);
+                    Vector3 spawn = Raycast.Trace(GameManager.GetPlayer(), 2.0f).GetEnd();
                     rigidBody3D.SetPosition(spawn);
-                    rigidBody3D.SetRotation(gameManager.GetPlayer().GetModel().GetRotation());
-                    IObjectBase objData = GameManager.I().RegisterObject(rigidBody3D);
+                    rigidBody3D.SetRotation(GameManager.GetPlayer().GetModel().GetRotation());
+                    IObjectBase objData = GameManager.RegisterObject(rigidBody3D);
                     itemType.TryOnDataSpawn(objData);
                     Close();
                 });

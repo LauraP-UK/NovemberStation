@@ -1,0 +1,173 @@
+[gd_scene load_steps=22 format=3 uid="uid://cuxbbqdb0c2fi"]
+
+[ext_resource type="Script" uid="uid://6vlx4b0sctjn" path="res://addons/lauras_game_stuff_dotnet/Main/Scripts/Core/Worlds/BackdropBootstrapper.cs" id="1_j43vs"]
+[ext_resource type="Texture2D" uid="uid://cvheypgqammaj" path="res://Main/Textures/Terrain/Grass006_alb_ht.dds" id="2_cegp7"]
+[ext_resource type="Texture2D" uid="uid://t8fdow2wr3sd" path="res://Main/Textures/Terrain/Grass006_nrm_rgh.dds" id="3_pk086"]
+[ext_resource type="Texture2D" uid="uid://ckhqjm3atphio" path="res://Main/Textures/Terrain/Rock032_alb_ht.dds" id="4_rayf3"]
+[ext_resource type="Texture2D" uid="uid://jfvibgqxyni6" path="res://Main/Textures/Terrain/Rock032_nrm_rgh.dds" id="5_vpqo2"]
+[ext_resource type="Texture2D" uid="uid://pvtoxwlp6d8o" path="res://Main/Textures/Terrain/Sky/galactic_plane_hazy_nebulae_1.png" id="6_vpqo2"]
+
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_y4vfh"]
+ground_horizon_color = Color(0.662243, 0.671743, 0.686743, 1)
+
+[sub_resource type="Sky" id="Sky_j43vs"]
+sky_material = SubResource("ProceduralSkyMaterial_y4vfh")
+
+[sub_resource type="Environment" id="Environment_0vocm"]
+background_mode = 2
+sky = SubResource("Sky_j43vs")
+tonemap_mode = 2
+glow_enabled = true
+
+[sub_resource type="BoxMesh" id="BoxMesh_j43vs"]
+
+[sub_resource type="Gradient" id="Gradient_j43vs"]
+offsets = PackedFloat32Array(0.2, 1)
+colors = PackedColorArray(1, 1, 1, 1, 0, 0, 0, 1)
+
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_0vocm"]
+noise_type = 2
+frequency = 0.03
+cellular_jitter = 3.0
+cellular_return_type = 0
+domain_warp_enabled = true
+domain_warp_type = 1
+domain_warp_amplitude = 50.0
+domain_warp_fractal_type = 2
+domain_warp_fractal_lacunarity = 1.5
+domain_warp_fractal_gain = 1.0
+
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_cegp7"]
+seamless = true
+color_ramp = SubResource("Gradient_j43vs")
+noise = SubResource("FastNoiseLite_0vocm")
+
+[sub_resource type="Terrain3DMaterial" id="Terrain3DMaterial_pk086"]
+_shader_parameters = {
+&"auto_base_texture": 1,
+&"auto_height_reduction": 0.1,
+&"auto_overlay_texture": 0,
+&"auto_slope": 1.0,
+&"bias_distance": 512.0,
+&"blend_sharpness": 0.87,
+&"depth_blur": 0.0,
+&"enable_macro_variation": true,
+&"enable_projection": true,
+&"height_blending": true,
+&"macro_variation1": Color(1, 1, 1, 1),
+&"macro_variation2": Color(1, 1, 1, 1),
+&"macro_variation_slope": 0.333,
+&"mipmap_bias": 1.0,
+&"noise1_angle": 0.0,
+&"noise1_offset": Vector2(0.5, 0.5),
+&"noise1_scale": 0.04,
+&"noise2_scale": 0.076,
+&"noise3_scale": 0.225,
+&"noise_texture": SubResource("NoiseTexture2D_cegp7"),
+&"projection_angular_division": 2.0,
+&"projection_threshold": 0.8,
+&"world_space_normal_blend": true
+}
+world_background = 0
+texture_filtering = 1
+auto_shader = true
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_rayf3"]
+transparency = 4
+cull_mode = 2
+vertex_color_use_as_albedo = true
+backlight_enabled = true
+backlight = Color(0.5, 0.5, 0.5, 1)
+distance_fade_mode = 1
+distance_fade_min_distance = 128.0
+distance_fade_max_distance = 96.0
+
+[sub_resource type="Terrain3DMeshAsset" id="Terrain3DMeshAsset_vpqo2"]
+generated_type = 1
+height_offset = 0.5
+material_override = SubResource("StandardMaterial3D_rayf3")
+last_lod = 0
+last_shadow_lod = 0
+lod0_range = 128.0
+
+[sub_resource type="Terrain3DTextureAsset" id="Terrain3DTextureAsset_rayf3"]
+name = "Grass006_alb_ht"
+albedo_color = Color(0.521569, 0.592157, 0.345098, 1)
+albedo_texture = ExtResource("2_cegp7")
+normal_texture = ExtResource("3_pk086")
+roughness = 1.0
+uv_scale = 0.7
+detiling_rotation = 0.369
+
+[sub_resource type="Terrain3DTextureAsset" id="Terrain3DTextureAsset_s2te2"]
+name = "Rock032_alb_ht"
+id = 1
+albedo_texture = ExtResource("4_rayf3")
+normal_texture = ExtResource("5_vpqo2")
+roughness = 0.1
+uv_scale = 0.7
+detiling_rotation = 0.172
+
+[sub_resource type="Terrain3DAssets" id="Terrain3DAssets_s2te2"]
+mesh_list = Array[Terrain3DMeshAsset]([SubResource("Terrain3DMeshAsset_vpqo2")])
+texture_list = Array[Terrain3DTextureAsset]([SubResource("Terrain3DTextureAsset_rayf3"), SubResource("Terrain3DTextureAsset_s2te2")])
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_s2te2"]
+transparency = 1
+cull_mode = 1
+shading_mode = 0
+albedo_texture = ExtResource("6_vpqo2")
+texture_filter = 1
+
+[sub_resource type="SphereMesh" id="SphereMesh_dvtis"]
+material = SubResource("StandardMaterial3D_s2te2")
+radius = 500.0
+height = 1000.0
+
+[node name="Main" type="Node3D"]
+script = ExtResource("1_j43vs")
+
+[node name="SunContainer" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 11.5191, 0)
+
+[node name="Sun" type="DirectionalLight3D" parent="SunContainer"]
+transform = Transform3D(-4.37114e-08, -0.939693, 0.34202, 0, 0.34202, 0.939693, -1, 4.10753e-08, -1.49502e-08, 0, 0, 0)
+shadow_enabled = true
+
+[node name="MoonlightReflec" type="DirectionalLight3D" parent="SunContainer"]
+transform = Transform3D(-4.37114e-08, -0.939693, 0.34202, 0, 0.34202, 0.939693, -1, 4.10753e-08, -1.49502e-08, 0, 0, 0)
+visible = false
+layers = 16
+light_cull_mask = 4293918736
+sky_mode = 1
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(-0.866023, -0.433016, 0.250001, 0, 0.499998, 0.866027, -0.500003, 0.749999, -0.43301, 0, 7.64853, 0)
+visible = false
+shadow_enabled = true
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_0vocm")
+
+[node name="Camera3D" type="Camera3D" parent="."]
+editor_description = "BackdropCam"
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.205457, 0)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 6.43232, -7.45235)
+visible = false
+mesh = SubResource("BoxMesh_j43vs")
+
+[node name="Terrain3D" type="Terrain3D" parent="."]
+data_directory = "res://Main/Prefabs/BackdropScenes/TestTerrain"
+material = SubResource("Terrain3DMaterial_pk086")
+assets = SubResource("Terrain3DAssets_s2te2")
+collision_mode = 0
+top_level = true
+visible = false
+metadata/_edit_lock_ = true
+
+[node name="Starfield" type="MeshInstance3D" parent="."]
+transform = Transform3D(-4.37114e-08, -1, 0, 1, -4.37114e-08, 0, 0, 0, 1, 0, 0, 0)
+cast_shadow = 0
+mesh = SubResource("SphereMesh_dvtis")

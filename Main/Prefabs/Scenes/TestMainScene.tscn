@@ -1,15 +1,16 @@
-[gd_scene load_steps=51 format=3 uid="uid://bea3c2ji0la15"]
+[gd_scene load_steps=52 format=3 uid="uid://bea3c2ji0la15"]
 
-[ext_resource type="Script" uid="uid://bkx3f86ut2kq0" path="res://Main/TestScript.cs" id="1_htyov"]
+[ext_resource type="Script" uid="uid://vkh1ay5dmsvx" path="res://Main/Scripts/Worlds/WorldBootstrappers/MainBootstrapper.cs" id="1_71w51"]
 [ext_resource type="PackedScene" uid="uid://bis7ttpok81r1" path="res://Main/Prefabs/PhysicsObjects/PaperSheet.tscn" id="2_6j61f"]
 [ext_resource type="PackedScene" uid="uid://thihe8g234f1" path="res://Main/Prefabs/PhysicsObjects/Bed.tscn" id="2_f5v0u"]
 [ext_resource type="PackedScene" uid="uid://5meuarkmnj54" path="res://Main/Prefabs/PhysicsObjects/Floodlight.tscn" id="2_f38n5"]
 [ext_resource type="PackedScene" uid="uid://behrpawhb313v" path="res://Main/Prefabs/PhysicsObjects/DigitalClock.tscn" id="2_fdxr2"]
+[ext_resource type="PackedScene" uid="uid://cojc8pwcfbm8p" path="res://Main/Prefabs/StaticObjects/Generator.tscn" id="2_ojjff"]
 [ext_resource type="PackedScene" uid="uid://cbyboln8qtkr5" path="res://Main/Prefabs/PhysicsObjects/FireExtinguisher.tscn" id="2_s7uom"]
 [ext_resource type="PackedScene" uid="uid://cqvhghgw72hrv" path="res://Main/Prefabs/Sandbox/Geometry/PhysicsCube.tscn" id="2_y3p7f"]
 [ext_resource type="PackedScene" uid="uid://5afg6a1f8nd3" path="res://Main/Prefabs/Sandbox/DeskTest.tscn" id="3_dkfcn"]
 [ext_resource type="Texture2D" uid="uid://cnafjpoh1lxps" path="res://Main/Textures/Sandbox/Checkerboard1.png" id="3_foc71"]
-[ext_resource type="PackedScene" uid="uid://dex27cawpv17k" path="res://Main/Prefabs/StaticObjects/PCTest2.tscn" id="5_cpa2d"]
+[ext_resource type="PackedScene" uid="uid://dex27cawpv17k" path="res://Main/Prefabs/StaticObjects/PCTest.tscn" id="5_cpa2d"]
 [ext_resource type="PackedScene" uid="uid://davr0xngcadpq" path="res://Main/Prefabs/Sandbox/GasCanTest.tscn" id="5_y86oe"]
 [ext_resource type="Texture2D" uid="uid://c5q1hp1s028lo" path="res://Main/Textures/Sandbox/Noise1.png" id="6_eukhs"]
 [ext_resource type="PackedScene" uid="uid://bglqvyeeifjom" path="res://Main/Prefabs/PhysicsObjects/Crowbar.tscn" id="8_crd5k"]
@@ -190,7 +191,7 @@ texture_list = Array[Terrain3DTextureAsset]([SubResource("Terrain3DTextureAsset_
 
 [node name="Main" type="Node3D"]
 process_mode = 3
-script = ExtResource("1_htyov")
+script = ExtResource("1_71w51")
 
 [node name="SunContainer" type="Node3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 11.5191, 0)
@@ -207,6 +208,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.62835, 0, 5.5933)
 transform = Transform3D(-0.407998, 0.32558, 0.852957, -0.00814145, 0.932918, -0.359997, -0.912946, -0.153822, -0.377978, 19.8778, 2.81648, -14.6444)
 
 [node name="SleepCam" type="Camera3D" parent="SleepCamContainer"]
+editor_description = "SleepCam"
 fov = 70.0
 size = 0.001
 
@@ -231,6 +233,9 @@ process_mode = 1
 
 [node name="SceneObjects" type="Node3D" parent="."]
 process_mode = 1
+
+[node name="Generator" parent="SceneObjects" instance=ExtResource("2_ojjff")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.44216, 0, -14.203)
 
 [node name="Sheet" parent="SceneObjects" instance=ExtResource("2_6j61f")]
 transform = Transform3D(0.706638, 0, -0.707576, 0, 1, 0, 0.707576, 0, 0.706638, -11.6245, 0.0203203, -11.0959)
@@ -292,6 +297,7 @@ metadata/init_state = "{  \"MetaTag\": \"cube_obj\",  \"TypeID\": \"storage_crat
 
 [node name="UILayer" type="CanvasLayer" parent="."]
 process_mode = 3
+follow_viewport_enabled = true
 
 [node name="Trees" type="Node3D" parent="."]
 

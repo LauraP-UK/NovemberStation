@@ -29,7 +29,7 @@ public class FloodlightObject : ObjectBase<RigidBody3D>, IGrabbable, IUsable, IC
         RegisterAction<IUsable>((_, _) => true, Use);
         RegisterAction<ICollectable>((_, _) => true, Collect);
         RegisterArbitraryAction("Open Battery Slot", 10, (_, _) => true, Recharge);
-        RegisterArbitraryAction("Save to File", 20, (_, _) => true, SerialiseTest);
+        //RegisterArbitraryAction("Save to File", 20, (_, _) => true, SerialiseTest);
 
         string finding = "NULL";
         try {
@@ -175,8 +175,7 @@ public class FloodlightObject : ObjectBase<RigidBody3D>, IGrabbable, IUsable, IC
 
     public override string GetContext() {
         float power = GetPowerRemaining();
-        string secondLine = power <= 0.0f ? "NO POWER" : $"Power: {power:00.00}%";
-        return $"Status: {(_isOn ? "ON" : "OFF")}\n{secondLine}";
+        return power <= 0.0f ? "NO POWER" : $"Power: {power:00.00}%";
     }
 
     public override string GetSummary() {
@@ -191,7 +190,7 @@ public class FloodlightObject : ObjectBase<RigidBody3D>, IGrabbable, IUsable, IC
 
     public AddItemFailCause StoreItem(ItemType itemType) {
         RigidBody3D node = itemType.CreateInstance();
-        IObjectBase obj = GameManager.I().RegisterObject(node);
+        IObjectBase obj = GameManager.RegisterObject(node);
         AddItemFailCause result = StoreItem(obj, node);
         node.QueueFree();
         return result;

@@ -104,10 +104,13 @@ public static class ObjectAtlas {
     public static Type GetObjectClass(string tag) => _registry.GetOrDefault(tag, null);
 
     private static string GetTag(Node3D node) {
-        if (node.HasMeta(OBJECT_TAG)) return node.GetMeta(OBJECT_TAG).AsString();
-
+        string tag = TryGetTag(node);
+        if (tag != "") return tag;
         GD.PrintErr($"ERROR: ObjectAtlas.GetTag() : Node3D '{node.Name}' does not have the required meta tag '{OBJECT_TAG}'.");
         return "";
+    }
+    public static string TryGetTag(Node node) {
+        return node.HasMeta(OBJECT_TAG) ? node.GetMeta(OBJECT_TAG).AsString() : "";
     }
     
     private static string GetInitStateTag(Node3D node) {
