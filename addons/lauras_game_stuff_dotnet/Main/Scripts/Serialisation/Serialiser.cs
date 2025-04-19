@@ -110,6 +110,44 @@ public static class Serialiser {
         };
     }
 
+    public static object ConvertType(JsonElement elem, Type to) {
+        if (to == typeof(Color)) {
+            float r = elem.GetProperty("R8").GetByte() / 255.0f;
+            float g = elem.GetProperty("G8").GetByte() / 255.0f;
+            float b = elem.GetProperty("B8").GetByte() / 255.0f;
+            float a = elem.TryGetProperty("A8", out JsonElement aElem) ? aElem.GetByte() / 255.0f : 1.0f;
+            return new Color(r, g, b, a);
+        }
+        if (to == typeof(Vector2)) {
+            float x = elem.GetProperty("X").GetSingle();
+            float y = elem.GetProperty("Y").GetSingle();
+            return new Vector2(x, y);
+        }
+        if (to == typeof(Vector3)) {
+            float x = elem.GetProperty("X").GetSingle();
+            float y = elem.GetProperty("Y").GetSingle();
+            float z = elem.GetProperty("Z").GetSingle();
+            return new Vector3(x, y, z);
+        }
+        if (to == typeof(Vector4)) {
+            float x = elem.GetProperty("X").GetSingle();
+            float y = elem.GetProperty("Y").GetSingle();
+            float z = elem.GetProperty("Z").GetSingle();
+            float w = elem.GetProperty("W").GetSingle();
+            return new Vector4(x, y, z, w);
+        }
+        if (to.IsEnum) {
+            if (elem.ValueKind == JsonValueKind.String) return Enum.Parse(to, elem.GetString());
+            if (elem.ValueKind == JsonValueKind.Number) return Enum.ToObject(to, elem.GetInt32());
+        }
+        try {
+            return Convert.ChangeType(elem.GetString(), to);
+        } catch (Exception e) {
+            GD.PrintErr($"WARN: Serialiser.ConvertType() : Failed to convert JsonElement to {to}. Exception: {e.Message}");
+            return null;
+        }
+    }
+
     public class ObjectSaveData {
         public const string META_TAG = "MetaTag", TYPE_ID = "TypeID", DATA = "Data";
         public string MetaTag { get; set; }

@@ -57,12 +57,12 @@ public class PCObject : ObjectBase<Node3D>, IUsable {
             .WithAction<IUsable>((_,_) => true, Use)
             .Build());
         AddInteractionZone(InteractionZoneBuilder<StaticBody3D, PCObject>.Builder("Tower", _tower, this)
-            .WithDisplayName("PC")
-            .WithArbitraryAction("Turn On", 0, (_,_) => !_isOn, (_, ev) => {
+            .WithDisplayName("PC Tower")
+            .WithArbitraryAction("Power On", 0, (_,_) => !_isOn, (_, ev) => {
                 if (ev is not KeyPressEvent) return;
                 Toggle(true);
             })
-            .WithArbitraryAction("Turn Off", 0, (_,_) => _isOn, (_, ev) => {
+            .WithArbitraryAction("Power Off", 0, (_,_) => _isOn, (_, ev) => {
                 if (ev is not KeyPressEvent) return;
                 Toggle();
             })
@@ -148,7 +148,6 @@ public class PCObject : ObjectBase<Node3D>, IUsable {
     public MeshInstance3D GetScreen() => _screen;
     public Camera3D GetCamera() => _camera;
     public ShopMenu GetShopMenu() => _shopMenu;
-    public override bool DisplayContextMenu() => false;
 
     public void Toggle(bool mode = false) {
         _isOn = mode;
@@ -191,7 +190,7 @@ public class PCObject : ObjectBase<Node3D>, IUsable {
         else View();
     }
 
-    public override string GetDisplayName() => "PC";
+    public override string GetDisplayName() => "";
     public override string GetContext() => "";
     public override string GetSummary() => "";
 }

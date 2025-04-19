@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
+using System.Text.Json;
 using Godot;
 
 public static class ObjectAtlas {
@@ -85,15 +86,15 @@ public static class ObjectAtlas {
                 () => throw new InvalidOperationException("Use the overload that accepts the instance for the GETTER."),
                 value => throw new InvalidOperationException("Use the overload that accepts the instance for the SETTER."),
                 () => throw new InvalidOperationException("Use the overload that accepts the instance for the FALLBACK.")
-            ).WithInstanceGetter((instance) => field.GetValue(instance)).WithInstanceSetter(
+            ).WithInstanceGetter(instance => field.GetValue(instance)).WithInstanceSetter(
                 (instance, value) => {
-                    object convertedValue = Convert.ChangeType(value, setterMethod.GetParameters()[0].ParameterType);
-                    setterMethod.Invoke(instance, new[] { convertedValue });
+                    object convertedValue;
+                    if (value is JsonElement jsonElem) convertedValue = Serialiser.ConvertType(jsonElem, setterMethod.GetParameters()[0].ParameterType);
+                    else convertedValue = Convert.ChangeType(value, setterMethod.GetParameters()[0].ParameterType);
+                    setterMethod.Invoke(instance, [convertedValue]);
                 }
             ).WithInstanceFallback(
-                instance => {
-                    fallbackMethod.Invoke(instance, null);
-                }
+                instance => fallbackMethod.Invoke(instance, null)
             );
         }
         

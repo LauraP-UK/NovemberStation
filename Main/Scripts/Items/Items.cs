@@ -79,6 +79,17 @@ public class Items {
         "A sheet of paper.",
         2,
         HeldDisplaySettings.Create(new Vector3(0.0f, 0.06f, 0.0f), new Vector3(90.0f, 33.0f, 77.4f), 0.75f));
+    public static readonly ItemType GLOWSTICK = ItemType.Create("glowstick",
+        "Glowstick",
+        "res://Main/Textures/Items/BatteryImage.png",
+        "res://Main/Prefabs/PhysicsObjects/GlowStick.tscn",
+        "I'm your only friend. I'm not your only friend, but I'm a little glowing friend. But really, I'm not actually your friend. But I am.",
+        100,
+        HeldDisplaySettings.Create(new Vector3(0.0f, 0.06f, 0.0f), new Vector3(168.3f, -44.4f, 0.0f), 0.75f),
+        null,
+        data => {
+            ((GlowstickObject)data).SetColour(Randf.Random(Colors.White, Colors.Red, Colors.Aqua, Colors.Green, Colors.Yellow, Colors.HotPink));
+        });
     
     private static readonly ItemType[] ALL_ITEMS;
 

@@ -46,7 +46,6 @@ public class GeneratorObject : ObjectBase<Node3D>, IProcess {
     public void SetMode(bool isOn = false) => _isOn = isOn;
     public void SetFuelAmount(int amount) => _fuelAmount = amount;
     public void SetFuelDefault() => _fuelAmount = 100;
-    public override bool DisplayContextMenu() => false;
     public override string GetDisplayName() => "";
     public override string GetContext() => "";
     public override string GetSummary() => "";

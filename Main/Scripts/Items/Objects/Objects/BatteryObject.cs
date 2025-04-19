@@ -4,7 +4,6 @@ public class BatteryObject : ObjectBase<RigidBody3D>, IGrabbable, ICollectable, 
     private const float MAX_POWER = 100;
     
     public const string POWER_KEY = "power";
-    
     [SerialiseData(POWER_KEY, nameof(SetBatteryPower), nameof(ResetBatteryPower))]
     private float _power = 100.0f;
 

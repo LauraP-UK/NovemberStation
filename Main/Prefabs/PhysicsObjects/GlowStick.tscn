@@ -1,0 +1,65 @@
+[gd_scene load_steps=7 format=3 uid="uid://blttakntuvdhy"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_plbfi"]
+metallic_specular = 0.0
+emission_enabled = true
+emission = Color(1, 1, 1, 1)
+emission_energy_multiplier = 2.5
+rim_enabled = true
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_2hoxf"]
+material = SubResource("StandardMaterial3D_plbfi")
+top_radius = 0.025
+bottom_radius = 0.025
+height = 0.4
+radial_segments = 8
+rings = 0
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_1frex"]
+albedo_color = Color(0.577008, 0.577008, 0.577008, 1)
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_f1oj0"]
+material = SubResource("StandardMaterial3D_1frex")
+top_radius = 0.03
+bottom_radius = 0.03
+height = 0.04
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_0x7fe"]
+height = 0.44
+radius = 0.03
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_afynj"]
+height = 0.44
+radius = 0.03
+
+[node name="GlowStick" type="RigidBody3D"]
+collision_layer = 4
+collision_mask = 7
+continuous_cd = true
+metadata/object_tag = "glowstick_obj"
+
+[node name="StickBody" type="MeshInstance3D" parent="."]
+mesh = SubResource("CylinderMesh_2hoxf")
+
+[node name="TopCap" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.2, 0)
+mesh = SubResource("CylinderMesh_f1oj0")
+
+[node name="BottomCap" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.2, 0)
+mesh = SubResource("CylinderMesh_f1oj0")
+
+[node name="Light" type="OmniLight3D" parent="."]
+shadow_enabled = true
+omni_range = 10.0
+omni_attenuation = 1.25
+
+[node name="Collision" type="CollisionShape3D" parent="."]
+shape = SubResource("CylinderShape3D_0x7fe")
+
+[node name="Area3D" type="Area3D" parent="."]
+collision_layer = 128
+collision_mask = 128
+
+[node name="BBox" type="CollisionShape3D" parent="Area3D"]
+shape = SubResource("CylinderShape3D_afynj")

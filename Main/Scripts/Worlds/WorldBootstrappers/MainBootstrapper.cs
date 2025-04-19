@@ -73,11 +73,8 @@ public partial class MainBootstrapper : SceneBootstrapper {
                 IObjectBase objData = GameManager.RegisterObject(obj);
                 _objSpawns.Add(objData.GetGUID(), obj.GlobalPosition);
                 rigid.AngularDamp = 0.5f;
-            } else {
+            } else
                 GameManager.RegisterObject(obj);
-                //SmartSet<IObjectBase> processObject = GameManager.ProcessObject(obj);
-            }
-            //SmartSet<IObjectBase> objs = GameManager.ProcessObject(obj);
         }
         
         GD.Print($"Dynamic Objects: {_objSpawns.Count}");

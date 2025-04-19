@@ -57,7 +57,7 @@ public abstract class ObjectBase<T> : ActionHolder, IObjectBase where T : Node3D
     }
 
     public Node3D GetBaseNode3D() => GetBaseNode();
-    public virtual bool DisplayContextMenu() => true;
+    public virtual bool DisplayContextMenu() => !(string.IsNullOrEmpty(GetDisplayName()) && string.IsNullOrEmpty(GetContext()) && string.IsNullOrEmpty(GetSummary()));
     public string GetObjectTag() => _objectTag;
     public abstract string GetDisplayName();
     public abstract string GetContext();

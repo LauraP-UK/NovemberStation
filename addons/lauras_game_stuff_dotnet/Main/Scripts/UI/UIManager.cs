@@ -93,8 +93,8 @@ public static class UIManager {
             GlobalPosition = uiPos,
             ButtonIndex =  ev.GetMouseButton(),
             Pressed = ev.IsPressed(),
-            DoubleClick = false, // Optional
-            Canceled = false     // Optional
+            DoubleClick = false,
+            Canceled = false
         };
         
         viewport.PushInput(mouseButton);

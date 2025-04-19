@@ -37,7 +37,7 @@ public static class GameManager {
             splash = (string)ProjectSettings.GetSetting("game/framework_console_splash");
             splash = splash.Replace("\\n", "\n");
         } else {
-            splash =  
+            splash = 
                 $"        [ WELCOME TO THE PLEASURE DOME ]\n" +
                 $"        This is a game framework for Godot {FRAMEWORK_VERSION} (Running: {version})\n" +
                 $"        It is designed to be modular and extensible.\n" +

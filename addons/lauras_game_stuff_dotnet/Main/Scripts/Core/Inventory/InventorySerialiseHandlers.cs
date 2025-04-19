@@ -18,7 +18,6 @@ public static class InventorySerialiseHandlers {
         }
 
         if (value is Dictionary<string, object> rawDict) {
-            // This happens if you're deserializing into Dictionary<string, object>
             Dictionary<string, string> items = rawDict.ToDictionary(kvp => kvp.Key, kvp => kvp.Value?.ToString());
             container.GetInventory().DeserialiseFromDict(items);
             return;
