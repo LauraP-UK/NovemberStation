@@ -464,7 +464,10 @@ public class PlayerController : ControllerBase<Player> {
 
         IObjectBase objectData = GameManager.GetObjectClass(instanceId);
         IInteractionZone zone = null;
-        if (objectData != null) zone = objectData.FindInteractionZoneFor(_contextObject);
+        if (objectData != null) {
+            zone = objectData.FindInteractionZoneFor(_contextObject);
+            if (zone != null && !zone.IsActive()) zone = null; 
+        }
 
         if (zone == null && objectData != null && !objectData.DisplayContextMenu()) {
             _contextObject = null;

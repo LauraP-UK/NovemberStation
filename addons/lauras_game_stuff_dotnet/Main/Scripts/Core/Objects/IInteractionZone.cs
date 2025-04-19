@@ -7,5 +7,6 @@ public interface IInteractionZone : IActionHolder {
     IObjectBase GetObjectBase();
     string GetDisplayName();
     string GetContext();
+    bool IsActive();
     Node3D GetBoundingBoxNode();
 }

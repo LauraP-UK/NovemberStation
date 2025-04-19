@@ -11,11 +11,17 @@ public class InteractionZoneBuilder<TNode, TObject> where TNode : Node3D where T
     private readonly List<PendingArbitraryAction> _arbitraryActions = [];
     private Func<string> _getDisplayName = () => "";
     private Func<string> _getContext = () => "";
+    private Func<bool> _isActive = () => true;
 
     private InteractionZoneBuilder(string identifier, TNode containingNode, TObject objectBase) {
         _identifier = identifier;
         _containingNode = containingNode;
         _objectBase = objectBase;
+    }
+    
+    public InteractionZoneBuilder<TNode, TObject> WithIsActive(Func<bool> isActive) {
+        _isActive = isActive;
+        return this;
     }
     
     public InteractionZoneBuilder<TNode, TObject> WithDisplayName(Func<string> getDisplayName) {
@@ -57,7 +63,7 @@ public class InteractionZoneBuilder<TNode, TObject> where TNode : Node3D where T
 
     public InteractionZone<TNode, TObject> Build() {
         return new InteractionZone<TNode, TObject>(
-            _identifier, _containingNode, _objectBase, _getDisplayName, _getContext, 
+            _identifier, _containingNode, _objectBase, _getDisplayName, _getContext, _isActive,
             zone => {
                 foreach (PendingAction action in _actions) {
                     try {

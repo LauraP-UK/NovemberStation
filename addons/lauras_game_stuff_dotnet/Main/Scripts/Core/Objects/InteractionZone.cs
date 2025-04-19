@@ -9,14 +9,16 @@ public class InteractionZone<TNode, TObject> : ActionHolder, IInteractionZone wh
     private readonly TObject _objectBase;
     private readonly Func<string> _getDisplayName;
     private readonly Func<string> _getContext;
+    private readonly Func<bool> _isActive;
     private Node3D _bboxNode;
     
-    public InteractionZone(string identifier, TNode containingNode, TObject objectBase, Func<string> getDisplayName, Func<string> getContext, Action<InteractionZone<TNode, TObject>> registerActions) {
+    public InteractionZone(string identifier, TNode containingNode, TObject objectBase, Func<string> getDisplayName, Func<string> getContext, Func<bool> isActive, Action<InteractionZone<TNode, TObject>> registerActions) {
         _identifier = identifier;
         _containingNode = containingNode;
         _objectBase = objectBase;
         _getDisplayName = getDisplayName;
         _getContext = getContext;
+        _isActive = isActive;
         registerActions?.Invoke(this);
     }
 
@@ -45,4 +47,5 @@ public class InteractionZone<TNode, TObject> : ActionHolder, IInteractionZone wh
     public TObject GetObjectBaseTyped() => _objectBase;
     public string GetDisplayName() => _getDisplayName?.Invoke() ?? _objectBase.GetDisplayName();
     public string GetContext() => _getContext?.Invoke() ?? _objectBase.GetContext();
+    public bool IsActive() => _isActive?.Invoke() ?? true;
 }

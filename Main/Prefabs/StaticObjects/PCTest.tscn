@@ -1,4 +1,4 @@
-[gd_scene load_steps=25 format=4 uid="uid://dex27cawpv17k"]
+[gd_scene load_steps=26 format=4 uid="uid://dex27cawpv17k"]
 
 [ext_resource type="Texture2D" uid="uid://bb0rx6euohljh" path="res://3DModelsDownload/low_poly_80s_computer_v3/textures/Old_Computer_V3_diffuse.png" id="1_hdr72"]
 [ext_resource type="Texture2D" uid="uid://cfi1rohtitane" path="res://3DModelsDownload/low_poly_80s_computer_v3/textures/Screen.001_emissive.png" id="2_eus0s"]
@@ -29,6 +29,9 @@ albedo_texture = SubResource("ViewportTexture_gc3dm")
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_l6ujm"]
 size = Vector3(0.601898, 0.234619, 0.608765)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_hdr72"]
+size = Vector3(0.602, 0.235, 0.609)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_y4h7b"]
 size = Vector3(0.0748501, 0.0906525, 0.798264)
@@ -192,13 +195,26 @@ transform = Transform3D(-4.30063e-08, 0.178888, -0.98387, 7.81944e-09, 0.98387, 
 
 [node name="Camera3D" type="Camera3D" parent="ScreenStatic/CamPos"]
 
+[node name="Tower" type="StaticBody3D" parent="."]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Tower"]
+transform = Transform3D(20, 0, 0, 0, 20, 0, 0, 0, 20, 0.0485232, 2.51368, 0.0622559)
+shape = SubResource("BoxShape3D_l6ujm")
+
+[node name="BBox" type="CollisionShape3D" parent="Tower"]
+transform = Transform3D(20, 0, 0, 0, 20, 0, 0, 0, 20, 0.049, 2.514, 0.062)
+shape = SubResource("BoxShape3D_hdr72")
+disabled = true
+
+[node name="Light" type="OmniLight3D" parent="Tower"]
+transform = Transform3D(16.6667, 0, 0, 0, 16.6667, 0, 0, 0, 16.6667, -6.06927, 4.21359, -4.90622)
+light_color = Color(0, 0.829295, 0.00390244, 1)
+light_energy = 0.5
+omni_range = 0.2
+
 [node name="Body" type="StaticBody3D" parent="."]
 collision_layer = 2
 collision_mask = 7
-
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Body"]
-transform = Transform3D(-20, 1.74846e-06, 0, -1.74846e-06, -20, 0, 0, 0, 20, 0.0485232, 2.51368, 0.0622559)
-shape = SubResource("BoxShape3D_l6ujm")
 
 [node name="CollisionShape3D4" type="CollisionShape3D" parent="Body"]
 transform = Transform3D(-20, 1.74846e-06, 0, -1.74846e-06, -20, 0, 0, 0, 20, -9.74869, 0.897787, -0.693817)

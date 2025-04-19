@@ -7,19 +7,25 @@ public class PCObject : ObjectBase<Node3D>, IUsable {
         SCREEN_PATH = "ScreenStatic/Screen",
         CAMERA_PATH = "ScreenStatic/CamPos/Camera3D",
         SPAWN_POINT_PATH = "Body/SpawnPoint",
-        BODY_PATH = "ScreenStatic";
+        BODY_PATH = "ScreenStatic",
+        LIGHT_PATH = "Tower/Light",
+        TOWER_PATH = "Tower";
 
     private readonly SubViewport _viewport;
     private readonly MeshInstance3D _screen;
     private readonly Camera3D _camera;
     private readonly Node3D _spawnPoint;
-    private readonly StaticBody3D _body;
+    private readonly StaticBody3D _body, _tower;
+    private readonly OmniLight3D _light;
     
     private readonly ShopMenu _shopMenu;
+    
+    public const string IS_ON_KEY = "isOn";
+    [SerialiseData(IS_ON_KEY, nameof(Toggle), nameof(Toggle))]
+    private bool _isOn;
 
     public PCObject(Node3D pcNode, bool dataOnly = false) : base(pcNode, "pc_obj") {
         if (dataOnly) return;
-        //RegisterAction<IUsable>((_,_) => true, Use);
 
         string finding = "NULL";
         try {
@@ -33,15 +39,33 @@ public class PCObject : ObjectBase<Node3D>, IUsable {
             _spawnPoint = FindNode<Node3D>(SPAWN_POINT_PATH);
             finding = BODY_PATH;
             _body = FindNode<StaticBody3D>(BODY_PATH);
+            finding = LIGHT_PATH;
+            _light = FindNode<OmniLight3D>(LIGHT_PATH);
+            finding = TOWER_PATH;
+            _tower = FindNode<StaticBody3D>(TOWER_PATH);
         }
         catch (Exception e) {
             GD.PrintErr($"WARN: PC2Object.<init> : Failed to find required {finding} node.");
             return;
         }
         
+        Toggle();
+        
         AddInteractionZone(InteractionZoneBuilder<StaticBody3D, PCObject>.Builder("Screen", _body, this)
             .WithDisplayName("PC")
+            .WithIsActive(() => _isOn)
             .WithAction<IUsable>((_,_) => true, Use)
+            .Build());
+        AddInteractionZone(InteractionZoneBuilder<StaticBody3D, PCObject>.Builder("Tower", _tower, this)
+            .WithDisplayName("PC")
+            .WithArbitraryAction("Turn On", 0, (_,_) => !_isOn, (_, ev) => {
+                if (ev is not KeyPressEvent) return;
+                Toggle(true);
+            })
+            .WithArbitraryAction("Turn Off", 0, (_,_) => _isOn, (_, ev) => {
+                if (ev is not KeyPressEvent) return;
+                Toggle();
+            })
             .Build());
         
         _shopMenu = new ShopMenu();
@@ -126,6 +150,11 @@ public class PCObject : ObjectBase<Node3D>, IUsable {
     public ShopMenu GetShopMenu() => _shopMenu;
     public override bool DisplayContextMenu() => false;
 
+    public void Toggle(bool mode = false) {
+        _isOn = mode;
+        _light.SetVisible(_isOn);
+        _screen.SetVisible(_isOn);
+    }
 
     private void View() {
         _camera.SetCurrent(true);
@@ -157,6 +186,7 @@ public class PCObject : ObjectBase<Node3D>, IUsable {
 
     public void Use(ActorBase actorBase, IEventBase ev) {
         if (ev is not KeyPressEvent) return;
+        
         if (_camera.IsCurrent()) Release();
         else View();
     }
