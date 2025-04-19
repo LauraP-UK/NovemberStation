@@ -16,4 +16,11 @@ public class SerialiseDataAttribute : Attribute {
         Fallback = fallback;
         Handler = handler;
     }
+
+    public SerialiseDataAttribute(string key, string setterAndFallback, SerialiseHandler handler = SerialiseHandler.AUTO) {
+        Key = key;
+        Setter = setterAndFallback;
+        Fallback = setterAndFallback;
+        Handler = handler;
+    }
 }

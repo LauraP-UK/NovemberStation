@@ -1,7 +1,8 @@
-[gd_scene load_steps=52 format=3 uid="uid://bea3c2ji0la15"]
+[gd_scene load_steps=53 format=3 uid="uid://bea3c2ji0la15"]
 
 [ext_resource type="Script" uid="uid://vkh1ay5dmsvx" path="res://Main/Scripts/Worlds/WorldBootstrappers/MainBootstrapper.cs" id="1_71w51"]
 [ext_resource type="PackedScene" uid="uid://bis7ttpok81r1" path="res://Main/Prefabs/PhysicsObjects/PaperSheet.tscn" id="2_6j61f"]
+[ext_resource type="PackedScene" uid="uid://3ctek0a0x23h" path="res://Main/Prefabs/StaticObjects/SlidingDoor.tscn" id="2_cppe1"]
 [ext_resource type="PackedScene" uid="uid://thihe8g234f1" path="res://Main/Prefabs/PhysicsObjects/Bed.tscn" id="2_f5v0u"]
 [ext_resource type="PackedScene" uid="uid://5meuarkmnj54" path="res://Main/Prefabs/PhysicsObjects/Floodlight.tscn" id="2_f38n5"]
 [ext_resource type="PackedScene" uid="uid://behrpawhb313v" path="res://Main/Prefabs/PhysicsObjects/DigitalClock.tscn" id="2_fdxr2"]
@@ -233,6 +234,9 @@ process_mode = 1
 
 [node name="SceneObjects" type="Node3D" parent="."]
 process_mode = 1
+
+[node name="SlidingDoor" parent="SceneObjects" instance=ExtResource("2_cppe1")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.76012, 0, -6.85572)
 
 [node name="Generator" parent="SceneObjects" instance=ExtResource("2_ojjff")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.44216, 0, -14.203)
